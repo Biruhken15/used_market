@@ -4,20 +4,23 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { createStoreAction } from "@/lib/actions/store-actions";
 
-const categories = ["Electronics", "Fashion", "Home & Garden", "Vehicles", "Real Estate", "Jobs", "Services"];
+const categories = ["Electronics", "Phones", "Real Estate", "Vehicles", "Houses", "Furniture", "Fashion", "Sports", "Books", "Other"];
 
 export function StoreForm() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [error, setError] = useState<{ message: string; details?: string } | null>(null);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [createdStoreName, setCreatedStoreName] = useState("");
     const [previews, setPreviews] = useState({ logo: "", cover: "" });
     const [slugModified, setSlugModified] = useState(false);
     const [formData, setFormData] = useState({
         storeName: "",
         storeSlug: "",
         description: "",
-        category: "Electronics",
+        category: [] as string[],
         phone: "",
         whatsapp: "",
         telegram: "",
@@ -68,40 +71,97 @@ export function StoreForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError("");
+        setError(null);
 
         try {
             const data = new FormData();
             Object.entries(formData).forEach(([key, value]) => {
-                if (value !== null) data.append(key, value as any);
+                if (value !== null) {
+                    if (key === 'category' && Array.isArray(value)) {
+                        // Append each category separately or as a stringified array
+                        // Server Actions handle arrays in FormData if passed correctly
+                        value.forEach(cat => data.append(key, cat));
+                    } else {
+                        data.append(key, value as any);
+                    }
+                }
             });
 
-            const res = await fetch("/api/stores", {
-                method: "POST",
-                body: data
-            });
-
-            const result = await res.json();
-
-            if (!res.ok) {
-                throw new Error(result.error || "Failed to create store");
+            if (formData.category.length === 0) {
+                setError({ message: "Category Required", details: "Please select at least one business category." });
+                setLoading(false);
+                return;
             }
 
-            router.push("/dashboard?storeCreated=true");
-            router.refresh();
+            const result = await createStoreAction(data);
+
+            if (result.error) {
+                setError({ message: result.error, details: result.details });
+                setLoading(false);
+                return;
+            }
+
+            setCreatedStoreName(formData.storeName);
+            setShowSuccess(true);
+            setLoading(false);
+
+            // Detailed Success Flow: Wait 3 seconds then redirect
+            setTimeout(() => {
+                router.push("/seller/mystore");
+                router.refresh();
+            }, 3000);
         } catch (err: any) {
-            setError(err.message);
-        } finally {
+            setError({ message: "An unexpected error occurred", details: err.message });
             setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-16">
+        <form onSubmit={handleSubmit} className="relative space-y-16">
+            {/* Success Overlay Modal */}
+            {showSuccess && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-500">
+                    <div className="bg-white rounded-[3rem] p-10 md:p-16 max-w-xl w-full shadow-2xl border border-slate-100 text-center space-y-8 animate-in zoom-in-95 duration-500">
+                        <div className="w-24 h-24 bg-blue-600 text-white rounded-[2rem] flex items-center justify-center text-5xl mx-auto shadow-2xl shadow-blue-200 animate-bounce">
+                            ✓
+                        </div>
+                        <div className="space-y-3">
+                            <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter">
+                                Store Protocol <br />
+                                <span className="text-blue-600">Successfully Initialized.</span>
+                            </h2>
+                            <p className="text-slate-500 font-bold text-lg leading-relaxed">
+                                Welcome, <span className="text-slate-900">{createdStoreName}</span>. Your digital storefront is now live on Ethio Market.
+                            </p>
+                        </div>
+                        <div className="pt-4">
+                            <div className="flex items-center justify-center gap-2 text-blue-600 font-black text-xs uppercase tracking-widest">
+                                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                </svg>
+                                Synchronizing Dashboard...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {error && (
-                <div className="p-5 bg-red-50 border-4 border-red-500 text-red-600 font-bold text-sm flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
-                    {error}
+                <div className="p-6 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-sm">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-5 h-5 flex items-center justify-center bg-red-500 rounded-full">
+                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </div>
+                        <h3 className="text-red-800 font-black uppercase text-xs tracking-widest">{error.message}</h3>
+                    </div>
+                    {error.details && (
+                        <p className="text-red-600/80 text-sm font-semibold ml-8 leading-relaxed italic">
+                            {error.details}
+                        </p>
+                    )}
                 </div>
             )}
 
@@ -130,6 +190,7 @@ export function StoreForm() {
                                 )}
                                 <input
                                     type="file"
+                                    name="coverImage"
                                     accept="image/*"
                                     onChange={(e) => handleFileChange(e, "coverImage")}
                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
@@ -148,6 +209,7 @@ export function StoreForm() {
                                 )}
                                 <input
                                     type="file"
+                                    name="logo"
                                     accept="image/*"
                                     onChange={(e) => handleFileChange(e, "logo")}
                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
@@ -179,6 +241,7 @@ export function StoreForm() {
                             <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Store Name</label>
                             <Input
                                 required
+                                name="storeName"
                                 placeholder="e.g. ADDIS LUXURY ITEMS"
                                 value={formData.storeName}
                                 onChange={handleNameChange}
@@ -191,6 +254,7 @@ export function StoreForm() {
                             <div className="relative">
                                 <Input
                                     required
+                                    name="storeSlug"
                                     placeholder="addis-luxury"
                                     value={formData.storeSlug}
                                     onChange={handleSlugChange}
@@ -200,20 +264,30 @@ export function StoreForm() {
                             </div>
                         </div>
 
-                        <div className="md:col-span-2 space-y-2">
-                            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Business Category</label>
-                            <div className="relative">
-                                <select
-                                    required
-                                    value={formData.category}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    className="w-full h-12 rounded-xl border border-slate-200 bg-slate-50/50 px-4 font-semibold text-slate-900 appearance-none outline-none focus:bg-white transition-all focus:ring-2 focus:ring-blue-500/20"
-                                >
-                                    {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                                </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m6 9 6 6 6-6" /></svg>
-                                </div>
+                        <div className="md:col-span-2 space-y-4">
+                            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Business Categories (Select all that apply)</label>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                                {categories.map(cat => {
+                                    const isSelected = formData.category.includes(cat);
+                                    return (
+                                        <button
+                                            key={cat}
+                                            type="button"
+                                            onClick={() => {
+                                                const newCats = isSelected
+                                                    ? formData.category.filter(c => c !== cat)
+                                                    : [...formData.category, cat];
+                                                setFormData({ ...formData, category: newCats });
+                                            }}
+                                            className={`px-4 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 ${isSelected
+                                                    ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100 scale-[1.02]"
+                                                    : "bg-white border-slate-100 text-slate-400 hover:border-slate-300"
+                                                }`}
+                                        >
+                                            {cat}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -221,6 +295,7 @@ export function StoreForm() {
                             <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Public Description</label>
                             <textarea
                                 required
+                                name="description"
                                 placeholder="Specify your business offerings and operational standards..."
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -242,6 +317,7 @@ export function StoreForm() {
                             <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Formal Owner Name</label>
                             <Input
                                 required
+                                name="sellerName"
                                 placeholder="Legal Entity or Full Name"
                                 value={formData.sellerName}
                                 onChange={(e) => setFormData({ ...formData, sellerName: e.target.value })}
@@ -252,6 +328,7 @@ export function StoreForm() {
                             <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Active Phone Number</label>
                             <Input
                                 required
+                                name="phone"
                                 placeholder="+251 911 ..."
                                 value={formData.phone}
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -261,6 +338,7 @@ export function StoreForm() {
                         <div className="space-y-2">
                             <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">WhatsApp</label>
                             <Input
+                                name="whatsapp"
                                 placeholder="+251 ..."
                                 value={formData.whatsapp}
                                 onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
@@ -270,6 +348,7 @@ export function StoreForm() {
                         <div className="space-y-2">
                             <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Telegram Handle</label>
                             <Input
+                                name="telegram"
                                 placeholder="@username"
                                 value={formData.telegram}
                                 onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
@@ -280,10 +359,11 @@ export function StoreForm() {
                             <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Business Address</label>
                             <Input
                                 required
+                                name="address"
                                 placeholder="Sub-city / Suite / Street Address"
                                 value={formData.address}
                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                className="h-12 rounded-xl border-slate-200 bg-slate-50/50 px-4 font-semibold text-slate-900"
+                                className="h-12 rounded-xl border border-slate-200 bg-slate-50/50 px-4 font-semibold text-slate-900"
                             />
                         </div>
                     </div>

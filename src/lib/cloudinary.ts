@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME?.trim(),
@@ -8,25 +8,55 @@ cloudinary.config({
 
 export const uploadImage = async (file: string, folder: string) => {
     try {
-        console.log('--- Cloudinary Upload Start ---');
-        console.log('Current System Time (UTC):', new Date().toISOString());
-        console.log('Cloud Name Present:', !!process.env.CLOUDINARY_CLOUD_NAME);
-
         const result = await cloudinary.uploader.upload(file, {
-            folder: `ethio-market/${folder}`,
+            folder: `Used-Store-Images/${folder}`,
             resource_type: 'auto',
         });
 
-        console.log('--- Cloudinary Upload Success ---');
         return {
             url: result.secure_url,
             publicId: result.public_id,
         };
     } catch (error: any) {
-        console.error('--- Cloudinary Upload Failure ---');
-        console.error('Cloudinary Error Detail:', JSON.stringify(error, null, 2));
-        throw new Error('Image upload failed');
+        console.error('Cloudinary Upload Error:', error);
+        throw error;
     }
+};
+
+export const uploadFromBuffer = async (
+    buffer: Buffer,
+    folder: string,
+    timestamp?: number
+): Promise<{ url: string; publicId: string }> => {
+    return new Promise((resolve, reject) => {
+        const options: any = {
+            folder: `ethio-market/${folder}`,
+            resource_type: 'auto',
+        };
+
+        if (timestamp) {
+            options.timestamp = timestamp;
+        }
+
+        const uploadStream = cloudinary.uploader.upload_stream(
+            options,
+            (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
+                if (error) {
+                    console.error('Cloudinary Stream Upload Error:', error);
+                    return reject(error);
+                }
+                if (!result) {
+                    return reject(new Error('Cloudinary upload resulting in empty response'));
+                }
+                resolve({
+                    url: result.secure_url,
+                    publicId: result.public_id,
+                });
+            }
+        );
+
+        uploadStream.end(buffer);
+    });
 };
 
 export const deleteImage = async (publicId: string) => {

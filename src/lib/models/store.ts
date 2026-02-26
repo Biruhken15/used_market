@@ -24,8 +24,8 @@ const storeSchema = new mongoose.Schema({
         required: true
     },
     category: {
-        type: String,
-        required: true  // Electronics, Fashion, etc.
+        type: [String],
+        required: true  // [Electronics, Phones]
     },
 
     // Approval status - DEFAULT APPROVED

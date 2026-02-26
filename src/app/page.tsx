@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import PricingSection from "@/components/pricing-section";
 
 export default function Home() {
   return (
@@ -105,9 +106,9 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { name: 'Electronics', icon: '📱', color: 'bg-blue-50', text: 'text-blue-600' },
-              { name: 'Vehicles', icon: '🚗', color: 'bg-emerald-50', text: 'text-emerald-600' },
-              { name: 'Fashion', icon: '👕', color: 'bg-amber-50', text: 'text-amber-600' },
-              { name: 'Properties', icon: '🏠', color: 'bg-indigo-50', text: 'text-indigo-600' }
+              { name: 'Phones', icon: '📲', color: 'bg-emerald-50', text: 'text-emerald-600' },
+              { name: 'Vehicles', icon: '🚗', color: 'bg-amber-50', text: 'text-amber-600' },
+              { name: 'Houses', icon: '🏠', color: 'bg-indigo-50', text: 'text-indigo-600' }
             ].map((cat) => (
               <div key={cat.name} className="group p-10 bg-white rounded-[2.5rem] border border-slate-100 hover:border-blue-200 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 cursor-pointer">
                 <div className={`w-20 h-20 ${cat.color} rounded-3xl flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform duration-500`}>
@@ -120,6 +121,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <PricingSection />
 
       {/* Values Section */}
       <section className="w-full py-32 px-6 bg-white">

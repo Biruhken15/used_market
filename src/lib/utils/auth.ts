@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import connectDB from "@/lib/db/mongoose";
 import User from "@/lib/models/user";
+import UserSubscription from "@/lib/models/user-subscription";
+import SubscriptionPlan from "@/lib/models/subscription-plan";
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -53,6 +55,20 @@ export const authOptions: AuthOptions = {
                 token.role = user.role;
                 token.name = user.name;
                 token.email = user.email;
+
+                // ADDED: Fetch subscription and store mapping on login
+                try {
+                    const sub = await UserSubscription.findOne({ userId: user.id }).populate('planId');
+                    if (sub) {
+                        token.storeId = sub.storeId?.toString();
+                        token.planCode = sub.planId?.planCode || 'FREE_TRIAL';
+                    } else {
+                        token.planCode = 'FREE_TRIAL';
+                    }
+                } catch (error) {
+                    console.error("Error fetching subscription in JWT callback:", error);
+                    token.planCode = 'FREE_TRIAL';
+                }
             }
             return token;
         },
@@ -60,6 +76,8 @@ export const authOptions: AuthOptions = {
             if (session?.user) {
                 (session.user as any).id = token.id;
                 (session.user as any).role = token.role;
+                (session.user as any).planCode = token.planCode;
+                (session.user as any).storeId = token.storeId;
                 session.user.name = token.name;
                 session.user.email = token.email;
             }
