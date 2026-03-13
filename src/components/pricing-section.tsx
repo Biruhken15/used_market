@@ -1,235 +1,175 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import Link from "next/link";
-
-interface PlanFeature {
-    text: string;
-    included: boolean;
-    highlight?: boolean;
-}
+import { useRouter } from "next/navigation";
 
 interface Plan {
-    id: string;
-    name: string;
-    pricing: string;
-    billingText: string;
-    tagline: string;
-    recommended?: boolean;
-    color: "emerald" | "blue" | "purple" | "gold";
+    _id: string;
+    planCode: string;
+    planName: string;
+    price: number;
+    durationMonths: number;
     limits: {
-        listings: string;
-        images: number;
-        staff: number;
-        featured: number;
-        duration: string;
+        maxActiveListings: number;
+        imagesPerProduct: number;
+        maxStaffAccounts: number;
+        featuredListingsPerMonth: number;
+        listingDurationDays: number;
     };
-    features: PlanFeature[];
+    features: {
+        canMarkAsSold: boolean;
+        hasAnalytics: boolean;
+        analyticsLevel: string;
+        hasStoreBanner: boolean;
+        hasVerifiedBadge: boolean;
+        hasBulkUpload: boolean;
+        telegramEnabled: boolean;
+        phoneEnabled: boolean;
+        whatsappEnabled: boolean;
+        searchRankingBoost: number;
+        hasApiAccess: boolean;
+        hasPrioritySupport: boolean;
+        hasHomepagePromotion: boolean;
+        multipleLocations: boolean;
+        customBranding: boolean;
+    };
+    metadata: {
+        colorTheme: "emerald" | "blue" | "purple" | "gold" | "slate";
+        tagline: string;
+    };
 }
 
 export default function PricingSection() {
-    const plans: Plan[] = [
-        {
-            id: "FREE_TRIAL",
-            name: "Free Trial",
-            pricing: "0",
-            billingText: "Free forever",
-            tagline: "Try before you buy",
-            color: "emerald",
-            limits: {
-                listings: "3 Listings",
-                images: 3,
-                staff: 1,
-                featured: 0,
-                duration: "60 Days",
-            },
-            features: [
-                { text: "Telegram Enabled", included: true },
-                { text: "Phone Support", included: true },
-                { text: "Basic Search Ranking", included: true },
-                { text: "Advanced Analytics", included: false },
-                { text: "Verified Badge", included: false },
-                { text: "WhatsApp Enabled", included: false },
-            ],
-        },
-        {
-            id: "BASIC_SELLER",
-            name: "Basic Seller",
-            pricing: "500",
-            billingText: "per month",
-            tagline: "Perfect for starting out",
-            color: "blue",
-            limits: {
-                listings: "20 Listings",
-                images: 5,
-                staff: 2,
-                featured: 0,
-                duration: "60 Days",
-            },
-            features: [
-                { text: "Basic Analytics", included: true },
-                { text: "Store Banner", included: true },
-                { text: "Search Ranking Boost (10%)", included: true },
-                { text: "Verified Badge", included: false },
-                { text: "Bulk Upload", included: false },
-                { text: "Multiple Locations", included: false },
-            ],
-        },
-        {
-            id: "PRO_SELLER",
-            name: "Pro Seller",
-            pricing: "4,800",
-            billingText: "per quarter",
-            tagline: "For serious sellers",
-            recommended: true,
-            color: "purple",
-            limits: {
-                listings: "100 Listings",
-                images: 10,
-                staff: 3,
-                featured: 5,
-                duration: "90 Days",
-            },
-            features: [
-                { text: "Advanced Analytics", included: true, highlight: true },
-                { text: "Verified Badge", included: true, highlight: true },
-                { text: "Bulk Upload Tools", included: true },
-                { text: "WhatsApp Enabled", included: true },
-                { text: "Sold Items Archive", included: true },
-                { text: "Search Ranking Boost (25%)", included: true },
-            ],
-        },
-        {
-            id: "ENTERPRISE_SELLER",
-            name: "Enterprise",
-            pricing: "22,000",
-            billingText: "per year",
-            tagline: "For high-volume stores",
-            color: "gold",
-            limits: {
-                listings: "Unlimited Listings",
-                images: 15,
-                staff: 5,
-                featured: 20,
-                duration: "Unlimited",
-            },
-            features: [
-                { text: "Custom Branding", included: true, highlight: true },
-                { text: "API Access", included: true },
-                { text: "Priority Support 24/7", included: true },
-                { text: "Homepage Promotion", included: true },
-                { text: "Multiple Locations", included: true },
-                { text: "Search Ranking Boost (50%)", included: true },
-            ],
-        },
-    ];
+    const [plans, setPlans] = useState<Plan[]>([]);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
-    const planStyles = {
-        emerald: "border-emerald-600 shadow-emerald-50",
-        blue: "border-blue-600 shadow-blue-50",
-        purple: "border-purple-600 shadow-purple-50",
-        gold: "border-amber-500 shadow-amber-50",
+    useEffect(() => {
+        const fetchPlans = async () => {
+            try {
+                const res = await fetch('/api/subscriptions/plans');
+                const data = await res.json();
+                console.log('Fetched Plans:', data);
+                if (Array.isArray(data)) {
+                    setPlans(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch plans:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPlans();
+    }, []);
+
+    const themeColors: Record<string, { bg: string, text: string, border: string, btn: string }> = {
+        emerald: { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-100", btn: "bg-emerald-600 hover:bg-emerald-700" },
+        blue: { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100", btn: "bg-blue-600 hover:bg-blue-700" },
+        purple: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-100", btn: "bg-purple-600 hover:bg-purple-700" },
+        gold: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100", btn: "bg-amber-600 hover:bg-amber-700" },
+        slate: { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-100", btn: "bg-slate-800 hover:bg-slate-900" },
     };
 
-    const buttonStyles = {
-        emerald: "bg-emerald-600 hover:bg-emerald-700",
-        blue: "bg-blue-600 hover:bg-blue-700",
-        purple: "bg-purple-600 hover:bg-purple-700",
-        gold: "bg-amber-500 hover:bg-amber-600",
-    };
-
-    const dotStyles = {
-        emerald: "bg-emerald-600",
-        blue: "bg-blue-600",
-        purple: "bg-purple-600",
-        gold: "bg-amber-500",
-    };
+    if (loading) {
+        return (
+            <section className="w-full py-20 px-4 bg-white flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+            </section>
+        );
+    }
 
     return (
-        <section className="w-full py-20 px-4 bg-white">
-            <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-16 space-y-3">
-                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
-                        Subscription <span className="text-blue-600">Plans</span>
+        <section id="pricing" className="w-full py-32 px-6 bg-white">
+            <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-20 space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-lg border border-accent/20">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-accent">Monetize Your Store</span>
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">
+                        Simple, Professional <span className="gradient-text">Pricing.</span>
                     </h2>
-                    <p className="text-slate-500 font-medium text-lg max-w-xl mx-auto">
-                        Clear, transparent pricing for Ethiopian businesses.
+                    <p className="text-slate-500 font-medium text-lg max-w-2xl mx-auto">
+                        Choose the plan that fits your business scale. No hidden fees, just growth.
                     </p>
                 </div>
 
-                {/* Compact 4-column layout */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {plans.map((plan) => {
-                        const style = planStyles[plan.color];
-                        const btnStyle = buttonStyles[plan.color];
-                        const dotStyle = dotStyles[plan.color];
+                        const theme = themeColors[plan.metadata.colorTheme] || themeColors.blue;
+                        const recommended = plan.planCode === 'PRO_SELLER';
 
                         return (
-                            <Card
-                                key={plan.id}
-                                className={`relative p-8 rounded-3xl bg-white border-2 flex flex-col items-center text-center shadow-sm ${plan.recommended ? "border-slate-900 shadow-xl z-20" : "border-slate-200"
-                                    }`}
+                            <div
+                                key={plan._id}
+                                className={`premium-card p-1 relative flex flex-col ${recommended ? 'shadow-2xl shadow-accent/20 border-accent ring-2 ring-accent/10 scale-[1.05] z-10' : ''}`}
                             >
-                                {plan.recommended && (
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider z-20">
-                                        Recommended
+                                {recommended && (
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                        Best Value
                                     </div>
                                 )}
 
-                                <div className="w-full mb-8">
-                                    <div className={`mx-auto w-4 h-4 rounded-full mb-4 shadow-sm border border-black/5 ${dotStyle}`}></div>
-                                    <h3 className="text-2xl font-black text-slate-900 mb-1 leading-tight">{plan.name}</h3>
-                                    <p className="text-slate-400 font-bold text-[9px] uppercase tracking-widest h-8 flex items-center justify-center">{plan.tagline}</p>
-                                </div>
-
-                                <div className="w-full mb-10 py-6 border-y border-slate-100 flex flex-col items-center">
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-4xl font-black text-slate-900">{plan.pricing}</span>
-                                        {plan.id !== "FREE_TRIAL" && <span className="text-slate-500 font-bold text-sm">ETB</span>}
-                                    </div>
-                                    <p className="text-slate-400 font-black text-[9px] uppercase tracking-widest mt-1">{plan.billingText}</p>
-                                </div>
-
-                                <div className="w-full space-y-8 mb-10 flex-grow">
-                                    <div className="space-y-4">
-                                        <div className="flex flex-col gap-2">
-                                            <div className="flex justify-between items-center text-[11px] font-bold px-2 py-1.5 bg-slate-50 rounded-lg">
-                                                <span className="text-slate-400 uppercase">Listings</span>
-                                                <span className="text-slate-900 tracking-tight">{plan.limits.listings.split(' ')[0]}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-[11px] font-bold px-2 py-1.5 bg-slate-50 rounded-lg">
-                                                <span className="text-slate-400 uppercase">Staff</span>
-                                                <span className="text-slate-900 tracking-tight">{plan.limits.staff}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-[11px] font-bold px-2 py-1.5 bg-slate-50 rounded-lg">
-                                                <span className="text-slate-400 uppercase">Images</span>
-                                                <span className="text-slate-900 tracking-tight">{plan.limits.images}</span>
-                                            </div>
+                                <div className="p-8 flex-grow flex flex-col">
+                                    <div className="mb-8">
+                                        <div className={`w-10 h-10 ${theme.bg} ${theme.text} rounded-xl flex items-center justify-center text-xl mb-4`}>
+                                            {plan.planCode === 'FREE_TRIAL' ? '🌱' : plan.planCode === 'BASIC_SELLER' ? '🚀' : plan.planCode === 'PRO_SELLER' ? '💎' : '👑'}
                                         </div>
+                                        <h3 className="text-xl font-extrabold text-slate-900">{plan.planName}</h3>
+                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{plan.metadata.tagline}</p>
                                     </div>
 
-                                    <ul className="flex flex-col items-center space-y-3 px-2">
-                                        {plan.features.map((feature, idx) => (
-                                            <li key={idx} className={`flex items-start gap-2 text-left text-xs font-bold leading-tight ${feature.included ? "text-slate-700" : "text-slate-300 line-through"}`}>
-                                                <span className={`flex-shrink-0 mt-0.5 w-4 h-4 rounded-md flex items-center justify-center text-[8px] ${feature.included ? `${dotStyle} text-white` : "bg-slate-100 text-slate-300"}`}>
-                                                    {feature.included ? "✓" : "×"}
-                                                </span>
-                                                <span>{feature.text}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                    <div className="mb-10 flex items-baseline gap-1">
+                                        <span className="text-4xl font-black text-slate-900">{(plan.price ?? 0).toLocaleString()}</span>
+                                        <span className="text-slate-400 font-bold text-sm uppercase">ETB / {plan.durationMonths === 1 ? 'mo' : plan.durationMonths === 3 ? '3mo' : 'yr'}</span>
+                                    </div>
 
-                                <Link href="/auth/register" className="w-full mt-auto">
+                                    <div className="space-y-4 mb-10 flex-grow">
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center text-xs font-bold p-3 bg-slate-50 rounded-xl">
+                                                <span className="text-slate-400 uppercase tracking-widest">Listings</span>
+                                                <span className="text-slate-900">{plan.limits.maxActiveListings > 1000 ? 'Unlimited' : plan.limits.maxActiveListings}</span>
+                                            </div>
+                                            {plan.features.searchRankingBoost > 0 && (
+                                                <div className="flex justify-between items-center text-xs font-bold p-3 bg-accent/5 rounded-xl border border-accent/10">
+                                                    <span className="text-accent uppercase tracking-widest">Boost</span>
+                                                    <span className="text-accent">+{plan.features.searchRankingBoost}%</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <ul className="space-y-3 pt-2">
+                                            {[
+                                                { text: `${plan.limits.imagesPerProduct} Images per Listing`, included: true },
+                                                { text: 'Verified Store Badge', included: plan.features.hasVerifiedBadge },
+                                                { text: 'Premium Analytics', included: plan.features.hasAnalytics },
+                                                { text: 'Bulk List Tools', included: plan.features.hasBulkUpload },
+                                                { text: 'Store Banner', included: plan.features.hasStoreBanner },
+                                                { text: 'Priority Support', included: plan.features.hasPrioritySupport },
+                                                { text: 'Telegram & Phone', included: plan.features.telegramEnabled || plan.features.phoneEnabled },
+                                                { text: 'WhatsApp Direct', included: plan.features.whatsappEnabled },
+                                            ].filter((f, i) => {
+                                                // Only show 6 relevant features to keep it clean
+                                                if (plan.planCode === 'FREE_TRIAL') return i < 4;
+                                                return true;
+                                            }).slice(0, 6).map((feature, idx) => (
+                                                <li key={idx} className={`flex items-center gap-3 text-[11px] font-bold ${feature.included ? 'text-slate-600' : 'text-slate-300'}`}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={feature.included ? 'text-emerald-500' : 'text-slate-200'}><polyline points="20 6 9 17 4 12" /></svg>
+                                                    {feature.text}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
                                     <Button
-                                        className={`w-full py-6 rounded-2xl font-black text-xs uppercase tracking-widest text-white shadow-md hover:shadow-lg transition-shadow border-none ${btnStyle}`}
+                                        onClick={() => router.push(`/seller/checkout?planId=${plan._id}`)}
+                                        className={`w-full !h-10 rounded-xl font-medium text-[11px] uppercase tracking-widest text-white border-none transition-all ${theme.btn} shadow-lg shadow-slate-100`}
                                     >
-                                        Select Plan
+                                        Get Started
                                     </Button>
-                                </Link>
-                            </Card>
+                                </div>
+                            </div>
                         );
                     })}
                 </div>

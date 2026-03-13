@@ -23,6 +23,7 @@ export async function middleware(req: any) {
 
     // ADDED: Subscription Gating Logic
     if (token) {
+        /* 
         const planCode = (token as any).planCode;
 
         // Example: Only Pro/Enterprise can access Bulk Upload
@@ -31,6 +32,7 @@ export async function middleware(req: any) {
                 return NextResponse.redirect(new URL("/pricing", req.nextUrl));
             }
         }
+        */
     }
 
     return NextResponse.next();

@@ -111,16 +111,25 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
     try {
+        const { searchParams } = new URL(req.url);
+        const fetchAll = searchParams.get("all") === "true";
+
+        await connectDB();
+
+        if (fetchAll) {
+            const stores = await Store.find({ status: "approved" }).sort({ createdAt: -1 });
+            return NextResponse.json({ stores });
+        }
+
         const session = await getServerSession(authOptions);
         if (!session || !session.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        await connectDB();
         const store = await Store.findOne({ ownerId: session.user.id });
-
         return NextResponse.json({ store });
     } catch (error: any) {
+        console.error("GET_STORES_ERROR:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

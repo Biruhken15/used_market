@@ -21,11 +21,23 @@ export async function POST(req: Request) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        await User.create({
+        const newUser = await User.create({
             name,
             email,
             password: hashedPassword,
         });
+
+        // Link to pending store invitations
+        try {
+            const Store = (await import("@/lib/models/store")).default;
+            await Store.updateMany(
+                { "staff.email": email, "staff.userId": { $exists: false } },
+                { $set: { "staff.$.userId": newUser._id } }
+            );
+        } catch (linkError) {
+            console.error("Error linking pending staff:", linkError);
+            // Non-blocking
+        }
 
         return NextResponse.json({ message: "User registered successfully" }, { status: 201 });
     } catch (error: any) {

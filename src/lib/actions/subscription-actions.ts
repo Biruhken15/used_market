@@ -1,52 +1,54 @@
 "use server";
 
-import dbConnect from "@/lib/db/mongoose";
-import SubscriptionPlan from "@/lib/models/subscription-plan";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/utils/auth";
+import { revalidatePath } from "next/cache";
+import dbConnect from "../db/mongoose";
+import UserSubscription from "../models/user-subscription";
+import { NotificationService } from "../services/notification-service";
+
+export type ActionState = {
+    success?: boolean;
+    error?: string;
+    details?: string;
+};
 
 /**
- * Run this once to initialize your 4 plans in the DB
+ * Action to cancel a subscription.
+ * In this implementation, we set the status to 'canceled'.
+ * The user still has access until the end of the period (currentPeriodEnd).
  */
-export async function seedSubscriptionPlans() {
-    await dbConnect();
+export async function cancelSubscriptionAction(storeId: string): Promise<ActionState> {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user) return { error: "Unauthorized" };
 
-    const plans = [
-        {
-            planCode: 'FREE_TRIAL',
-            planName: 'Free Trial',
-            pricing: { monthly: 0 },
-            limits: { maxActiveListings: 3, imagesPerProduct: 3, featuredListingsPerMonth: 0, listingDurationDays: 60, maxStaffAccounts: 1 },
-            features: { telegramEnabled: true, phoneEnabled: true },
-            metadata: { colorTheme: 'emerald', tagline: 'Try before you buy' }
-        },
-        {
-            planCode: 'BASIC_SELLER',
-            planName: 'Basic Seller',
-            pricing: { monthly: 500 },
-            limits: { maxActiveListings: 20, imagesPerProduct: 5, featuredListingsPerMonth: 0, listingDurationDays: 60, maxStaffAccounts: 2 },
-            features: { hasAnalytics: true, analyticsLevel: 'basic', hasStoreBanner: true, telegramEnabled: true, phoneEnabled: true },
-            metadata: { colorTheme: 'blue', tagline: 'Perfect for starting out' }
-        },
-        {
-            planCode: 'PRO_SELLER',
-            planName: 'Pro Seller',
-            pricing: { monthly: 1300 }, // Monthly avg based on your requested cycle
-            limits: { maxActiveListings: 100, imagesPerProduct: 10, featuredListingsPerMonth: 5, listingDurationDays: 90, maxStaffAccounts: 3 },
-            features: { canMarkAsSold: true, hasAnalytics: true, analyticsLevel: 'advanced', hasStoreBanner: true, hasVerifiedBadge: true, hasBulkUpload: true, telegramEnabled: true, phoneEnabled: true, whatsappEnabled: true },
-            metadata: { colorTheme: 'purple', tagline: 'For serious sellers' }
-        },
-        {
-            planCode: 'ENTERPRISE_SELLER',
-            planName: 'Enterprise Seller',
-            pricing: { monthly: 2500 },
-            limits: { maxActiveListings: -1, imagesPerProduct: 15, featuredListingsPerMonth: 20, listingDurationDays: -1, maxStaffAccounts: 5 },
-            features: { canMarkAsSold: true, hasAnalytics: true, analyticsLevel: 'custom', hasStoreBanner: true, hasVerifiedBadge: true, hasBulkUpload: true, hasApiAccess: true, hasPrioritySupport: true, hasHomepagePromotion: true, telegramEnabled: true, phoneEnabled: true, whatsappEnabled: true },
-            metadata: { colorTheme: 'gold', tagline: 'For high-volume businesses' }
+        await dbConnect();
+
+        const subscription = await UserSubscription.findOne({ storeId });
+        if (!subscription) return { error: "No active subscription found." };
+
+        if (subscription.userId.toString() !== session.user.id) {
+            return { error: "Unauthorized. You are not the owner of this subscription." };
         }
-    ];
 
-    for (const plan of plans) {
-        await SubscriptionPlan.findOneAndUpdate({ planCode: plan.planCode }, plan, { upsert: true, new: true });
+        subscription.status = 'canceled'; // Marks for non-renewal
+        await subscription.save();
+
+        await NotificationService.create({
+            userId: session.user.id,
+            storeId: storeId,
+            type: 'subscription_canceled',
+            title: 'Subscription Canceled',
+            message: 'Your subscription has been set to cancel at the end of the current billing period.',
+            metadata: { currentPeriodEnd: subscription.currentPeriodEnd }
+        });
+
+        revalidatePath("/seller/mystore");
+        revalidatePath("/seller/checkout");
+
+        return { success: true };
+    } catch (error: any) {
+        return { error: "Cancellation Failed", details: error.message };
     }
-
-    return { success: true, message: "Plans seeded successfully" };
 }

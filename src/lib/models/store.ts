@@ -50,8 +50,34 @@ const storeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    email: {
+        type: String,
+        required: true
+    },
     city: String,
     country: String,
+
+    // Identity Verification
+    idType: {
+        type: String,
+        enum: ['National ID', 'Kebele ID', 'Driver License', 'Passport'],
+        required: true
+    },
+    idFront: {
+        url: String,
+        publicId: String
+    },
+    idBack: {
+        url: String,
+        publicId: String
+    },
+
+    // Multiple Locations (Enterprise Only)
+    locations: [{
+        city: String,
+        address: String,
+        phone: String
+    }],
 
     // Seller info
     sellerName: {
@@ -68,6 +94,14 @@ const storeSchema = new mongoose.Schema({
         url: String,
         publicId: String
     },
+
+    // Staff Management
+    staff: [{
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        email: String,
+        role: { type: String, enum: ['manager', 'editor'], default: 'editor' },
+        addedAt: { type: Date, default: Date.now }
+    }],
 
     // Timestamps
     createdAt: { type: Date, default: Date.now },

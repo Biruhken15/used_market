@@ -2,10 +2,29 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/utils/auth";
 import { redirect } from "next/navigation";
 import { StoreService } from "@/lib/services/store-service";
+import { SubscriptionService } from "@/lib/services/subscription-service";
+import { AnalyticsService } from "@/lib/services/analytics-service";
+import { ProductService } from "@/lib/services/product-service";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import InventoryList from "@/components/seller/InventoryList";
+import ProductForm from "@/components/seller/ProductForm";
+import TrialExpiryPopup from "@/components/seller/TrialExpiryPopup";
+import StoreInsights from "@/components/seller/StoreInsights";
+import StoreSettings from "@/components/seller/StoreSettings";
+import { StaffList } from "@/components/seller/StaffList";
+import { SubscriptionDetails } from "@/components/seller/SubscriptionDetails";
+import { TransactionHistory } from "@/components/seller/TransactionHistory";
+import { getStoreTransactions } from "@/lib/actions/billing-actions";
 
-export default async function MyStorePage() {
+export default async function MyStorePage({ searchParams }: { searchParams: Promise<{ mode?: string }> }) {
+    const params = await searchParams;
+    const isAddingProduct = params?.mode === "add-product";
+    const isAnalytics = params?.mode === "analytics";
+    const isSettings = params?.mode === "settings";
+    const isStaff = params?.mode === "staff";
+    const isBilling = params?.mode === "billing";
+
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
@@ -18,8 +37,38 @@ export default async function MyStorePage() {
         redirect("/stores/create");
     }
 
+    // Parallelize data fetching for better performance
+    const [subscription, metrics, products, transactions] = await Promise.all([
+        SubscriptionService.getStoreSubscription(store._id.toString()),
+        AnalyticsService.getStoreMetrics(store._id.toString()),
+        ProductService.getStoreProducts(store._id.toString()),
+        isBilling ? getStoreTransactions(store._id.toString()) : Promise.resolve([])
+    ]);
+
+    const plan = subscription?.planId as any;
+    const isProOrEnterprise = plan?.planCode === 'PRO_SELLER' || plan?.planCode === 'ENTERPRISE_SELLER';
+
+    // Fetch activity only if in analytics mode and user has the plan for it
+    const recentActivity = isAnalytics && isProOrEnterprise
+        ? await AnalyticsService.getRecentActivity(store._id.toString())
+        : [];
+
+    // Check for expiry status
+    const expiryStatus = await SubscriptionService.checkSubscriptionExpiry(store._id.toString());
+    const isExpired = expiryStatus?.expired || subscription?.status === 'expired';
+
+    // Parse data for client components
+    const serializedProducts = JSON.parse(JSON.stringify(products));
+    const serializedActivity = JSON.parse(JSON.stringify(recentActivity));
+    const serializedPlanFeatures = JSON.parse(JSON.stringify(plan?.features || { canMarkAsSold: false }));
+    const serializedStaff = JSON.parse(JSON.stringify(store.staff || []));
+
     return (
         <div className="min-h-screen bg-slate-50/50 pb-24">
+            <TrialExpiryPopup
+                isExpired={!!isExpired}
+                planName={plan?.planName || 'Free Trial'}
+            />
             {/* Store Header / Branding */}
             <div className="relative h-64 md:h-80 w-full overflow-hidden bg-slate-200">
                 {store.coverImage?.url ? (
@@ -55,64 +104,164 @@ export default async function MyStorePage() {
                             <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">
                                 {store.storeName}
                             </h1>
-                            <span className="px-4 py-1.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-blue-200">
-                                Verified Store
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className={`px-4 py-1.5 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg ${plan?.planCode === 'ENTERPRISE_SELLER' ? 'bg-amber-500 shadow-amber-200' :
+                                    plan?.planCode === 'PRO_SELLER' ? 'bg-purple-600 shadow-purple-200' :
+                                        'bg-blue-600 shadow-blue-200'
+                                    }`}>
+                                    {plan?.planName || 'Free Trial'} Plan
+                                </span>
+                                {plan?.features?.hasVerifiedBadge && (
+                                    <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-[9px] font-black uppercase tracking-widest rounded-full border border-emerald-200">
+                                        Verified Store
+                                    </span>
+                                )}
+                            </div>
                         </div>
                         <p className="text-slate-500 font-bold text-base flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                            {store.category} • {store.city}, {store.country}
+                            {Array.isArray(store.category) ? store.category.join(', ') : store.category} • {store.city}, {store.country}
                         </p>
                     </div>
                 </div>
 
-                {/* Dashboard Actions */}
+                {/* Dashboard Navigation */}
                 <div className="mt-16 flex flex-col md:flex-row items-center justify-between gap-8 pb-8 border-b border-slate-200">
                     <div className="flex items-center gap-10">
-                        {["Inventory", "Analytics", "Settings"].map((tab, i) => (
-                            <button
-                                key={tab}
-                                className={`pb-4 text-sm font-black uppercase tracking-[0.2em] transition-all border-b-2 ${i === 0 ? "border-blue-600 text-blue-600" : "border-transparent text-slate-400 hover:text-slate-600"}`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
+                        {isAddingProduct ? (
+                            <Link href="/seller/mystore" className="flex items-center gap-2 text-blue-600 font-black text-xs uppercase tracking-widest group">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6" /></svg>
+                                Back to Inventory
+                            </Link>
+                        ) : (
+                            [
+                                { name: "Inventory", mode: null },
+                                { name: "Analytics", mode: "analytics" },
+                                { name: "Staff", mode: "staff" },
+                                { name: "Billing", mode: "billing" },
+                                { name: "Settings", mode: "settings" }
+                            ].map((tab) => {
+                                const isActive = (tab.mode === null && !isAddingProduct && !isAnalytics && !isSettings && !isBilling && !isStaff) ||
+                                    (tab.mode === "analytics" && isAnalytics) ||
+                                    (tab.mode === "settings" && isSettings) ||
+                                    (tab.mode === "staff" && isStaff) ||
+                                    (tab.mode === "billing" && isBilling);
+                                return (
+                                    <Link
+                                        key={tab.name}
+                                        href={tab.mode ? `/seller/mystore?mode=${tab.mode}` : '/seller/mystore'}
+                                        className={`pb-4 text-sm font-black uppercase tracking-[0.2em] transition-all border-b-2 ${isActive ? "border-blue-600 text-blue-600" : "border-transparent text-slate-400 hover:text-slate-600"}`}
+                                    >
+                                        {tab.name}
+                                    </Link>
+                                );
+                            })
+                        )}
                     </div>
 
-                    <Link href="/seller/mystore/add-product">
-                        <Button className="h-14 px-10 rounded-2xl bg-slate-900 text-white font-black text-sm uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
-                            Add Product
-                        </Button>
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-4">
+                        {!isAddingProduct && !isAnalytics && !isSettings && (
+                            products.length >= (plan?.limits?.maxActiveListings || 3) ? (
+                                <div className="group relative">
+                                    <Button disabled className="!h-13 !px-8 rounded-xl bg-slate-200 text-slate-400 font-black text-[11px] uppercase tracking-widest border-none flex items-center gap-2 cursor-not-allowed">
+                                        Limit Reached
+                                    </Button>
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-center shadow-xl">
+                                        You reached the max listing limit for {plan?.planName || 'Free'} plan. Upgrade to add more!
+                                    </div>
+                                </div>
+                            ) : (
+                                <Link href="/seller/mystore?mode=add-product">
+                                    <Button className="!h-13 !px-8 rounded-xl bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-accent transition-all shadow-lg shadow-slate-200 border-none flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
+                                        Add Product
+                                    </Button>
+                                </Link>
+                            )
+                        )}
+                        <Link href="/pricing">
+                            <Button variant="outline" className="!h-13 !px-8 rounded-xl border-2 border-slate-200 font-black text-[11px] uppercase tracking-widest hover:border-accent hover:text-accent transition-all">
+                                {plan ? 'Manage Plan' : 'Upgrade Plan'}
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
-                {/* Main Content Area */}
-                <div className="py-20">
-                    {/* Simplified Empty State */}
-                    <div className="bg-white rounded-[4rem] p-16 md:p-24 border border-slate-100 shadow-sm text-center space-y-12">
-                        <div className="max-w-sm mx-auto space-y-8">
-                            <div className="w-32 h-32 bg-slate-50 rounded-[3rem] flex items-center justify-center text-6xl mx-auto shadow-inner transform -rotate-6">
-                                📦
-                            </div>
-                            <div className="space-y-4">
-                                <h2 className="text-4xl font-black text-slate-900 tracking-tighter italic">No Products Yet.</h2>
-                                <p className="text-slate-400 font-bold text-lg leading-relaxed">
-                                    Your inventory is currently empty. Ready to start selling?
-                                </p>
-                            </div>
-
-                            <Link href="/seller/mystore/add-product" className="inline-block pt-4">
-                                <Button className="h-16 px-12 rounded-[2rem] bg-blue-600 text-white font-black text-xl hover:bg-blue-700 transition-all shadow-2xl shadow-blue-100 border-none group">
-                                    <span className="flex items-center gap-4">
-                                        Post First Listing
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="translate-x-0 group-hover:translate-x-1 transition-transform font-black"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
-                                    </span>
-                                </Button>
-                            </Link>
+                {/* Content Sections */}
+                {isAddingProduct ? (
+                    <div className="py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="text-center mb-10">
+                            <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">Initialize <span className="text-blue-600">New Product</span></h2>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Marketplace Inventory Control</p>
+                        </div>
+                        <ProductForm
+                            storeId={store._id.toString()}
+                            storeSlug={store.storeSlug}
+                            planLimits={plan?.limits || { maxActiveListings: 3, imagesPerProduct: 3 }}
+                        />
+                    </div>
+                ) : isAnalytics ? (
+                    <div className="py-12">
+                        {/* Summary Metrics moved here for consistency */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                            {[
+                                { label: 'Store Views', value: metrics.store_view, icon: '👁️' },
+                                { label: 'Product Views', value: metrics.product_view, icon: '📦' },
+                                { label: 'Contact Clicks', value: metrics.contact_click, icon: '📞' },
+                                { label: 'Rank Boost', value: `${plan?.features?.searchRankingBoost || 0}%`, icon: '🚀' }
+                            ].map((m) => (
+                                <div key={m.label} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                                    <div className="text-2xl mb-2">{m.icon}</div>
+                                    <div className="text-2xl font-black text-slate-900">{m.value}</div>
+                                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{m.label}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <StoreInsights
+                            metrics={metrics}
+                            recentActivity={serializedActivity}
+                            planName={plan?.planName || 'Free Trial'}
+                            isProOrEnterprise={isProOrEnterprise}
+                        />
+                    </div>
+                ) : isSettings ? (
+                    <div className="py-12">
+                        <StoreSettings store={JSON.parse(JSON.stringify(store))} />
+                    </div>
+                ) : isStaff ? (
+                    <div className="py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="text-center mb-10">
+                            <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">Team <span className="text-blue-600">Protocol</span></h2>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Store Access & Permission Control</p>
+                        </div>
+                        <div className="max-w-4xl mx-auto bg-white rounded-[3rem] p-8 md:p-12 border border-slate-200 shadow-sm relative overflow-hidden">
+                            <StaffList storeId={store._id.toString()} staff={serializedStaff} />
                         </div>
                     </div>
-                </div>
+                ) : isBilling ? (
+                    <div className="py-12 space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="text-center">
+                            <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">Billing <span className="text-blue-600">Infrastructure</span></h2>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol Subscriptions & Receipts</p>
+                        </div>
+                        <SubscriptionDetails
+                            subscription={JSON.parse(JSON.stringify(subscription))}
+                            plan={JSON.parse(JSON.stringify(plan))}
+                        />
+                        <TransactionHistory transactions={transactions} />
+                    </div>
+                ) : (
+                    <>
+                        {/* Inventory List */}
+                        <div className="py-20">
+                            <InventoryList
+                                initialProducts={serializedProducts}
+                                storeId={store._id.toString()}
+                                subscriptionFeatures={serializedPlanFeatures}
+                            />
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

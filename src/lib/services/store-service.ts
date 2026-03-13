@@ -13,11 +13,15 @@ export interface StoreData {
     whatsapp?: string;
     telegram?: string;
     address: string;
+    email: string;
     sellerName: string;
     city: string;
     country: string;
+    idType: string;
     logo?: { url: string; publicId: string };
     coverImage?: { url: string; publicId: string };
+    idFront?: { url: string; publicId: string };
+    idBack?: { url: string; publicId: string };
 }
 
 export class StoreService {
@@ -65,11 +69,93 @@ export class StoreService {
         // 4. Update User Role
         await User.findByIdAndUpdate(data.ownerId, { role: "seller" });
 
+        // 5. Assign Default Free Trial Subscription
+        const { SubscriptionService } = await import("./subscription-service");
+        await SubscriptionService.assignDefaultSubscription(data.ownerId, newStore._id.toString());
+
         return newStore;
     }
 
     static async getStoreByOwner(ownerId: string) {
         await connectDB();
         return await Store.findOne({ ownerId });
+    }
+
+    static async getStoreById(storeId: string) {
+        await connectDB();
+        return await Store.findById(storeId);
+    }
+
+    static async getAllStores() {
+        await connectDB();
+        return await Store.find({ status: "approved" }).sort({ createdAt: -1 });
+    }
+
+    static async updateStore(storeId: string, data: Partial<StoreData>) {
+        await connectDB();
+        const updatedStore = await Store.findByIdAndUpdate(
+            storeId,
+            { $set: data },
+            { new: true, runValidators: true }
+        );
+        if (!updatedStore) {
+            throw new Error("Store not found");
+        }
+        return updatedStore;
+    }
+
+    static async deleteStore(storeId: string) {
+        await connectDB();
+        const store = await Store.findById(storeId);
+        if (!store) throw new Error("Store not found");
+
+        // 1. Revert user role to 'user'
+        await User.findByIdAndUpdate(store.ownerId, { role: "user" });
+
+        // 2. Delete the store
+        return await Store.findByIdAndDelete(storeId);
+    }
+
+    static async addStaff(storeId: string, email: string, role: string) {
+        await connectDB();
+
+        // 1. Find user by email
+        const user = await User.findOne({ email });
+        if (!user) throw new Error("User with this email not found. They must have an account first.");
+
+        // 2. Check if user is already staff or owner
+        const store = await Store.findById(storeId);
+        if (store.ownerId.toString() === user._id.toString()) {
+            throw new Error("This user is already the store owner.");
+        }
+
+        const isAlreadyStaff = store.staff.some((s: any) => s.userId.toString() === user._id.toString());
+        if (isAlreadyStaff) {
+            throw new Error("This user is already a staff member.");
+        }
+
+        // 3. Add to staff list
+        return await Store.findByIdAndUpdate(
+            storeId,
+            {
+                $push: {
+                    staff: {
+                        userId: user._id,
+                        email: user.email,
+                        role
+                    }
+                }
+            },
+            { new: true }
+        );
+    }
+
+    static async removeStaff(storeId: string, userId: string) {
+        await connectDB();
+        return await Store.findByIdAndUpdate(
+            storeId,
+            { $pull: { staff: { userId } } },
+            { new: true }
+        );
     }
 }

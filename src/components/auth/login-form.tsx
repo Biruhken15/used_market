@@ -5,7 +5,6 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Card } from "../ui/card";
 import Link from "next/link";
 
 export const LoginForm = () => {
@@ -41,50 +40,90 @@ export const LoginForm = () => {
     };
 
     return (
-        <Card className="w-full max-w-md mx-auto card-premium p-8">
-            <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Welcome Back</h1>
-                <p className="text-slate-500 font-medium">Sign in to your Ethio Market account</p>
-            </div>
+        <div className="w-full max-w-md mx-auto relative group">
+            {/* Decorative Background Elements */}
+            <div className="absolute -top-12 -left-12 w-24 h-24 bg-accent/10 rounded-full blur-2xl group-hover:bg-accent/20 transition-all"></div>
+            <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-blue-400/10 rounded-full blur-3xl group-hover:bg-blue-400/20 transition-all"></div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {error && (
-                    <div className="bg-red-50 border border-red-100 text-red-600 text-sm py-3 px-4 rounded-xl text-center font-semibold">
-                        {error}
-                    </div>
-                )}
-
-                <Input
-                    label="Email Address"
-                    type="email"
-                    placeholder="email@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-
-                <Input
-                    label="Password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-
-                <div className="flex justify-end pt-1">
-                    <Link href="/" className="text-sm text-blue-600 hover:text-blue-700 font-bold underline transition-colors">Forgot password?</Link>
+            <div className="premium-card p-10 bg-white/80 backdrop-blur-xl border border-white relative z-10 shadow-2xl shadow-slate-200/50">
+                <div className="text-center mb-10">
+                    <Link href="/" className="inline-flex items-center gap-2 mb-6 group/logo">
+                        <div className="w-10 h-10 bg-accent text-white rounded-xl flex items-center justify-center text-xl font-black shadow-lg shadow-accent/20 group-hover/logo:scale-105 transition-transform">
+                            U
+                        </div>
+                        <span className="font-black text-2xl tracking-tighter text-slate-900">Used Market</span>
+                    </Link>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tighter mb-2">Welcome Back.</h1>
+                    <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">kesew ej • ክስው እጅ</p>
                 </div>
 
-                <Button type="submit" fullWidth disabled={isLoading}>
-                    {isLoading ? "Signing In..." : "Sign In"}
-                </Button>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {error && (
+                        <div className="bg-rose-50 border border-rose-100 text-rose-600 text-[11px] font-black uppercase tracking-widest py-4 px-4 rounded-xl text-center flex items-center justify-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span>
+                            {error}
+                        </div>
+                    )}
 
-                <p className="text-center text-slate-500 text-sm font-medium">
-                    Don't have an account?{" "}
-                    <Link href="/auth/register" className="text-blue-600 hover:text-blue-700 font-bold underline transition-colors">Create account</Link>
-                </p>
-            </form>
-        </Card>
+                    <div className="space-y-4">
+                        <Input
+                            label="Store Email"
+                            type="email"
+                            placeholder="you@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="h-14 !rounded-2xl border-slate-100 focus:border-accent transition-all"
+                            required
+                        />
+
+                        <div className="relative">
+                            <Input
+                                label="Password"
+                                type="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="h-14 !rounded-2xl border-slate-100 focus:border-accent transition-all"
+                                required
+                            />
+                            <div className="flex justify-end mt-2">
+                                <Link href="/" className="text-[10px] font-black text-accent uppercase tracking-widest hover:text-slate-900 transition-colors">
+                                    Forgot Password?
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Button
+                        type="submit"
+                        fullWidth
+                        disabled={isLoading}
+                        className="!h-14 rounded-2xl bg-slate-900 text-white font-black text-sm uppercase tracking-widest hover:bg-accent hover:shadow-xl hover:shadow-accent/20 border-none transition-all mt-4"
+                    >
+                        {isLoading ? (
+                            <div className="flex items-center gap-2">
+                                <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                                Processing...
+                            </div>
+                        ) : "Step into Market"}
+                    </Button>
+
+                    <div className="relative py-4">
+                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-50"></div></div>
+                        <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-white px-4 text-slate-300">New around here?</span></div>
+                    </div>
+
+                    <Link href="/auth/register" className="block">
+                        <Button
+                            variant="outline"
+                            fullWidth
+                            className="!h-14 rounded-2xl border-2 border-slate-100 text-slate-600 font-black text-sm uppercase tracking-widest hover:bg-slate-50 hover:border-slate-200 transition-all"
+                        >
+                            Create Store Account
+                        </Button>
+                    </Link>
+                </form>
+            </div>
+        </div>
     );
 };

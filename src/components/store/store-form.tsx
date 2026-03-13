@@ -12,9 +12,10 @@ export function StoreForm() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<{ message: string; details?: string } | null>(null);
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     const [showSuccess, setShowSuccess] = useState(false);
     const [createdStoreName, setCreatedStoreName] = useState("");
-    const [previews, setPreviews] = useState({ logo: "", cover: "" });
+    const [previews, setPreviews] = useState({ logo: "", cover: "", idFront: "", idBack: "" });
     const [slugModified, setSlugModified] = useState(false);
     const [formData, setFormData] = useState({
         storeName: "",
@@ -25,11 +26,15 @@ export function StoreForm() {
         whatsapp: "",
         telegram: "",
         address: "",
+        email: "",
         sellerName: "",
         city: "Addis Ababa",
         country: "Ethiopia",
+        idType: "National ID",
         logo: null as File | null,
-        coverImage: null as File | null
+        coverImage: null as File | null,
+        idFront: null as File | null,
+        idBack: null as File | null
     });
 
     const slugifyLocal = (text: string) => {
@@ -56,13 +61,25 @@ export function StoreForm() {
         setFormData({ ...formData, storeSlug: slugifyLocal(e.target.value) });
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: "logo" | "coverImage") => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: "logo" | "coverImage" | "idFront" | "idBack") => {
         const file = e.target.files?.[0];
         if (file) {
+            if (file.size > MAX_FILE_SIZE) {
+                setError({
+                    message: "File Too Large",
+                    details: `The file "${file.name}" exceeds the 5MB limit. Please upload a smaller image.`
+                });
+                return;
+            }
+            setError(null);
             setFormData({ ...formData, [field]: file });
             const reader = new FileReader();
             reader.onloadend = () => {
-                setPreviews(prev => ({ ...prev, [field === "logo" ? "logo" : "cover"]: reader.result as string }));
+                let previewKey: keyof typeof previews = "logo";
+                if (field === "coverImage") previewKey = "cover";
+                if (field === "idFront") previewKey = "idFront";
+                if (field === "idBack") previewKey = "idBack";
+                setPreviews(prev => ({ ...prev, [previewKey]: reader.result as string }));
             };
             reader.readAsDataURL(file);
         }
@@ -280,8 +297,8 @@ export function StoreForm() {
                                                 setFormData({ ...formData, category: newCats });
                                             }}
                                             className={`px-4 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 ${isSelected
-                                                    ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100 scale-[1.02]"
-                                                    : "bg-white border-slate-100 text-slate-400 hover:border-slate-300"
+                                                ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100 scale-[1.02]"
+                                                : "bg-white border-slate-100 text-slate-400 hover:border-slate-300"
                                                 }`}
                                         >
                                             {cat}
@@ -355,6 +372,18 @@ export function StoreForm() {
                                 className="h-12 rounded-xl border border-slate-200 bg-slate-50/50 px-4 font-mono font-bold text-slate-900"
                             />
                         </div>
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Email Address</label>
+                            <Input
+                                required
+                                type="email"
+                                name="email"
+                                placeholder="business@example.com"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                className="h-12 rounded-xl border border-slate-200 bg-slate-50/50 px-4 font-semibold text-slate-900"
+                            />
+                        </div>
                         <div className="md:col-span-2 space-y-2">
                             <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Business Address</label>
                             <Input
@@ -368,24 +397,103 @@ export function StoreForm() {
                         </div>
                     </div>
                 </div>
+
+                {/* ID Verification Section */}
+                <div className="space-y-8">
+                    <h3 className="text-xl font-bold text-slate-900 flex items-center gap-3">
+                        <span className="w-8 h-8 bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-bold rounded-lg border border-slate-200">04</span>
+                        Identity Verification
+                    </h3>
+
+                    <div className="space-y-10">
+                        <div className="space-y-2 max-w-md">
+                            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Document Type</label>
+                            <select
+                                name="idType"
+                                value={formData.idType}
+                                onChange={(e) => setFormData({ ...formData, idType: e.target.value })}
+                                className="w-full h-12 rounded-xl border border-slate-200 bg-slate-50/50 px-4 font-semibold text-slate-900 outline-none focus:bg-white transition-all focus:ring-2 focus:ring-blue-500/20"
+                            >
+                                <option value="National ID">National ID</option>
+                                <option value="Kebele ID">Kebele ID</option>
+                                <option value="Driver License">Driver License</option>
+                                <option value="Passport">Passport</option>
+                            </select>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            {/* ID Front */}
+                            <div className="space-y-4">
+                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">ID Front Side</label>
+                                <div className="relative h-48 w-full bg-white border border-slate-200 rounded-2xl overflow-hidden group">
+                                    {previews.idFront ? (
+                                        <img src={previews.idFront} alt="ID Front Preview" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                                            <div className="mb-4">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /><rect width="14" height="10" x="5" y="11" rx="2" /></svg>
+                                            </div>
+                                            <p className="font-black text-xs uppercase tracking-widest">Upload ID Front</p>
+                                        </div>
+                                    )}
+                                    <input
+                                        required
+                                        type="file"
+                                        name="idFront"
+                                        accept="image/*"
+                                        onChange={(e) => handleFileChange(e, "idFront")}
+                                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                    />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none" />
+                                </div>
+                            </div>
+
+                            {/* ID Back */}
+                            <div className="space-y-4">
+                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">ID Back Side</label>
+                                <div className="relative h-48 w-full bg-white border border-slate-200 rounded-2xl overflow-hidden group">
+                                    {previews.idBack ? (
+                                        <img src={previews.idBack} alt="ID Back Preview" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                                            <div className="mb-4">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /><rect width="14" height="10" x="5" y="11" rx="2" /></svg>
+                                            </div>
+                                            <p className="font-black text-xs uppercase tracking-widest">Upload ID Back</p>
+                                        </div>
+                                    )}
+                                    <input
+                                        required
+                                        type="file"
+                                        name="idBack"
+                                        accept="image/*"
+                                        onChange={(e) => handleFileChange(e, "idBack")}
+                                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                    />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div className="pt-12">
+            <div className="pt-12 flex justify-center">
                 <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-14 rounded-2xl bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition-all active:scale-[0.98] shadow-lg shadow-blue-500/10"
+                    className="!h-14 !px-12 rounded-2xl bg-slate-900 text-white font-black text-sm uppercase tracking-[0.2em] hover:bg-accent transition-all active:scale-[0.98] shadow-xl shadow-slate-200 border-none"
                 >
                     <span className="relative z-10 flex items-center justify-center gap-4">
                         {loading ? (
                             <>
-                                <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-                                INITIALIZING SYSTEM...
+                                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                                Initializing...
                             </>
                         ) : (
                             <>
-                                CREATE STORE ENTITY
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="translate-x-1"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
+                                Create Store Entity
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
                             </>
                         )}
                     </span>

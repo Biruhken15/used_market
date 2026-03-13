@@ -100,7 +100,7 @@ const productSchema = new Schema<IProduct>({
         required: [true, 'Owner ID is required']
     },
 
-    // Media - with 5 image limit
+    // Media - with dynamic plan limits (enforced in service)
     images: {
         type: [{
             url: {
@@ -115,19 +115,13 @@ const productSchema = new Schema<IProduct>({
                 type: Boolean,
                 default: false
             }
-        }],
-        validate: {
-            validator: function (images: any[]) {
-                return images.length <= 5;
-            },
-            message: 'You can only upload up to 5 images per product'
-        }
+        }]
     },
 
     // Thumbnail
     thumbnail: {
         type: String,
-        required: [true, 'Thumbnail is required']
+        required: [false, 'Thumbnail is required'] // Generated in pre-save hook
     },
 
     // Dynamic Attributes
@@ -152,17 +146,8 @@ const productSchema = new Schema<IProduct>({
 productSchema.pre('save', function (next) {
     const product = this as any;
 
-    // Auto-generate slug if title changed or slug missing
-    if (!product.slug || product.isModified('title')) {
-        product.slug = product.title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '')
-            + '-' + Date.now().toString(36);
-    }
-
-    // Auto-set thumbnail from images
-    if (product.images && product.images.length > 0) {
+    // Auto-set thumbnail from images if missing
+    if (product.images && product.images.length > 0 && !product.thumbnail) {
         const primaryImage = product.images.find((img: any) => img.isPrimary);
         product.thumbnail = primaryImage
             ? primaryImage.url
