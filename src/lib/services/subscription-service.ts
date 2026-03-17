@@ -61,7 +61,7 @@ export class SubscriptionService {
                     maxStaffAccounts: 2
                 },
                 features: {
-                    canMarkAsSold: false,
+                    canMarkAsSold: true,
                     hasAnalytics: true,
                     analyticsLevel: 'basic',
                     hasStoreBanner: true,

@@ -1,19 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import Link from "next/link";
 
 export const RegisterForm = () => {
+    const searchParams = useSearchParams();
+    const inviteEmail = searchParams.get("inviteEmail");
+    const storeId = searchParams.get("storeId");
+
     const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState(inviteEmail || "");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        if (inviteEmail) setEmail(inviteEmail);
+    }, [inviteEmail]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -46,7 +54,11 @@ export const RegisterForm = () => {
             });
 
             if (res.ok) {
-                router.push("/auth/login");
+                // If it was an invite, we might want to go straight to login or dashboard
+                // For better UX during invitation: push to login but with a hint, 
+                // or just to dashboard if redirect works.
+                // Redirecting to login is safer for next-auth session establishment.
+                router.push(`/auth/login?email=${encodeURIComponent(email)}&invited=true`);
             } else {
                 const data = await res.json();
                 setError(data.message || "Registration failed.");
@@ -59,71 +71,75 @@ export const RegisterForm = () => {
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto relative group">
-            {/* Decorative Background Elements */}
-            <div className="absolute -top-12 -right-12 w-24 h-24 bg-accent/10 rounded-full blur-2xl group-hover:bg-accent/20 transition-all"></div>
-            <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-blue-400/10 rounded-full blur-3xl group-hover:bg-blue-400/20 transition-all"></div>
-
-            <div className="premium-card p-10 bg-white/80 backdrop-blur-xl border border-white relative z-10 shadow-2xl shadow-slate-200/50">
+        <div className="w-full max-w-lg mx-auto relative">
+            <div className="p-10 bg-white border-2 border-slate-200 rounded-[2rem] shadow-sm">
                 <div className="text-center mb-10">
                     <Link href="/" className="inline-flex items-center gap-2 mb-6 group/logo">
-                        <div className="w-10 h-10 bg-accent text-white rounded-xl flex items-center justify-center text-xl font-black shadow-lg shadow-accent/20 group-hover/logo:scale-105 transition-transform">
-                            U
+                        <div className="w-12 h-12 flex items-center justify-center">
+                            <img src="/ethiopian-mascot.png" alt="Logo" className="w-full h-full object-contain" />
                         </div>
-                        <span className="font-black text-2xl tracking-tighter text-slate-900">Used Market</span>
+                        <div className="flex flex-col items-start -space-y-1">
+                            <span className="font-black text-2xl tracking-tighter text-slate-950 uppercase italic leading-none">Used Market</span>
+                            <span className="text-[11px] font-bold text-accent uppercase tracking-widest italic ml-0.5">ከሰው እጅ</span>
+                        </div>
                     </Link>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tighter mb-2">Create Account.</h1>
-                    <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">Join kesew ej • ክስው እጅ</p>
+
+                    <h1 className="text-3xl font-black text-slate-950 tracking-tighter mb-2">Create Account</h1>
+                    <p className="text-slate-500 font-bold text-sm">Join our marketplace today</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     {error && (
-                        <div className="bg-rose-50 border border-rose-100 text-rose-600 text-[11px] font-black uppercase tracking-widest py-4 px-4 rounded-xl text-center flex items-center justify-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span>
+                        <div className="bg-rose-50 border-2 border-rose-100 text-rose-600 text-[11px] font-black uppercase tracking-widest py-4 px-4 rounded-xl text-center">
                             {error}
                         </div>
                     )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Input
-                            label="Full Name"
-                            type="text"
-                            placeholder="Abebe Balcha"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="h-14 !rounded-2xl border-slate-100 focus:border-accent transition-all"
-                            required
-                        />
-                        <Input
-                            label="Email Address"
-                            type="email"
-                            placeholder="abebe@market.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="h-14 !rounded-2xl border-slate-100 focus:border-accent transition-all"
-                            required
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Input
-                            label="Password"
-                            type="password"
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="h-14 !rounded-2xl border-slate-100 focus:border-accent transition-all"
-                            required
-                        />
-                        <Input
-                            label="Confirm Password"
-                            type="password"
-                            placeholder="••••••••"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="h-14 !rounded-2xl border-slate-100 focus:border-accent transition-all"
-                            required
-                        />
+                    <div className="space-y-4">
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-700">Full Name</label>
+                            <Input
+                                type="text"
+                                placeholder="Abebe Balcha"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="h-12 !rounded-lg border-slate-200 focus:border-slate-950 transition-all bg-white"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-700">Email Address</label>
+                            <Input
+                                type="email"
+                                placeholder="abebe@market.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="h-12 !rounded-lg border-slate-200 focus:border-slate-950 transition-all bg-white"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-700">Password</label>
+                            <Input
+                                type="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="h-12 !rounded-lg border-slate-200 focus:border-slate-950 transition-all bg-white"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-700">Confirm Password</label>
+                            <Input
+                                type="password"
+                                placeholder="••••••••"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className="h-12 !rounded-lg border-slate-200 focus:border-slate-950 transition-all bg-white"
+                                required
+                            />
+                        </div>
                     </div>
 
                     <div className="pt-4">
@@ -131,27 +147,20 @@ export const RegisterForm = () => {
                             type="submit"
                             fullWidth
                             disabled={isLoading}
-                            className="!h-16 rounded-2xl bg-slate-900 text-white font-black text-sm uppercase tracking-widest hover:bg-accent hover:shadow-xl hover:shadow-accent/20 border-none transition-all"
+                            className="h-14 rounded-lg bg-slate-950 text-white font-bold text-base hover:bg-slate-800 transition-all"
                         >
-                            {isLoading ? (
-                                <div className="flex items-center gap-2">
-                                    <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                                    Creating Store...
-                                </div>
-                            ) : "Launch My Store"}
+                            {isLoading ? "Creating Account..." : "Register"}
                         </Button>
                     </div>
 
-                    <div className="relative py-4">
-                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-50"></div></div>
-                        <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-white px-4 text-slate-300">Already a Partner?</span></div>
+                    <div className="text-center pt-2">
+                        <p className="text-sm text-slate-500">
+                            Already have an account?{" "}
+                            <Link href="/auth/login" className="text-slate-950 font-bold hover:underline">
+                                Login
+                            </Link>
+                        </p>
                     </div>
-
-                    <Link href="/auth/login" className="block text-center">
-                        <span className="text-xs font-black text-accent uppercase tracking-widest hover:text-slate-900 underline underline-offset-8 transition-all">
-                            Sign in to Existing Store
-                        </span>
-                    </Link>
                 </form>
             </div>
         </div>

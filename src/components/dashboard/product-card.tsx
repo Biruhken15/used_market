@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
 import { ShareModal } from "../products/share-modal";
 
@@ -21,6 +22,7 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product, initialIsFavorited = false }: ProductCardProps) => {
     const { data: session } = useSession();
+    const router = useRouter();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -36,7 +38,8 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
         e.stopPropagation();
 
         if (!session) {
-            alert("Please log in to favorite products.");
+            alert("Please register first to favorite products.");
+            router.push('/auth/register');
             return;
         }
 
@@ -61,6 +64,13 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
     const handleShare = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (!session) {
+            alert("Please register first to share products.");
+            router.push('/auth/register');
+            return;
+        }
+
         setIsShareModalOpen(true);
     };
 
@@ -152,14 +162,14 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
                             </span>
                         </div>
 
-                        {/* Row 3: Buttons */}
+                        {/* Row 3: Buttons - Visible to all, Guest triggers redirect */}
                         <div className="mt-auto flex gap-2 pt-3 border-t border-slate-50">
                             <button
                                 onClick={handleFavorite}
                                 disabled={isThinking}
                                 className={`flex-1 h-10 rounded-xl border border-slate-100 flex items-center justify-center transition-all active:scale-95 ${isFavorited
-                                        ? 'text-rose-500 border-rose-100 bg-rose-50'
-                                        : 'text-slate-500 hover:text-rose-500 hover:border-rose-100 hover:bg-rose-50'
+                                    ? 'text-rose-500 border-rose-100 bg-rose-50'
+                                    : 'text-slate-500 hover:text-rose-500 hover:border-rose-100 hover:bg-rose-50'
                                     }`}
                             >
                                 <svg

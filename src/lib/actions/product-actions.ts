@@ -38,7 +38,7 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
         const uploadedImages: any[] = [];
 
         for (const file of imageFiles) {
-            if (file && file.size > 0) {
+            if (file && file.size > 0 && typeof file !== 'string') {
                 try {
                     // Organization: products/[store-slug]/[file]
                     const uploadResult = await UploadService.uploadFile(file, `products/${storeSlug}`);
@@ -75,6 +75,13 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
             condition,
             quantity,
             isFeatured,
+            sourceOwner: {
+                name: formData.get("sourceOwnerName") as string,
+                phone: formData.get("sourceOwnerPhone") as string,
+                telegram: formData.get("sourceOwnerTelegram") as string,
+                address: formData.get("sourceOwnerAddress") as string,
+                otherInfo: formData.get("sourceOwnerOtherInfo") as string,
+            },
             images: uploadedImages,
             thumbnail: uploadedImages[0].url
         };
@@ -145,13 +152,16 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
             category,
             condition,
             quantity,
-            isFeatured
+            isFeatured,
+            sourceOwner: {
+                name: formData.get("sourceOwnerName") as string,
+                phone: formData.get("sourceOwnerPhone") as string,
+                telegram: formData.get("sourceOwnerTelegram") as string,
+                address: formData.get("sourceOwnerAddress") as string,
+                otherInfo: formData.get("sourceOwnerOtherInfo") as string,
+            }
         };
 
-        // If new images were uploaded, we might want to handle existing vs new
-        // For now, let's just add new ones if provided, or keep existing in a real app logic
-        // But the current ProductForm doesn't easily distinguish between "keep old" and "add new"
-        // Let's simplify: if new images are provided, use them. 
         if (uploadedImages.length > 0) {
             updateData.images = uploadedImages;
             updateData.thumbnail = uploadedImages[0].url;

@@ -7,12 +7,21 @@ import Link from "next/link";
 
 import { SearchFilter } from "@/components/dashboard/search-filter";
 import { ProductGrid } from "@/components/dashboard/product-grid";
+import PricingSection from "@/components/pricing-section";
 
 export default function Dashboard() {
     const { data: session } = useSession();
     const [store, setStore] = useState<any>(null);
     const [allStores, setAllStores] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState<"products" | "stores">("products");
+
+    // Force products tab for guests
+    useEffect(() => {
+        if (!session) {
+            setActiveTab("products");
+        }
+    }, [session]);
+
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -52,20 +61,22 @@ export default function Dashboard() {
                             <h1 className="text-4xl font-extrabold text-slate-900 tracking-tighter mb-2">Marketplace</h1>
                             <p className="text-slate-500 font-medium">Discover quality products and verified stores across Ethiopia.</p>
                         </div>
-                        <div className="inline-flex bg-slate-100 p-1.5 rounded-2xl">
-                            <button
-                                onClick={() => setActiveTab("products")}
-                                className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'products' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                            >
-                                Products
-                            </button>
-                            <button
-                                onClick={() => setActiveTab("stores")}
-                                className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'stores' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                            >
-                                Stores
-                            </button>
-                        </div>
+                        {session && (
+                            <div className="inline-flex bg-slate-100 p-1.5 rounded-2xl">
+                                <button
+                                    onClick={() => setActiveTab("products")}
+                                    className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'products' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                >
+                                    Products
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("stores")}
+                                    className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'stores' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                >
+                                    Stores
+                                </button>
+                            </div>
+                        )}
                     </div>
                     <SearchFilter />
                 </div>
@@ -105,6 +116,13 @@ export default function Dashboard() {
                     </div>
                 )}
             </div>
+
+            {/* Pricing Section for Guests */}
+            {!session && (
+                <div className="mt-12">
+                    <PricingSection />
+                </div>
+            )}
 
             {/* Action Section - Refined for Guest vs Logged In */}
             <div className="max-w-7xl mx-auto px-6 mt-12 pb-24">

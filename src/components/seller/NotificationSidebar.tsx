@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
-import { X, Bell, Info, AlertTriangle, CheckCircle, Gift, ArrowRight } from 'lucide-react';
+import { X, Bell, Info, AlertTriangle, CheckCircle, Gift } from 'lucide-react';
 
 interface Notification {
     _id: string;
@@ -20,6 +20,12 @@ interface NotificationSidebarProps {
 }
 
 export const NotificationSidebar = ({ isOpen, onClose, notifications, onMarkAllAsRead }: NotificationSidebarProps) => {
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     const getIcon = (type: string) => {
         const iconSize = 16;
         switch (type) {
@@ -33,6 +39,14 @@ export const NotificationSidebar = ({ isOpen, onClose, notifications, onMarkAllA
 
     return (
         <>
+            {/* Sidebar Overlay */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-[100] transition-opacity duration-500"
+                    onClick={onClose}
+                />
+            )}
+
             {/* Sidebar */}
             <div className={`fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white z-[101] shadow-[-20px_0_50px_-20px_rgba(0,0,0,0.15)] border-l border-slate-100 transition-transform duration-500 ease-in-out transform ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                 <div className="flex flex-col h-full">
@@ -70,10 +84,10 @@ export const NotificationSidebar = ({ isOpen, onClose, notifications, onMarkAllA
                                             <h3 className="text-[13px] font-black text-slate-900 tracking-tight leading-tight">{notif.title}</h3>
                                             <p className="text-[11px] text-slate-500 font-medium leading-normal">{notif.message}</p>
                                             <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest pt-1">
-                                                {new Date(notif.createdAt).toLocaleDateString(undefined, {
+                                                {isMounted ? new Date(notif.createdAt).toLocaleDateString(undefined, {
                                                     month: 'short',
                                                     day: 'numeric'
-                                                })}
+                                                }) : '--'}
                                             </p>
                                         </div>
                                     </div>
@@ -92,19 +106,6 @@ export const NotificationSidebar = ({ isOpen, onClose, notifications, onMarkAllA
                     </div>
                 </div>
             </div>
-
-            <style jsx global>{`
-                @keyframes swing {
-                    0% { transform: rotate(0deg); }
-                    10% { transform: rotate(10deg); }
-                    30% { transform: rotate(-10deg); }
-                    50% { transform: rotate(10deg); }
-                    100% { transform: rotate(0deg); }
-                }
-                .animate-swing {
-                    animation: swing 2s infinite ease-in-out;
-                }
-            `}</style>
         </>
     );
 };

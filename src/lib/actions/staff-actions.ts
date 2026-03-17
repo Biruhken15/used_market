@@ -51,9 +51,6 @@ export async function inviteStaffAction(storeId: string, email: string): Promise
             await store.save();
         } else {
             // Per requirement: "invited staff have to be register to the website if not registered"
-            // We can pre-add them to the staff list with just email, and when they register, 
-            // a hook or logic during registration should link them.
-
             // Check if email already in pending/staff list
             const isEmailInStaff = store.staff.some((s: any) => s.email === email);
             if (isEmailInStaff) return { error: "An invitation has already been sent to this email." };
@@ -64,8 +61,17 @@ export async function inviteStaffAction(storeId: string, email: string): Promise
             });
             await store.save();
 
-            // TODO: In a real app, send actual email here.
-            console.log(`[Staff Invitation] Email sent to ${email} for store ${store.storeName}`);
+            // Generate invitation link for new users
+            const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+            const inviteLink = `${baseUrl}/auth/register?inviteEmail=${encodeURIComponent(email)}&storeId=${store._id}`;
+
+            // SIMULATED EMAIL LOG
+            console.log("\n--- SIMULATED PROTOCOL EMAIL ---");
+            console.log(`To: ${email}`);
+            console.log(`Subject: Invitation to join ${store.storeName} Staff`);
+            console.log(`Message: You have been invited to manage ${store.storeName}.`);
+            console.log(`Register here: ${inviteLink}`);
+            console.log("-------------------------------\n");
         }
 
         revalidatePath("/seller/mystore");

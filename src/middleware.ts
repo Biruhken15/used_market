@@ -4,17 +4,20 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(req: any) {
     const path = req.nextUrl.pathname;
 
-    const isPublicPath = path === "/auth/login" || path === "/auth/register" || path === "/";
+    const isPublicPath =
+        path === "/auth/login" ||
+        path === "/auth/register" ||
+        path === "/" ||
+        path.startsWith("/dashboard") ||
+        path.startsWith("/products");
 
     const token = await getToken({
         req,
         secret: process.env.NEXTAUTH_SECRET,
     });
 
-    if (isPublicPath && token) {
-        if (path !== "/") {
-            return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
-        }
+    if (token && (path === "/auth/login" || path === "/auth/register")) {
+        return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
     }
 
     if (!isPublicPath && !token) {

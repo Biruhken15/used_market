@@ -124,6 +124,34 @@ export class ProductService {
     }
 
     /**
+     * Mark a product as sold with subscription verification.
+     */
+    static async markAsSold(productId: string, ownerId: string) {
+        await dbConnect();
+
+        const product = await Product.findOne({
+            _id: productId,
+            ownerId: new mongoose.Types.ObjectId(ownerId)
+        });
+
+        if (!product) {
+            throw new Error('Product not found or access denied');
+        }
+
+        // Verify subscription features
+        const subscription = await SubscriptionService.getStoreSubscription(product.storeId.toString());
+        const plan = subscription?.planId as any;
+
+        if (!plan?.features?.canMarkAsSold) {
+            throw new Error('Your current plan does not support marking items as sold. Please upgrade.');
+        }
+
+        product.status = 'sold';
+        product.updatedAt = new Date();
+        return await product.save();
+    }
+
+    /**
      * Update an existing product with ownership verification.
      */
     static async updateProduct(productId: string, ownerId: string, data: any) {

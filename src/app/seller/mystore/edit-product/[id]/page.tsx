@@ -31,7 +31,7 @@ export default async function EditProductPage({ params }: { params: { id: string
     // Get plan limits for the form
     const { SubscriptionService } = await import('@/lib/services/subscription-service');
     const plan = await SubscriptionService.getStoreSubscription(product.storeId);
-    const planLimits = plan?.planId?.limits;
+    const planLimits = JSON.parse(JSON.stringify(plan?.planId?.limits || null));
 
     return (
         <main className="min-h-screen bg-[#fcfcfc]">

@@ -20,6 +20,74 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
         );
     }
 
+    const handlePrintReceipt = (tx: any) => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        const date = new Date(tx.paymentDate || tx.createdAt).toLocaleDateString();
+        const planName = tx.subscriptionPlanId?.planName || 'Store Protocol Upgrade';
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Receipt - ${tx.referenceId}</title>
+                    <style>
+                        body { font-family: 'Inter', sans-serif; padding: 40px; color: #0f172a; }
+                        .receipt-box { max-width: 600px; margin: auto; border: 1px solid #e2e8f0; padding: 40px; border-radius: 20px; }
+                        .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; }
+                        .logo { font-size: 24px; font-weight: 900; letter-spacing: -1px; margin-bottom: 10px; }
+                        .details { margin-bottom: 40px; }
+                        .detail-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; }
+                        .label { color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
+                        .value { font-weight: 700; }
+                        .total-row { margin-top: 30px; border-top: 2px solid #f1f5f9; pt: 20px; font-size: 20px; font-weight: 900; display: flex; justify-content: space-between; }
+                        .footer { text-align: center; font-size: 10px; color: #94a3b8; margin-top: 40px; text-transform: uppercase; letter-spacing: 2px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt-box">
+                        <div class="header">
+                            <div class="logo">USED MARKET</div>
+                            <div style="font-size: 10px; font-weight: 900; color: #3b82f6;">OFFICIAL TRANSACTION PROTOCOL</div>
+                        </div>
+                        <div class="details">
+                            <div class="detail-row">
+                                <span class="label">Reference ID</span>
+                                <span class="value">${tx.referenceId}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Date</span>
+                                <span class="value">${date}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Plan Protocol</span>
+                                <span class="value">${planName}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Billing Cycle</span>
+                                <span class="value" style="text-transform: capitalize;">${tx.billingCycle}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Status</span>
+                                <span class="value" style="color: #10b981;">VERIFIED</span>
+                            </div>
+                        </div>
+                        <div class="total-row">
+                            <span>TOTAL PAID</span>
+                            <span>${tx.amount.toLocaleString()} ETB</span>
+                        </div>
+                        <div class="footer">
+                            Powered by Chapa Payment Gateway<br>
+                            This is a digitally generated receipt.
+                        </div>
+                    </div>
+                    <script>window.onload = function() { window.print(); window.close(); }</script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between mb-4 px-2">
@@ -67,12 +135,15 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
                                         </span>
                                     </td>
                                     <td className="px-8 py-6 text-right">
-                                        <button
-                                            onClick={() => window.print()}
-                                            className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-all hover:shadow-lg"
-                                        >
-                                            <Download className="w-4 h-4" />
-                                        </button>
+                                        {tx.status === 'completed' && (
+                                            <button
+                                                onClick={() => handlePrintReceipt(tx)}
+                                                className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-all hover:shadow-lg ml-auto"
+                                                title="Generate Receipt"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { createProductAction, updateProductAction } from '@/lib/actions/product-actions';
+import { X, Bell, Info, AlertTriangle, CheckCircle, Gift, ChevronRight, Sparkles } from 'lucide-react';
 
 interface ProductFormProps {
     initialData?: any;
@@ -16,14 +16,18 @@ interface ProductFormProps {
         maxActiveListings: number;
         imagesPerProduct: number;
     };
+    onClose?: () => void;
+    closeUrl?: string;
+    viewType?: 'inline' | 'drawer';
 }
 
-export default function ProductForm({ initialData, isEditing = false, productId, storeId, storeSlug, planLimits }: ProductFormProps) {
+export default function ProductForm({ initialData, isEditing = false, productId, storeId, storeSlug, planLimits, onClose, closeUrl, viewType = 'inline' }: ProductFormProps) {
     const router = useRouter();
-    // ... rest of the component state ...
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<{ message: string; details?: string } | null>(null);
+    const [showSuccess, setShowSuccess] = useState(false);
+
 
     // Media state
     const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -39,15 +43,22 @@ export default function ProductForm({ initialData, isEditing = false, productId,
         condition: initialData?.condition || 'good',
         quantity: initialData?.quantity || '1',
         isFeatured: initialData?.isFeatured || false,
+        sourceOwner: {
+            name: initialData?.sourceOwner?.name || '',
+            phone: initialData?.sourceOwner?.phone || '',
+            telegram: initialData?.sourceOwner?.telegram || '',
+            address: initialData?.sourceOwner?.address || '',
+            otherInfo: initialData?.sourceOwner?.otherInfo || '',
+        },
     });
 
     const categories = ['electronics', 'phones', 'real-estate', 'vehicles', 'houses', 'furniture', 'fashion', 'sports', 'books', 'other'];
     const conditions = [
-        { value: 'new', label: 'Brand New' },
+        { value: 'new', label: 'New' },
         { value: 'like-new', label: 'Like New' },
-        { value: 'good', label: 'Good condition' },
-        { value: 'fair', label: 'Well used' },
-        { value: 'for-parts', label: 'For Parts / Repair' }
+        { value: 'good', label: 'Good' },
+        { value: 'fair', label: 'Fair' },
+        { value: 'for-parts', label: 'For Parts' }
     ];
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +68,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
         if (imageFiles.length + files.length > limit) {
             setError({
                 message: "Image Limit Reached",
-                details: `Your current plan allows only ${limit} images per product. Please upgrade to add more.`
+                details: `Your current plan allows only ${limit} images per product.`
             });
             return;
         }
@@ -77,7 +88,15 @@ export default function ProductForm({ initialData, isEditing = false, productId,
     const removeImage = (index: number) => {
         setImageFiles(prev => prev.filter((_, i) => i !== index));
         setImagePreviews(prev => prev.filter((_, i) => i !== index));
-        if (error?.message.includes('images')) setError(null);
+    };
+
+    const handleClose = () => {
+        if (onClose) onClose();
+        if (closeUrl) {
+            router.push(closeUrl);
+        } else {
+            router.back();
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -101,6 +120,12 @@ export default function ProductForm({ initialData, isEditing = false, productId,
             data.append("quantity", formData.quantity);
             data.append("isFeatured", formData.isFeatured.toString());
 
+            data.append("sourceOwnerName", formData.sourceOwner.name);
+            data.append("sourceOwnerPhone", formData.sourceOwner.phone);
+            data.append("sourceOwnerTelegram", formData.sourceOwner.telegram);
+            data.append("sourceOwnerAddress", formData.sourceOwner.address);
+            data.append("sourceOwnerOtherInfo", formData.sourceOwner.otherInfo);
+
             imageFiles.forEach(file => {
                 data.append("images", file);
             });
@@ -115,195 +140,278 @@ export default function ProductForm({ initialData, isEditing = false, productId,
                 return;
             }
 
-            // Redirect back to inventory mode using client-side router
-            router.push('/seller/mystore?success=true');
+            setShowSuccess(true);
+            setLoading(false);
+
+            // Close after a short delay to show success
+            setTimeout(() => {
+                handleClose();
+                // Optional: short delay for refresh
+                router.refresh();
+            }, 2000);
+
         } catch (err: any) {
-            setError({ message: "An unexpected error occurred", details: err.message });
+            setError({ message: "An error occurred", details: err.message });
             setLoading(false);
         }
     };
 
-    return (
-        <form onSubmit={handleSubmit} className="space-y-12 max-w-2xl mx-auto pb-12 pt-4">
-            {error && (
-                <div className="p-6 bg-red-50 border-l-4 border-red-500 rounded-2xl shadow-sm">
-                    <h3 className="text-red-800 font-black uppercase text-xs tracking-widest leading-none mb-1">{error.message}</h3>
-                    {error.details && <p className="text-red-600/80 text-sm font-bold">{error.details}</p>}
+    const inputClasses = "w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 font-medium text-slate-900 placeholder:text-slate-300 outline-none focus:border-slate-900 transition-all shadow-sm";
+    const labelClasses = "block text-sm font-bold text-slate-700 mb-1.5";
+
+    const FormContent = (
+        <form onSubmit={handleSubmit} className="space-y-8 pb-10">
+            {showSuccess && (
+                <div className="absolute inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 backdrop-blur-sm animate-in fade-in duration-500 rounded-[2.5rem]">
+                    <div className="text-center space-y-4 animate-in zoom-in-95 duration-500">
+                        <div className="w-16 h-16 bg-emerald-500 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-xl shadow-emerald-100">
+                            ✓
+                        </div>
+                        <div className="space-y-1">
+                            <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase italic">Success</h2>
+                            <p className="text-slate-400 font-bold text-[10px] tracking-wide uppercase">
+                                Product {isEditing ? 'updated' : 'added'} successfully.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             )}
 
-            {/* Media Section */}
-            <section className="space-y-4">
-                <div className="flex justify-between items-end mb-2">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">Product Visuals ({imageFiles.length}/{planLimits?.imagesPerProduct || 3})</label>
-                    <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="text-[10px] font-black text-accent uppercase tracking-widest hover:underline"
-                    >
-                        Add Media +
-                    </button>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        multiple
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleFileChange}
-                    />
+            {error && (
+                <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl">
+                    <h3 className="text-rose-600 font-black text-xs uppercase tracking-widest">{error.message}</h3>
+                    {error.details && <p className="text-rose-600/60 text-[10px] font-bold mt-1">{error.details}</p>}
+                </div>
+            )}
+
+            {/* 1. Item Visuals & Details */}
+            <div className="space-y-8 bg-slate-50/30 p-6 rounded-[2rem] border border-slate-100">
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-sm shadow-sm border border-slate-100">1</div>
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest italic">Item Essentials</h3>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {imagePreviews.map((preview, idx) => (
-                        <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border border-slate-200 group">
-                            <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-                            <button
-                                type="button"
-                                onClick={() => removeImage(idx)}
-                                className="absolute top-2 right-2 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
-                            </button>
-                            {idx === 0 && (
-                                <div className="absolute bottom-2 left-2 px-2 py-1 bg-accent text-white text-[8px] font-black uppercase rounded shadow-lg">Primary</div>
+                <div className="space-y-6">
+                    {/* Media Section */}
+                    <div className="space-y-4">
+                        <label className={labelClasses}>Product Photos ({imageFiles.length}/{planLimits?.imagesPerProduct || 3})</label>
+                        <div className="grid grid-cols-3 gap-3">
+                            {imagePreviews.map((preview, idx) => (
+                                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 group">
+                                    <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(idx)}
+                                        className="absolute top-1 right-1 w-5 h-5 bg-slate-900/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <X size={10} strokeWidth={3} />
+                                    </button>
+                                </div>
+                            ))}
+                            {imageFiles.length < (planLimits?.imagesPerProduct || 3) && (
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="aspect-square rounded-xl border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300 hover:border-slate-900 hover:text-slate-900 transition-all bg-white shadow-inner"
+                                >
+                                    <Sparkles size={20} className="opacity-20" />
+                                </button>
                             )}
                         </div>
-                    ))}
-                    {imageFiles.length < (planLimits?.imagesPerProduct || 3) && (
-                        <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            className="aspect-square rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-accent hover:text-accent transition-all"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
-                            <span className="text-[10px] font-black uppercase tracking-widest">Upload Image</span>
-                        </button>
-                    )}
-                </div>
-            </section>
-
-            <section className="space-y-8">
-                <div className="grid grid-cols-1 gap-8">
-                    <div className="space-y-2">
-                        <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Listing Title</label>
-                        <Input
-                            placeholder="e.g. iPhone 15 Pro Max - 256GB"
-                            required
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        />
+                        <input type="file" ref={fileInputRef} multiple accept="image/*" className="hidden" onChange={handleFileChange} />
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Product Description</label>
-                        <textarea
-                            placeholder="Describe your item in detail..."
-                            required
-                            rows={4}
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="w-full bg-white border border-slate-300 rounded-2xl p-4 font-bold text-slate-900 placeholder:text-slate-300 outline-none focus:ring-4 focus:ring-accent/10 focus:border-accent transition-all resize-none shadow-sm"
-                        />
-                    </div>
+                    <div className="space-y-6">
+                        <div>
+                            <label className={labelClasses}>Item Name</label>
+                            <input
+                                className={inputClasses}
+                                placeholder="What are you selling?"
+                                required
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            />
+                        </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-4">
-                            <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Price & Type</label>
-                            <div className="flex gap-2">
-                                <Input
+                        <div>
+                            <label className={labelClasses}>Description</label>
+                            <textarea
+                                className="w-full bg-white border border-slate-300 rounded-lg p-4 font-medium text-slate-900 placeholder:text-slate-300 outline-none focus:border-slate-900 transition-all resize-none shadow-sm text-sm"
+                                placeholder="Tell buyers more about it..."
+                                required
+                                rows={3}
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className={labelClasses}>Price (ETB)</label>
+                                <input
                                     type="number"
                                     required
+                                    className={inputClasses}
                                     placeholder="Amount"
                                     value={formData.price}
                                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                                 />
+                            </div>
+                            <div>
+                                <label className={labelClasses}>Price Type</label>
                                 <select
                                     value={formData.priceType}
-                                    onChange={(e) => setFormData({ ...formData, priceType: e.target.value })}
-                                    className="bg-slate-900 text-white rounded-xl px-4 text-[10px] font-black uppercase tracking-widest outline-none border-none cursor-pointer"
+                                    onChange={(e) => setFormData({ ...formData, priceType: e.target.value as any })}
+                                    className={inputClasses}
                                 >
                                     <option value="fixed">Fixed</option>
-                                    <option value="negotiable">Negotiable</option>
+                                    <option value="negotiable">Deal</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Quantity Available</label>
-                            <Input
-                                type="number"
-                                required
-                                min="1"
-                                value={formData.quantity}
-                                onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className={labelClasses}>Category</label>
+                                <select
+                                    required
+                                    className={inputClasses}
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                >
+                                    <option value="">Choose Area</option>
+                                    {categories.map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className={labelClasses}>Condition</label>
+                                <select
+                                    className={inputClasses}
+                                    value={formData.condition}
+                                    onChange={(e) => setFormData({ ...formData, condition: e.target.value as any })}
+                                >
+                                    {conditions.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 2. Broker / Owner Information Area */}
+            <div className="space-y-8 bg-white p-6 rounded-[2rem] border-2 border-slate-100 shadow-sm">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-sm shadow-sm border border-blue-100">2</div>
+                        <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest italic">Product Owner Info</h3>
+                    </div>
+                    <span className="text-[9px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full uppercase tracking-widest border border-slate-100">Optional</span>
+                </div>
+
+                <div className="space-y-6">
+                    <div>
+                        <label className={labelClasses}>Source Identity</label>
+                        <input
+                            className={inputClasses}
+                            placeholder="Owner Name"
+                            value={formData.sourceOwner.name}
+                            onChange={(e) => setFormData({ ...formData, sourceOwner: { ...formData.sourceOwner, name: e.target.value } })}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className={labelClasses}>Phone Protocol</label>
+                            <input
+                                className={inputClasses}
+                                placeholder="Number"
+                                value={formData.sourceOwner.phone}
+                                onChange={(e) => setFormData({ ...formData, sourceOwner: { ...formData.sourceOwner, phone: e.target.value } })}
+                            />
+                        </div>
+                        <div>
+                            <label className={labelClasses}>Telegram</label>
+                            <input
+                                className={inputClasses}
+                                placeholder="@handle"
+                                value={formData.sourceOwner.telegram}
+                                onChange={(e) => setFormData({ ...formData, sourceOwner: { ...formData.sourceOwner, telegram: e.target.value } })}
                             />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                            <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Category</label>
-                            <select
-                                required
-                                value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 font-black text-[11px] uppercase tracking-widest text-slate-900 outline-none focus:ring-4 focus:ring-accent/10 focus:border-accent transition-all appearance-none cursor-pointer shadow-sm"
-                            >
-                                <option value="">Select Domain</option>
-                                {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Condition</label>
-                            <select
-                                value={formData.condition}
-                                onChange={(e) => setFormData({ ...formData, condition: e.target.value as any })}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 font-black text-[11px] uppercase tracking-widest text-slate-900 outline-none focus:ring-4 focus:ring-accent/10 focus:border-accent transition-all appearance-none cursor-pointer shadow-sm"
-                            >
-                                {conditions.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                            </select>
-                        </div>
-
+                    <div>
+                        <label className={labelClasses}>Physical Address</label>
+                        <input
+                            className={inputClasses}
+                            placeholder="Location / Neighborhood"
+                            value={formData.sourceOwner.address}
+                            onChange={(e) => setFormData({ ...formData, sourceOwner: { ...formData.sourceOwner, address: e.target.value } })}
+                        />
                     </div>
 
-                    {/* Featured Option - Only for Pro/Enterprise */}
-                    {(planLimits?.maxActiveListings || 0) > 20 && (
-                        <div className="p-6 rounded-[2rem] bg-amber-50 border-2 border-amber-100 flex items-center justify-between group hover:border-amber-400 transition-all">
-                            <div className="space-y-1">
-                                <h3 className="text-sm font-black text-amber-900 uppercase tracking-widest italic">Featured Listing</h3>
-                                <p className="text-[10px] font-bold text-amber-700/60 uppercase tracking-wider">Boost visibility by 25% on homepage</p>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setFormData({ ...formData, isFeatured: !formData.isFeatured })}
-                                className={`w-14 h-8 rounded-full relative transition-all ${formData.isFeatured ? 'bg-amber-500' : 'bg-slate-200'}`}
-                            >
-                                <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${formData.isFeatured ? 'left-7' : 'left-1'}`} />
-                            </button>
-                        </div>
-                    )}
+                    <div>
+                        <label className={labelClasses}>Special Notice (Notes)</label>
+                        <textarea
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-4 font-medium text-slate-900 placeholder:text-slate-300 outline-none focus:border-slate-900 transition-all resize-none text-sm"
+                            placeholder="Any private notes about this source..."
+                            rows={2}
+                            value={formData.sourceOwner.otherInfo}
+                            onChange={(e) => setFormData({ ...formData, sourceOwner: { ...formData.sourceOwner, otherInfo: e.target.value } })}
+                        />
+                    </div>
                 </div>
-            </section>
+            </div>
 
-            <div className="pt-6 flex justify-center">
+
+            <div className="pt-6">
                 <Button
-                    disabled={loading}
-                    className="!h-13 !px-12 rounded-xl bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-accent transition-all border-none"
+                    disabled={loading || showSuccess}
+                    className="h-14 w-full rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-blue-600 transition-all active:scale-95 shadow-xl shadow-slate-200"
                 >
-                    {loading ? (
-                        <div className="flex items-center gap-3">
-                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-                            Processing...
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-2">
-                            {isEditing ? 'Update Listing' : 'Add Product'}
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
-                        </div>
-                    )}
+                    {loading ? 'Wait...' : showSuccess ? 'Success!' : (isEditing ? 'Update Product' : 'Add Product')}
                 </Button>
             </div>
         </form>
+    );
+
+    if (viewType === 'drawer') {
+        return (
+            <div className="fixed top-[15%] right-6 bottom-6 w-full max-w-[420px] bg-white z-[200] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] border border-slate-100 flex flex-col rounded-[2.5rem] animate-in fade-in slide-in-from-bottom-8 duration-500 overflow-hidden">
+                {/* Independent Scroll Container */}
+                <div className="flex-1 overflow-y-auto px-8 pt-8 relative scrollbar-hide">
+                    {/* Floating Header */}
+                    <div className="flex items-center justify-between mb-8 sticky top-0 bg-white/90 backdrop-blur-md pt-2 pb-4 z-20 border-b border-slate-50">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
+                                <ChevronRight size={18} strokeWidth={3} />
+                            </div>
+                            <h2 className="text-lg font-black text-slate-900 tracking-tight italic uppercase">{isEditing ? 'Edit Item' : 'New Product'}</h2>
+                        </div>
+                        <button
+                            onClick={handleClose}
+                            className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all group"
+                            title="Cancel and Close"
+                        >
+                            <X size={16} strokeWidth={3} className="group-active:scale-90 transition-transform" />
+                        </button>
+                    </div>
+
+                    {FormContent}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-slate-50/30">
+            <div className="w-full max-w-2xl bg-white border-4 border-slate-200 rounded-[2.5rem] p-10 md:p-14 shadow-2xl shadow-slate-200/50">
+                <div className="mb-10 text-center">
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tight italic uppercase">{isEditing ? 'Edit Listing' : 'New Listing'}</h1>
+                    <p className="text-slate-400 font-bold text-[10px] tracking-[0.3em] uppercase mt-1">Marketplace Protocol</p>
+                </div>
+                {FormContent}
+            </div>
+        </div>
     );
 }

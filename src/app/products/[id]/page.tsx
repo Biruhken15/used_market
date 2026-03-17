@@ -106,6 +106,66 @@ export default function ProductDetailPage() {
                             productPrice={product.price}
                             pageUrl={typeof window !== 'undefined' ? window.location.href : ''}
                         />
+
+                        {/* Source Owner Info - Only Visible to Store Owner */}
+                        {product.sourceOwner && (
+                            <div className="p-8 rounded-[2.5rem] bg-white border-2 border-slate-100 space-y-6 shadow-sm relative overflow-hidden">
+                                <div className="flex items-center justify-between border-b border-slate-100 pb-4 relative z-10">
+                                    <div className="space-y-1">
+                                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-blue-600 italic">Product Owner Info</h3>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Confidential Broker View</p>
+                                    </div>
+                                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" /></svg>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6 relative z-10">
+                                    {product.sourceOwner.name && (
+                                        <div className="space-y-1">
+                                            <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Owner Identity</p>
+                                            <p className="text-lg font-black tracking-tight italic uppercase text-slate-900">{product.sourceOwner.name}</p>
+                                        </div>
+                                    )}
+
+                                    {product.sourceOwner.phone && (
+                                        <div className="space-y-1">
+                                            <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Contact Protocol</p>
+                                            <div className="flex flex-col gap-2">
+                                                <div className="flex items-center gap-3">
+                                                    <p className="text-base font-black tracking-widest text-blue-600">{product.sourceOwner.phone}</p>
+                                                    <a href={`tel:${product.sourceOwner.phone}`} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-slate-600">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                                                    </a>
+                                                </div>
+                                                {product.sourceOwner.telegram && (
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-5 h-5 rounded-full bg-blue-50 flex items-center justify-center">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></svg>
+                                                        </div>
+                                                        <p className="text-xs font-black tracking-widest text-slate-400 lowercase italic">{product.sourceOwner.telegram}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {product.sourceOwner.address && (
+                                        <div className="space-y-1">
+                                            <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Physical Location</p>
+                                            <p className="text-xs font-bold text-slate-600 leading-relaxed italic">{product.sourceOwner.address}</p>
+                                        </div>
+                                    )}
+
+                                    {product.sourceOwner.otherInfo && (
+                                        <div className="pt-4 border-t border-slate-100">
+                                            <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2">Internal Intel</p>
+                                            <p className="text-[10px] font-medium text-slate-400 leading-relaxed italic uppercase">{product.sourceOwner.otherInfo}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 

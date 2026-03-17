@@ -13,7 +13,7 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['subscription_expired', 'limit_reached', 'payment_success', 'system_alert', 'new_feature'],
+        enum: ['subscription_expired', 'limit_reached', 'payment_success', 'system_alert', 'new_feature', 'subscription_canceled'],
         required: true
     },
     title: { type: String, required: true },

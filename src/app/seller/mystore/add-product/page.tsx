@@ -33,7 +33,7 @@ export default async function AddProductPage() {
 
                 <ProductForm
                     storeId={store._id.toString()}
-                    planLimits={plan?.limits || { maxActiveListings: 3, imagesPerProduct: 3 }}
+                    planLimits={JSON.parse(JSON.stringify(plan?.limits || { maxActiveListings: 3, imagesPerProduct: 3 }))}
                 />
             </div>
         </main>

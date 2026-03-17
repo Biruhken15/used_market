@@ -29,20 +29,21 @@ export const ProductEssentials = ({
 }: ProductEssentialsProps) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
-    const shouldTruncate = description?.length > 300;
+    const truncatedLimit = 200;
+    const shouldTruncate = description?.length > truncatedLimit;
     const displayDescription = isDescriptionExpanded || !shouldTruncate
         ? description
-        : `${description?.slice(0, 300)}...`;
+        : `${description?.slice(0, truncatedLimit)}...`;
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-10 w-full max-w-full overflow-hidden">
             {/* Title and Price */}
             <div className="space-y-6">
                 <div className="space-y-2">
-                    <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                    <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight leading-tight break-words">
                         {title}
                     </h1>
-                    <div className="flex items-baseline gap-1.5">
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
                         <span className="text-4xl font-medium text-slate-900 tracking-tighter">
                             {price.toLocaleString()}
                         </span>
@@ -71,8 +72,8 @@ export const ProductEssentials = ({
             <div className="space-y-8">
                 <div className="space-y-3">
                     <h5 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Description</h5>
-                    <div className="relative">
-                        <p className="text-slate-500 font-medium leading-relaxed text-sm whitespace-pre-line">
+                    <div className="relative w-full max-w-full overflow-hidden">
+                        <p className="text-slate-500 font-medium leading-relaxed text-sm whitespace-pre-line break-words overflow-hidden">
                             {displayDescription}
                         </p>
                         {shouldTruncate && (
@@ -85,6 +86,7 @@ export const ProductEssentials = ({
                         )}
                     </div>
                 </div>
+
 
                 {/* Specs Grid */}
                 <div className="grid grid-cols-2 gap-3">

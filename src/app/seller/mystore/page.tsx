@@ -62,6 +62,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
     const serializedActivity = JSON.parse(JSON.stringify(recentActivity));
     const serializedPlanFeatures = JSON.parse(JSON.stringify(plan?.features || { canMarkAsSold: false }));
     const serializedStaff = JSON.parse(JSON.stringify(store.staff || []));
+    const serializedPlanLimits = JSON.parse(JSON.stringify(plan?.limits || { maxActiveListings: 3, imagesPerProduct: 3 }));
 
     return (
         <div className="min-h-screen bg-slate-50/50 pb-24">
@@ -126,8 +127,8 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                 </div>
 
                 {/* Dashboard Navigation */}
-                <div className="mt-16 flex flex-col md:flex-row items-center justify-between gap-8 pb-8 border-b border-slate-200">
-                    <div className="flex items-center gap-10">
+                <div className="mt-16 flex items-center justify-between pb-4 border-b border-slate-200">
+                    <div className="flex items-center gap-10 overflow-x-auto no-scrollbar">
                         {isAddingProduct ? (
                             <Link href="/seller/mystore" className="flex items-center gap-2 text-blue-600 font-black text-xs uppercase tracking-widest group">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6" /></svg>
@@ -158,49 +159,47 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                             })
                         )}
                     </div>
-
-                    <div className="flex flex-wrap items-center gap-4">
-                        {!isAddingProduct && !isAnalytics && !isSettings && (
-                            products.length >= (plan?.limits?.maxActiveListings || 3) ? (
-                                <div className="group relative">
-                                    <Button disabled className="!h-13 !px-8 rounded-xl bg-slate-200 text-slate-400 font-black text-[11px] uppercase tracking-widest border-none flex items-center gap-2 cursor-not-allowed">
-                                        Limit Reached
-                                    </Button>
-                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-center shadow-xl">
-                                        You reached the max listing limit for {plan?.planName || 'Free'} plan. Upgrade to add more!
-                                    </div>
-                                </div>
-                            ) : (
-                                <Link href="/seller/mystore?mode=add-product">
-                                    <Button className="!h-13 !px-8 rounded-xl bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-accent transition-all shadow-lg shadow-slate-200 border-none flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
-                                        Add Product
-                                    </Button>
-                                </Link>
-                            )
-                        )}
-                        <Link href="/pricing">
-                            <Button variant="outline" className="!h-13 !px-8 rounded-xl border-2 border-slate-200 font-black text-[11px] uppercase tracking-widest hover:border-accent hover:text-accent transition-all">
-                                {plan ? 'Manage Plan' : 'Upgrade Plan'}
-                            </Button>
-                        </Link>
-                    </div>
                 </div>
 
-                {/* Content Sections */}
-                {isAddingProduct ? (
-                    <div className="py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="text-center mb-10">
-                            <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">Initialize <span className="text-blue-600">New Product</span></h2>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Marketplace Inventory Control</p>
-                        </div>
-                        <ProductForm
-                            storeId={store._id.toString()}
-                            storeSlug={store.storeSlug}
-                            planLimits={plan?.limits || { maxActiveListings: 3, imagesPerProduct: 3 }}
-                        />
-                    </div>
-                ) : isAnalytics ? (
+                {/* Action Row - Moved below navigation links */}
+                <div className="mt-8 flex flex-wrap items-center justify-end gap-3 px-2">
+                    {!isAddingProduct && !isAnalytics && !isSettings && (
+                        products.length >= (plan?.limits?.maxActiveListings || 3) ? (
+                            <div className="group relative">
+                                <Button disabled className="!h-10 !px-6 rounded-xl bg-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest border-none flex items-center gap-2 cursor-not-allowed">
+                                    Limit Reached
+                                </Button>
+                                <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-center shadow-xl">
+                                    You reached the max listing limit for {plan?.planName || 'Free'} plan. Upgrade to add more!
+                                </div>
+                            </div>
+                        ) : (
+                            <Link href="/seller/mystore?mode=add-product">
+                                <Button className="!h-10 !px-6 rounded-xl bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 border-none flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
+                                    Add Product
+                                </Button>
+                            </Link>
+                        )
+                    )}
+                    <Link href="/pricing">
+                        <Button variant="outline" className="!h-10 !px-6 rounded-xl border-2 border-blue-600 text-blue-600 font-black text-[10px] uppercase tracking-widest hover:bg-blue-50 transition-all">
+                            {plan ? 'Upgrade Plan' : 'Go Premium'}
+                        </Button>
+                    </Link>
+                </div>
+
+                {isAddingProduct && (
+                    <ProductForm
+                        storeId={store._id.toString()}
+                        storeSlug={store.storeSlug}
+                        planLimits={serializedPlanLimits}
+                        viewType="drawer"
+                        closeUrl="/seller/mystore"
+                    />
+                )}
+
+                {isAnalytics ? (
                     <div className="py-12">
                         {/* Summary Metrics moved here for consistency */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">

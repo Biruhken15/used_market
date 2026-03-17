@@ -20,7 +20,17 @@ export async function GET(
         if (!product) {
             return NextResponse.json({ error: 'Product not found' }, { status: 404 });
         }
-        return NextResponse.json(product);
+
+        // Role-based Sanitization
+        const session = await getServerSession(authOptions);
+        const isOwner = session?.user && (product.ownerId.toString() === (session.user as any).id);
+
+        const productObj = product.toObject();
+        if (!isOwner) {
+            delete productObj.sourceOwner;
+        }
+
+        return NextResponse.json(productObj);
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

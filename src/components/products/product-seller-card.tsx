@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 /**
  * ProductSellerCard Component
@@ -24,20 +26,34 @@ interface ProductSellerCardProps {
 }
 
 export const ProductSellerCard = ({ store, productTitle, productPrice, pageUrl }: ProductSellerCardProps) => {
+    const { data: session } = useSession();
+    const router = useRouter();
+
+    const handleGuestAction = (e: React.MouseEvent, action: string) => {
+        if (!session) {
+            e.preventDefault();
+            alert(`Please register first to ${action}.`);
+            router.push('/auth/register');
+        }
+    };
+
     // Contact URIs
     const whatsappUrl = `https://wa.me/${store?.whatsapp || store?.phone}?text=Hello! I am interested in your *${productTitle}* listed for *${productPrice.toLocaleString()} ETB* on Used Market. Link: ${pageUrl}`;
     const telegramUrl = store?.telegram?.startsWith('http') ? store.telegram : `https://t.me/${store?.telegram?.replace('@', '')}`;
 
     return (
         <div className="p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50/30 space-y-8">
-            {/* Store Branding */}
-            <div className="flex items-center gap-4 pb-8 border-b border-slate-100">
-                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-3xl overflow-hidden shadow-sm border border-slate-100">
+            {/* Store Branding - Now Interactive for Guests */}
+            <div
+                className="flex items-center gap-4 pb-8 border-b border-slate-100 cursor-pointer group/store hover:opacity-80 transition-opacity"
+                onClick={(e) => handleGuestAction(e, "view store details")}
+            >
+                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-3xl overflow-hidden shadow-sm border border-slate-100 group-hover/store:border-accent/30 transition-colors">
                     {store?.logo?.url ? <img src={store.logo.url} className="w-full h-full object-cover" alt="Store logo" /> : "🏪"}
                 </div>
                 <div className="space-y-1">
                     <p className="text-[10px] font-black text-accent uppercase tracking-widest mb-1">Store Name</p>
-                    <h4 className="font-extrabold text-slate-900 text-lg leading-none">{store?.storeName}</h4>
+                    <h4 className="font-extrabold text-slate-900 text-lg leading-none group-hover/store:text-accent transition-colors">{store?.storeName}</h4>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{store?.city || 'Addis Ababa'}, Ethiopia</p>
                 </div>
             </div>
@@ -97,8 +113,11 @@ export const ProductSellerCard = ({ store, productTitle, productPrice, pageUrl }
                     </a>
                 </div>
 
-                {/* In-App Chat Backup */}
-                <Button className="w-full !h-14 bg-slate-900 text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 mt-2">
+                {/* In-App Chat Backup - Visible to all, Guest triggers redirect */}
+                <Button
+                    onClick={(e) => handleGuestAction(e, "message the seller")}
+                    className="w-full !h-14 bg-slate-900 text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 mt-2 hover:bg-accent transition-all hover:scale-[1.02] active:scale-95"
+                >
                     Message in Marketplace
                 </Button>
             </div>

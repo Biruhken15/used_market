@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 // Custom high-fidelity CheckIcon to replace lucide-react
 const CheckIcon = ({ className }: { className?: string }) => (
     <svg
@@ -30,8 +32,10 @@ interface SubscriptionDetailsProps {
 export function SubscriptionDetails({ subscription, plan }: SubscriptionDetailsProps) {
     if (!plan) return null;
 
+    const startDate = new Date(subscription?.currentPeriodStart || subscription?.createdAt);
     const expiryDate = new Date(subscription?.currentPeriodEnd);
-    const isExpired = new Date() > expiryDate;
+    const isExpired = new Date() > expiryDate || subscription?.status === 'expired';
+    const isCanceled = subscription?.status === 'canceled';
     const daysRemaining = Math.max(0, Math.ceil((expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)));
 
     // Highlight key features for the current plan
@@ -52,7 +56,9 @@ export function SubscriptionDetails({ subscription, plan }: SubscriptionDetailsP
                 <div className="p-8 md:p-12">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
                         <div className="space-y-2">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Active Managed Protocol</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                                {isCanceled ? 'Cancellation Pending' : 'Active Managed Protocol'}
+                            </span>
                             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">
                                 {plan.planName}
                             </h2>
@@ -68,6 +74,24 @@ export function SubscriptionDetails({ subscription, plan }: SubscriptionDetailsP
                         </div>
                     </div>
 
+                    {/* New: Period Dates */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-lg shadow-sm">🗓️</div>
+                            <div>
+                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Activated On</div>
+                                <div className="text-sm font-black text-slate-900">{startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4 border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-8">
+                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-lg shadow-sm">⌛</div>
+                            <div>
+                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Expires On</div>
+                                <div className="text-sm font-black text-slate-900">{expiryDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {featureHighlights.map((item) => (
                             <div key={item.label} className="bg-slate-50/50 p-6 rounded-[2rem] border border-transparent hover:border-slate-100 transition-all hover:bg-white hover:shadow-lg hover:shadow-slate-100 group">
@@ -77,18 +101,33 @@ export function SubscriptionDetails({ subscription, plan }: SubscriptionDetailsP
                             </div>
                         ))}
                     </div>
+
+                    {/* Renew Button for expired or canceled */}
+                    {(isExpired || isCanceled) && (
+                        <div className="mt-12">
+                            <Link href={`/seller/checkout?planId=${plan._id}`} className="block">
+                                <button className="w-full py-6 bg-blue-600 text-white rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-blue-200 hover:bg-blue-700 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-4 group">
+                                    Renew Protocol Access
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-12 transition-transform"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" /><path d="M16 16h5v5" /></svg>
+                                </button>
+                            </Link>
+                            <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-4">
+                                {isExpired ? 'Access limited. Renew to restore full functionality.' : 'Auto-renewal disabled. Manual protocol required for continuation.'}
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Status Footer */}
-                <div className={`px-8 py-4 flex items-center justify-between border-t ${isExpired ? 'bg-rose-50 border-rose-100' : 'bg-emerald-50 border-emerald-100'}`}>
+                <div className={`px-8 py-4 flex items-center justify-between border-t ${isExpired ? 'bg-rose-50 border-rose-100' : isCanceled ? 'bg-amber-50 border-amber-100' : 'bg-emerald-50 border-emerald-100'}`}>
                     <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full animate-pulse ${isExpired ? 'bg-rose-500' : 'bg-emerald-500'}`} />
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${isExpired ? 'text-rose-600' : 'text-emerald-600'}`}>
-                            {isExpired ? 'Subscription Expired' : 'System Secure & Active'}
+                        <div className={`w-2 h-2 rounded-full animate-pulse ${isExpired ? 'bg-rose-500' : isCanceled ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${isExpired ? 'text-rose-600' : isCanceled ? 'text-amber-600' : 'text-emerald-600'}`}>
+                            {isExpired ? 'Subscription Expired' : isCanceled ? 'Protocol Cancellation Active' : 'System Secure & Active'}
                         </span>
                     </div>
                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        Refreshes in {daysRemaining} days • {expiryDate.toLocaleDateString()}
+                        {isExpired ? 'Expired' : `Refreshes in ${daysRemaining} days`} • {expiryDate.toLocaleDateString()}
                     </div>
                 </div>
             </div>

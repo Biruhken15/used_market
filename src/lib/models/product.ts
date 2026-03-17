@@ -20,6 +20,12 @@ export interface IProduct extends Document {
     thumbnail: string;
     features: Map<string, any>;
     views: number;
+    sourceOwner?: {
+        name?: string;
+        phone?: string;
+        address?: string;
+        otherInfo?: string;
+    };
     createdAt: Date;
     updatedAt: Date;
 }
@@ -135,6 +141,15 @@ const productSchema = new Schema<IProduct>({
     views: {
         type: Number,
         default: 0
+    },
+
+    // Broker info: Source Owner (Hidden from public)
+    sourceOwner: {
+        name: { type: String, trim: true },
+        phone: { type: String, trim: true },
+        telegram: { type: String, trim: true },
+        address: { type: String, trim: true },
+        otherInfo: { type: String, trim: true }
     }
 }, {
     timestamps: true,
