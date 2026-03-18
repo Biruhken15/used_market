@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { createProductAction, updateProductAction } from '@/lib/actions/product-actions';
 import { X, Bell, Info, AlertTriangle, CheckCircle, Gift, ChevronRight, Sparkles } from 'lucide-react';
@@ -43,6 +43,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
         condition: initialData?.condition || 'good',
         quantity: initialData?.quantity || '1',
         isFeatured: initialData?.isFeatured || false,
+        isUrgent: initialData?.isUrgent || false,
         sourceOwner: {
             name: initialData?.sourceOwner?.name || '',
             phone: initialData?.sourceOwner?.phone || '',
@@ -90,6 +91,11 @@ export default function ProductForm({ initialData, isEditing = false, productId,
         setImagePreviews(prev => prev.filter((_, i) => i !== index));
     };
 
+    const searchParams = useSearchParams();
+    const planCode = searchParams.get('planCode');
+    const planId = searchParams.get('planId');
+    const isSoloFlow = planCode === 'PAY_PER_PRODUCT';
+
     const handleClose = () => {
         if (onClose) onClose();
         if (closeUrl) {
@@ -106,8 +112,9 @@ export default function ProductForm({ initialData, isEditing = false, productId,
 
         try {
             const data = new FormData();
-            data.append("storeId", storeId || "");
-            data.append("storeSlug", storeSlug || "");
+            const storeIdValue = storeId === 'undefined' ? "" : (storeId || "");
+            data.append("storeId", storeIdValue);
+            data.append("storeSlug", storeSlug || "personal");
             if (isEditing && productId) {
                 data.append("productId", productId);
             }
@@ -119,6 +126,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
             data.append("condition", formData.condition);
             data.append("quantity", formData.quantity);
             data.append("isFeatured", formData.isFeatured.toString());
+            data.append("isUrgent", formData.isUrgent.toString());
 
             data.append("sourceOwnerName", formData.sourceOwner.name);
             data.append("sourceOwnerPhone", formData.sourceOwner.phone);
@@ -143,11 +151,15 @@ export default function ProductForm({ initialData, isEditing = false, productId,
             setShowSuccess(true);
             setLoading(false);
 
-            // Close after a short delay to show success
+            // Handle Redirection
             setTimeout(() => {
-                handleClose();
-                // Optional: short delay for refresh
-                router.refresh();
+                if (isSoloFlow && result.productId) {
+                    // Redirect to checkout with the new product ID
+                    router.push(`/seller/checkout?planId=${planId}&productId=${result.productId}`);
+                } else {
+                    handleClose();
+                    router.refresh();
+                }
             }, 2000);
 
         } catch (err: any) {
@@ -363,13 +375,34 @@ export default function ProductForm({ initialData, isEditing = false, productId,
                 </div>
             </div>
 
+            {/* 3. Promotion Preferences */}
+            <div className="space-y-6 bg-amber-50/30 p-6 rounded-[2rem] border border-amber-100">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-white text-amber-600 flex items-center justify-center text-sm shadow-sm border border-amber-100 italic">!</div>
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest italic">Promotion Extras</h3>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-amber-100 shadow-sm">
+                    <div className="space-y-1">
+                        <p className="text-sm font-black text-slate-900 uppercase italic">Urgent Listing</p>
+                        <p className="text-[10px] font-bold text-slate-400">Add a bright "Urgent" badge to your product.</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, isUrgent: !formData.isUrgent })}
+                        className={`w-12 h-6 rounded-full transition-all relative ${formData.isUrgent ? 'bg-amber-500' : 'bg-slate-200'}`}
+                    >
+                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isUrgent ? 'left-7' : 'left-1'}`} />
+                    </button>
+                </div>
+            </div>
 
             <div className="pt-6">
                 <Button
                     disabled={loading || showSuccess}
                     className="h-14 w-full rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-blue-600 transition-all active:scale-95 shadow-xl shadow-slate-200"
                 >
-                    {loading ? 'Wait...' : showSuccess ? 'Success!' : (isEditing ? 'Update Product' : 'Add Product')}
+                    {loading ? 'Wait...' : showSuccess ? 'Success!' : (isEditing ? 'Update Product' : isSoloFlow ? 'Proceed to Payment' : 'Add Product')}
                 </Button>
             </div>
         </form>

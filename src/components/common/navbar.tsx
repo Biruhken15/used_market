@@ -99,8 +99,9 @@ export const Navbar = () => {
                             <Link href="/dashboard" className="text-accent hover:underline decoration-2 underline-offset-4">Marketplace</Link>
                         </>
                     ) : (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-6">
                             <Link href="/dashboard" className="hover:text-accent transition-colors">Marketplace</Link>
+                            <Link href="/pricing" className="hover:text-accent transition-colors">Pricing</Link>
                         </div>
                     )}
                 </div>

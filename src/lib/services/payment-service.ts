@@ -18,11 +18,14 @@ export class PaymentService {
         userId: string;
         storeId: string;
         planId: string;
+        productId?: string; // Add productId
         amount: number;
         email: string;
         firstName: string;
         lastName: string;
         billingCycle: 'monthly' | 'quarterly' | 'yearly';
+        paymentMethod: string;
+        phone?: string;
     }) {
         await dbConnect();
 
@@ -38,7 +41,8 @@ export class PaymentService {
             paymentMethod: 'other', // Chapa handles multiple methods
             referenceId: tx_ref,
             billingCycle: params.billingCycle,
-            status: 'pending'
+            status: 'pending',
+            metadata: params.productId ? { productId: params.productId } : {} // Save productId in metadata
         });
 
         // 3. Chapa Integration Logic
@@ -185,5 +189,20 @@ export class PaymentService {
             },
             { upsert: true, new: true }
         );
+
+        // Product Activation Logic (Solo Seller Flow)
+        if (transaction.metadata) {
+            // metadata might be a Map or a plain object depending on how it's saved/retrieved
+            const metadata = transaction.metadata instanceof Map
+                ? Object.fromEntries(transaction.metadata)
+                : transaction.metadata;
+
+            const productId = metadata.productId;
+            if (productId) {
+                const Product = (await import("../models/product")).default;
+                await Product.findByIdAndUpdate(productId, { status: 'active' });
+                console.log(`Product ${productId} activated after successful payment.`);
+            }
+        }
     }
 }

@@ -21,12 +21,20 @@ export async function GET(
             return NextResponse.json({ error: 'Product not found' }, { status: 404 });
         }
 
-        // Role-based Sanitization
+        // Role-based Sanitization & Privacy logic
         const session = await getServerSession(authOptions);
         const isOwner = session?.user && (product.ownerId.toString() === (session.user as any).id);
 
+        // Check if the store is on a Pay-Per-Product plan
+        const { SubscriptionService } = await import('@/lib/services/subscription-service');
+        const subscription = await SubscriptionService.getStoreSubscription(product.storeId._id.toString());
+        const isPayPerProduct = subscription?.planId?.planCode === 'PAY_PER_PRODUCT';
+
         const productObj = product.toObject();
-        if (!isOwner) {
+
+        // IF it's Solo Seller (Pay per product), the individual contact is PUBLIC.
+        // IF it's ANY OTHER plan, the sourceOwner is PRIVATE (only for the broker/owner).
+        if (!isOwner && !isPayPerProduct) {
             delete productObj.sourceOwner;
         }
 

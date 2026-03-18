@@ -19,13 +19,10 @@ export interface IProduct extends Document {
     }>;
     thumbnail: string;
     features: Map<string, any>;
-    views: number;
-    sourceOwner?: {
-        name?: string;
-        phone?: string;
-        address?: string;
-        otherInfo?: string;
-    };
+    isFeatured: boolean;
+    featuredUntil?: Date;
+    isUrgent: boolean;
+    urgentUntil?: Date;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -141,6 +138,25 @@ const productSchema = new Schema<IProduct>({
     views: {
         type: Number,
         default: 0
+    },
+
+    // Promotion
+    isFeatured: {
+        type: Boolean,
+        default: false
+    },
+
+    featuredUntil: {
+        type: Date
+    },
+
+    isUrgent: {
+        type: Boolean,
+        default: false
+    },
+
+    urgentUntil: {
+        type: Date
     },
 
     // Broker info: Source Owner (Hidden from public)

@@ -23,9 +23,11 @@ export default function CheckoutForm() {
     const router = useRouter();
     const { data: session } = useSession();
     const planId = searchParams.get('planId');
+    const productId = searchParams.get('productId');
     const tx_ref_query = searchParams.get('tx_ref');
 
     const [plan, setPlan] = useState<Plan | null>(null);
+    const [currentSubscription, setCurrentSubscription] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [verifying, setVerifying] = useState(false);
     const [error, setError] = useState('');
@@ -49,7 +51,7 @@ export default function CheckoutForm() {
                 });
         }
 
-        // Fetch store info to pre-fill subscriber details
+        // Fetch store and subscription info
         fetch('/api/stores')
             .then(res => res.json())
             .then(data => {
@@ -57,6 +59,9 @@ export default function CheckoutForm() {
                     setSubscriberName(data.store.sellerName || session?.user?.name || '');
                     setSubscriberEmail(data.store.email || session?.user?.email || '');
                     setSubscriberPhone(data.store.phone || '');
+                }
+                if (data.subscription) {
+                    setCurrentSubscription(data.subscription);
                 }
             });
     }, [planId, session]);
@@ -70,6 +75,7 @@ export default function CheckoutForm() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     planId,
+                    productId,
                     paymentMethod,
                     subscriberName,
                     subscriberEmail,
@@ -109,7 +115,12 @@ export default function CheckoutForm() {
             const data = await res.json();
             if (data.error) throw new Error(data.error);
 
-            router.push('/seller/mystore?subscribed=true');
+            // If it's a Solo Seller flow, redirect to the product page if we have a productId
+            if (productId) {
+                router.push(`/products/${productId}`);
+            } else {
+                router.push('/seller/mystore?subscribed=true');
+            }
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -142,7 +153,16 @@ export default function CheckoutForm() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
                 <Card className="p-10 rounded-[3rem] border-none shadow-2xl bg-white space-y-8 relative overflow-hidden">
                     <div className="relative z-10">
-                        <h2 className="text-2xl font-bold text-slate-900 italic mb-6">Subscription Summary</h2>
+                        <div className="flex justify-between items-start mb-6">
+                            <h2 className="text-2xl font-bold text-slate-900 italic">Subscription Summary</h2>
+                            {currentSubscription && (
+                                <div className="px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full">
+                                    <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-tight">
+                                        Current: {currentSubscription.planId?.planName || 'Active'}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Plan</span>

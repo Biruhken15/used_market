@@ -43,11 +43,11 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'No store found. Create a store first.' }, { status: 404 });
         }
 
-        const product = await ProductService.createProduct(
-            (session.user as any).id,
-            store._id.toString(),
-            data
-        );
+        const product = await ProductService.createProduct({
+            ...data,
+            ownerId: (session.user as any).id,
+            storeId: store._id.toString()
+        });
 
         return NextResponse.json(product);
     } catch (error: any) {

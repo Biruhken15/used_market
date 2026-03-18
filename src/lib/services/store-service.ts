@@ -158,4 +158,59 @@ export class StoreService {
             { new: true }
         );
     }
+
+    /**
+     * Ensure a user has a store. If they don't, create a "Personal Store" (Shadow Store).
+     * Used for Pay-Per-Product flow to simplify onboarding.
+     */
+    static async ensureUserHasStore(userId: string, userName: string, phone: string, email: string) {
+        await connectDB();
+
+        // 1. Check existing
+        let store = await Store.findOne({ ownerId: userId });
+        if (store) return store;
+
+        // 2. Generate generic details
+        const storeName = `${userName}'s Personal Listings`;
+        const storeSlug = `${slugify(userName)}-${Math.random().toString(36).substring(2, 7)}`;
+
+        // Master Defaults for Cloudinary (Pre-existing in system)
+        const DEFAULT_LOGO = {
+            url: "https://res.cloudinary.com/demo/image/upload/v1/Used-Store-Images/defaults/logo-placeholder.png",
+            publicId: "defaults/logo-placeholder"
+        };
+        const DEFAULT_COVER = {
+            url: "https://res.cloudinary.com/demo/image/upload/v1/Used-Store-Images/defaults/cover-placeholder.png",
+            publicId: "defaults/cover-placeholder"
+        };
+
+        // 3. Create Store
+        store = await Store.create({
+            ownerId: userId,
+            storeName,
+            storeSlug,
+            description: `Official personal profile for ${userName}. Individual seller verified by system.`,
+            category: ['other'],
+            phone,
+            email,
+            address: "Addis Ababa, Ethiopia",
+            city: "Addis Ababa",
+            country: "Ethiopia",
+            sellerName: userName,
+            idType: 'National ID', // Placeholder, handled in Pay-Per-Product payment
+            status: "approved",
+            logo: DEFAULT_LOGO,
+            coverImage: DEFAULT_COVER
+        });
+
+        // 4. Update User Role
+        await User.findByIdAndUpdate(userId, { role: "seller" });
+
+        // 5. Assign Default Subscription (Free Trial)
+        // This ensures the store is ready for upgrades and product listing count checks
+        const { SubscriptionService } = await import("./subscription-service");
+        await SubscriptionService.assignDefaultSubscription(store._id.toString(), userId);
+
+        return store;
+    }
 }

@@ -12,15 +12,39 @@ export const metadata = {
     description: 'List a new product for sale in the marketplace.',
 };
 
-export default async function AddProductPage() {
+export default async function AddProductPage({ searchParams }: { searchParams: { planCode?: string, planId?: string } }) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) redirect("/auth/login");
 
-    const store = await StoreService.getStoreByOwner(session.user.id);
-    if (!store) redirect("/stores/create");
+    let store = await StoreService.getStoreByOwner(session.user.id);
+    const planCode = searchParams.planCode;
 
-    const subscription = await SubscriptionService.getStoreSubscription(store._id.toString());
-    const plan = subscription?.planId as any;
+    if (!store) {
+        if (planCode === 'PAY_PER_PRODUCT') {
+            // Auto-create a "Personal Store" for Pay-Per-Product flow
+            store = await StoreService.ensureUserHasStore(
+                session.user.id,
+                session.user.name || "Seller",
+                "", // Phone placeholder, can be updated later
+                session.user.email || ""
+            );
+        } else {
+            redirect("/stores/create");
+        }
+    }
+
+    // Fetch the plan limits
+    let plan: any = null;
+    const planCode = searchParams.planCode;
+
+    if (planCode === 'PAY_PER_PRODUCT') {
+        // If in Solo Flow, use the PAY_PER_PRODUCT plan limits directly
+        plan = await SubscriptionService.getPlan('PAY_PER_PRODUCT');
+    } else {
+        // Otherwise use the store's active subscription
+        const subscription = await SubscriptionService.getStoreSubscription(store._id.toString());
+        plan = subscription?.planId as any;
+    }
 
     return (
         <main className="min-h-screen bg-[#fcfcfc]">

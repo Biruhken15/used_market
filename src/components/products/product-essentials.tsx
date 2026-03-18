@@ -15,6 +15,8 @@ interface ProductEssentialsProps {
     priceType: string;
     condition: string;
     location: string;
+    isUrgent?: boolean;
+    isFeatured?: boolean;
 }
 
 export const ProductEssentials = ({
@@ -25,7 +27,9 @@ export const ProductEssentials = ({
     description,
     priceType,
     condition,
-    location
+    location,
+    isUrgent,
+    isFeatured
 }: ProductEssentialsProps) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
@@ -53,6 +57,16 @@ export const ProductEssentials = ({
 
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-4">
+                    {isUrgent && (
+                        <span className="px-3 py-1.5 bg-amber-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-lg shadow-sm shadow-amber-200 italic animate-pulse">
+                            Urgent
+                        </span>
+                    )}
+                    {isFeatured && (
+                        <span className="px-3 py-1.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-lg shadow-sm shadow-blue-200 italic">
+                            Featured
+                        </span>
+                    )}
                     <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${status === 'sold' ? 'bg-slate-300' : 'bg-green-400'}`}></div>
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">

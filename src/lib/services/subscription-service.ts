@@ -23,7 +23,7 @@ export class SubscriptionService {
                 price: 0,
                 durationMonths: 1,
                 limits: {
-                    maxActiveListings: 3,
+                    maxActiveListings: 10,
                     imagesPerProduct: 3,
                     featuredListingsPerMonth: 0,
                     listingDurationDays: 60,
@@ -39,6 +39,7 @@ export class SubscriptionService {
                     hasApiAccess: false,
                     hasPrioritySupport: false,
                     hasHomepagePromotion: false,
+                    isUrgentEnabled: false,
                     telegramEnabled: true,
                     phoneEnabled: true,
                     whatsappEnabled: false,
@@ -54,8 +55,8 @@ export class SubscriptionService {
                 price: 2999,
                 durationMonths: 1,
                 limits: {
-                    maxActiveListings: 20,
-                    imagesPerProduct: 5,
+                    maxActiveListings: 100,
+                    imagesPerProduct: 10,
                     featuredListingsPerMonth: 0,
                     listingDurationDays: 60,
                     maxStaffAccounts: 2
@@ -70,6 +71,7 @@ export class SubscriptionService {
                     hasApiAccess: false,
                     hasPrioritySupport: false,
                     hasHomepagePromotion: false,
+                    isUrgentEnabled: false,
                     telegramEnabled: true,
                     phoneEnabled: true,
                     whatsappEnabled: false,
@@ -83,10 +85,10 @@ export class SubscriptionService {
                 planCode: 'PRO_SELLER',
                 planName: 'Pro Seller',
                 price: 11999,
-                durationMonths: 3,
+                durationMonths: 6,
                 limits: {
-                    maxActiveListings: 100,
-                    imagesPerProduct: 7,
+                    maxActiveListings: 300,
+                    imagesPerProduct: 5,
                     featuredListingsPerMonth: 5,
                     listingDurationDays: 90,
                     maxStaffAccounts: 4
@@ -101,6 +103,7 @@ export class SubscriptionService {
                     hasApiAccess: false,
                     hasPrioritySupport: false,
                     hasHomepagePromotion: false,
+                    isUrgentEnabled: true,
                     telegramEnabled: true,
                     phoneEnabled: true,
                     whatsappEnabled: true,
@@ -117,10 +120,10 @@ export class SubscriptionService {
                 durationMonths: 12,
                 limits: {
                     maxActiveListings: 9999,
-                    imagesPerProduct: 15,
+                    imagesPerProduct: 7,
                     featuredListingsPerMonth: 20,
                     listingDurationDays: 365,
-                    maxStaffAccounts: 10
+                    maxStaffAccounts: 6
                 },
                 features: {
                     canMarkAsSold: true,
@@ -128,10 +131,11 @@ export class SubscriptionService {
                     analyticsLevel: 'custom',
                     hasStoreBanner: true,
                     hasVerifiedBadge: true,
-                    hasBulkUpload: true,
-                    hasApiAccess: true,
+                    hasBulkUpload: false,
+                    hasApiAccess: false,
                     hasPrioritySupport: true,
                     hasHomepagePromotion: true,
+                    isUrgentEnabled: true,
                     telegramEnabled: true,
                     phoneEnabled: true,
                     whatsappEnabled: true,
@@ -140,6 +144,42 @@ export class SubscriptionService {
                     searchRankingBoost: 50
                 },
                 metadata: { colorTheme: 'slate', tagline: 'Market domination' }
+            },
+            {
+                planCode: 'PAY_PER_PRODUCT',
+                planName: 'Pay-Per-Product',
+                price: 14889,
+                durationMonths: 4,
+                limits: {
+                    maxActiveListings: 1,
+                    imagesPerProduct: 7,
+                    featuredListingsPerMonth: 1,
+                    listingDurationDays: 120,
+                    maxStaffAccounts: 0
+                },
+                features: {
+                    canMarkAsSold: true,
+                    hasAnalytics: true,
+                    analyticsLevel: 'basic',
+                    hasStoreBanner: false,
+                    hasVerifiedBadge: true,
+                    hasBulkUpload: false,
+                    hasApiAccess: false,
+                    hasPrioritySupport: true,
+                    hasHomepagePromotion: true,
+                    whatsappEnabled: true,
+                    telegramEnabled: true,
+                    phoneEnabled: true,
+                    multipleLocations: false,
+                    customBranding: false,
+                    searchRankingBoost: 80,
+                    // New requested features
+                    isUrgentEnabled: true
+                },
+                metadata: {
+                    colorTheme: 'orange',
+                    tagline: 'Get your single item sold instantly with premium exposure.'
+                }
             }
         ];
 
@@ -179,12 +219,11 @@ export class SubscriptionService {
         });
     }
 
-    /**
-     * Get all available subscription plans.
-     */
     static async getPlans() {
         await dbConnect();
-        return await SubscriptionPlan.find({}).sort({ 'price': 1 });
+        const plans = await SubscriptionPlan.find({}).sort({ 'price': 1 });
+        console.log(`[API] Returning ${plans.length} plans:`, plans.map(p => p.planCode));
+        return plans;
     }
 
     /**
@@ -229,6 +268,11 @@ export class SubscriptionService {
         }
 
         const plan = subscription.planId as any;
+        if (!plan || !plan.limits) {
+            console.error(`Subscription ${subscription._id} has missing plan or limits:`, plan);
+            return { allowed: false, reason: 'Invalid plan configuration' };
+        }
+
         if (currentActiveCount >= plan.limits.maxActiveListings) {
             return {
                 allowed: false,
@@ -244,7 +288,9 @@ export class SubscriptionService {
      */
     static async validateImageCount(storeId: string, count: number) {
         const subscription = await this.getStoreSubscription(storeId);
-        const plan = subscription?.planId as any;
+        if (!subscription) return { allowed: false, reason: 'No active subscription found' };
+
+        const plan = subscription.planId as any;
         const limit = plan?.limits?.imagesPerProduct || 3;
 
         if (count > limit) {

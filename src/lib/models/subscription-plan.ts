@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const subscriptionPlanSchema = new mongoose.Schema({
     planCode: {
         type: String,
-        enum: ['FREE_TRIAL', 'BASIC_SELLER', 'PRO_SELLER', 'ENTERPRISE_SELLER'],
+        enum: ['FREE_TRIAL', 'BASIC_SELLER', 'PRO_SELLER', 'ENTERPRISE_SELLER', 'PAY_PER_PRODUCT'],
         required: true,
         unique: true
     },
@@ -27,6 +27,7 @@ const subscriptionPlanSchema = new mongoose.Schema({
         hasApiAccess: { type: Boolean, default: false },
         hasPrioritySupport: { type: Boolean, default: false },
         hasHomepagePromotion: { type: Boolean, default: false },
+        isUrgentEnabled: { type: Boolean, default: false },
         whatsappEnabled: { type: Boolean, default: false },
         telegramEnabled: { type: Boolean, default: true },
         phoneEnabled: { type: Boolean, default: true },

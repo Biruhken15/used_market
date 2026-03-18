@@ -16,7 +16,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { planId, paymentMethod, subscriberName, subscriberEmail, subscriberPhone } = await req.json();
+        const { planId, paymentMethod, subscriberName, subscriberEmail, subscriberPhone, productId } = await req.json();
 
         if (!planId || !paymentMethod) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -31,9 +31,16 @@ export async function POST(req: Request) {
         }
 
         // 2. Get the store for the current user
-        const store = await Store.findOne({ ownerId: (session.user as any).id });
+        let store = await Store.findOne({ ownerId: (session.user as any).id });
         if (!store) {
-            return NextResponse.json({ error: 'No store found. Please create a store first.' }, { status: 404 });
+            // Shadow Store Logic: Create a store on the fly if it doesn't exist
+            const { StoreService } = await import("@/lib/services/store-service");
+            store = await StoreService.ensureUserHasStore(
+                (session.user as any).id,
+                (session.user as any).name || "Seller",
+                "", // Phone will be captured in checkout form
+                (session.user as any).email || ""
+            );
         }
 
         // 3. Use the flat price
@@ -54,6 +61,7 @@ export async function POST(req: Request) {
                 userId: (session.user as any).id,
                 storeId: store._id.toString(),
                 planId: plan._id.toString(),
+                productId, // Pass productId here
                 amount,
                 email: subscriberEmail || (session.user as any).email,
                 firstName: subscriberName?.split(' ')[0] || (session.user as any).name?.split(' ')[0] || 'Store',

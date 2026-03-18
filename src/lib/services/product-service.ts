@@ -12,29 +12,53 @@ export class ProductService {
     /**
      * Create a new product listing with subscription enforcement.
      */
-    static async createProduct(ownerId: string, storeId: string, data: any) {
+    static async createProduct(data: any) {
         await dbConnect();
 
-        // 1. Check listing limits
-        const currentCount = await Product.countDocuments({ storeId, status: 'active' });
-        const canAdd = await SubscriptionService.canAddProduct(storeId, currentCount);
+        const ownerId = data.ownerId;
+        const storeId = data.storeId;
 
-        if (!canAdd.allowed) {
-            throw new Error(canAdd.reason);
+        // 1. Ensure Store Exists (Shadow Store Logic)
+        let finalStoreId = storeId;
+        if (!finalStoreId || finalStoreId === 'undefined' || finalStoreId === 'null') {
+            const { StoreService } = await import("./store-service");
+            const User = (await import("../models/user")).default;
+            const user = await User.findById(ownerId);
+            if (!user) throw new Error("User not found");
+
+            const store = await StoreService.ensureUserHasStore(
+                ownerId,
+                user.name || "Seller",
+                user.phone || "",
+                user.email || ""
+            );
+            finalStoreId = store._id.toString();
         }
 
-        // 2. Generate Slug explicitly to bypass validation issues
+        // 2. Check listing limits
+        // Exception: If status is 'pending', we might be in the Pay-Per-Product flow and haven't paid yet.
+        // The limit check usually applies to 'active' listings.
+        if (data.status !== 'pending') {
+            const currentCount = await Product.countDocuments({ storeId: finalStoreId, status: 'active' });
+            const canAdd = await SubscriptionService.canAddProduct(finalStoreId, currentCount);
+
+            if (!canAdd.allowed) {
+                throw new Error(canAdd.reason);
+            }
+        }
+
+        // 3. Generate Slug explicitly to bypass validation issues
         const { slugify } = await import("../utils/slug");
         const baseSlug = slugify(data.title || "product");
         const uniqueSlug = `${baseSlug}-${Date.now().toString(36)}`;
 
-        // 3. Create the product
+        // 4. Create the product
         return await Product.create({
             ...data,
             slug: uniqueSlug,
             ownerId: new mongoose.Types.ObjectId(ownerId),
-            storeId: new mongoose.Types.ObjectId(storeId),
-            status: 'active'
+            storeId: new mongoose.Types.ObjectId(finalStoreId),
+            status: data.status || 'active'
         });
     }
 
@@ -70,12 +94,27 @@ export class ProductService {
             // Calculate a score for sorting
             {
                 $addFields: {
+                    // Check if isFeatured is still valid
+                    isStillFeatured: {
+                        $and: [
+                            { $eq: ['$isFeatured', true] },
+                            {
+                                $or: [
+                                    { $not: ['$featuredUntil'] }, // No expiry
+                                    { $gt: ['$featuredUntil', new Date()] } // Not yet expired
+                                ]
+                            }
+                        ]
+                    },
                     rankingScore: {
                         $add: [
                             { $ifNull: ['$plan.features.searchRankingBoost', 0] },
+                            // Add extra boost for specifically featured items
+                            { $cond: [{ $eq: ['$isStillFeatured', true] }, 50, 0] },
+                            // Add extra boost for urgent items
+                            { $cond: [{ $eq: ['$isUrgent', true] }, 30, 0] },
                             // Add other factors here (e.g., recency, verified badge)
-                            { $cond: [{ $eq: ['$plan.features.hasVerifiedBadge', true] }, 10, 0] },
-                            { $cond: [{ $eq: ['$isFeatured', true] }, 25, 0] }
+                            { $cond: [{ $eq: ['$plan.features.hasVerifiedBadge', true] }, 10, 0] }
                         ]
                     }
                 }
@@ -99,32 +138,6 @@ export class ProductService {
 
     /**
      * Mark a product as sold with subscription enforcement.
-     */
-    static async markAsSold(productId: string, storeId: string) {
-        await dbConnect();
-
-        const subscription = await SubscriptionService.getStoreSubscription(storeId);
-        const plan = subscription?.planId as any;
-
-        if (!plan?.features?.canMarkAsSold) {
-            throw new Error(`The ${plan?.planName || 'Free'} plan does not support marking items as sold. Please upgrade.`);
-        }
-
-        const product = await Product.findOneAndUpdate(
-            { _id: productId, storeId: new mongoose.Types.ObjectId(storeId) },
-            { status: 'sold' },
-            { new: true }
-        );
-
-        if (!product) {
-            throw new Error('Product not found or access denied');
-        }
-
-        return product;
-    }
-
-    /**
-     * Mark a product as sold with subscription verification.
      */
     static async markAsSold(productId: string, ownerId: string) {
         await dbConnect();

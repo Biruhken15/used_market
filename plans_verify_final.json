@@ -1,0 +1,215 @@
+﻿{
+    "value":  [
+                  {
+                      "limits":  {
+                                     "maxActiveListings":  10,
+                                     "imagesPerProduct":  3,
+                                     "featuredListingsPerMonth":  0,
+                                     "listingDurationDays":  60,
+                                     "maxStaffAccounts":  1
+                                 },
+                      "features":  {
+                                       "canMarkAsSold":  false,
+                                       "hasAnalytics":  false,
+                                       "analyticsLevel":  "none",
+                                       "hasStoreBanner":  true,
+                                       "hasVerifiedBadge":  false,
+                                       "hasBulkUpload":  false,
+                                       "hasApiAccess":  false,
+                                       "hasPrioritySupport":  false,
+                                       "hasHomepagePromotion":  false,
+                                       "telegramEnabled":  true,
+                                       "phoneEnabled":  true,
+                                       "whatsappEnabled":  false,
+                                       "multipleLocations":  false,
+                                       "customBranding":  false,
+                                       "searchRankingBoost":  0
+                                   },
+                      "metadata":  {
+                                       "colorTheme":  "emerald",
+                                       "tagline":  "Try before you buy"
+                                   },
+                      "_id":  "69af2e8d61136e0c5c556b45",
+                      "planCode":  "FREE_TRIAL",
+                      "__v":  0,
+                      "createdAt":  "2026-03-09T20:33:16.728Z",
+                      "planName":  "Free Trial",
+                      "pricing":  {
+                                      "monthly":  0,
+                                      "quarterly":  0,
+                                      "yearly":  0
+                                  },
+                      "updatedAt":  "2026-03-17T14:30:50.404Z",
+                      "durationMonths":  1,
+                      "price":  0
+                  },
+                  {
+                      "limits":  {
+                                     "maxActiveListings":  100,
+                                     "imagesPerProduct":  10,
+                                     "featuredListingsPerMonth":  0,
+                                     "listingDurationDays":  60,
+                                     "maxStaffAccounts":  2
+                                 },
+                      "features":  {
+                                       "canMarkAsSold":  true,
+                                       "hasAnalytics":  true,
+                                       "analyticsLevel":  "basic",
+                                       "hasStoreBanner":  true,
+                                       "hasVerifiedBadge":  false,
+                                       "hasBulkUpload":  false,
+                                       "hasApiAccess":  false,
+                                       "hasPrioritySupport":  false,
+                                       "hasHomepagePromotion":  false,
+                                       "telegramEnabled":  true,
+                                       "phoneEnabled":  true,
+                                       "whatsappEnabled":  false,
+                                       "multipleLocations":  false,
+                                       "customBranding":  false,
+                                       "searchRankingBoost":  10
+                                   },
+                      "metadata":  {
+                                       "colorTheme":  "blue",
+                                       "tagline":  "Perfect for starting out"
+                                   },
+                      "_id":  "69af2e8d61136e0c5c556b46",
+                      "planCode":  "BASIC_SELLER",
+                      "__v":  0,
+                      "createdAt":  "2026-03-09T20:33:17.404Z",
+                      "planName":  "Basic Seller",
+                      "pricing":  {
+                                      "monthly":  4800,
+                                      "quarterly":  13500,
+                                      "yearly":  48000
+                                  },
+                      "updatedAt":  "2026-03-17T14:30:50.411Z",
+                      "durationMonths":  1,
+                      "price":  2999
+                  },
+                  {
+                      "limits":  {
+                                     "maxActiveListings":  300,
+                                     "imagesPerProduct":  5,
+                                     "featuredListingsPerMonth":  5,
+                                     "listingDurationDays":  90,
+                                     "maxStaffAccounts":  4
+                                 },
+                      "features":  {
+                                       "canMarkAsSold":  true,
+                                       "hasAnalytics":  true,
+                                       "analyticsLevel":  "advanced",
+                                       "hasStoreBanner":  true,
+                                       "hasVerifiedBadge":  true,
+                                       "hasBulkUpload":  true,
+                                       "hasApiAccess":  false,
+                                       "hasPrioritySupport":  false,
+                                       "hasHomepagePromotion":  false,
+                                       "telegramEnabled":  true,
+                                       "phoneEnabled":  true,
+                                       "whatsappEnabled":  true,
+                                       "multipleLocations":  true,
+                                       "customBranding":  false,
+                                       "searchRankingBoost":  25
+                                   },
+                      "metadata":  {
+                                       "colorTheme":  "purple",
+                                       "tagline":  "For serious sellers"
+                                   },
+                      "_id":  "69af2e8d61136e0c5c556b47",
+                      "planCode":  "PRO_SELLER",
+                      "__v":  0,
+                      "createdAt":  "2026-03-09T20:33:17.429Z",
+                      "planName":  "Pro Seller",
+                      "pricing":  {
+                                      "monthly":  5000,
+                                      "quarterly":  12000,
+                                      "yearly":  42000
+                                  },
+                      "updatedAt":  "2026-03-17T14:30:50.416Z",
+                      "durationMonths":  6,
+                      "price":  11999
+                  },
+                  {
+                      "limits":  {
+                                     "maxActiveListings":  1,
+                                     "imagesPerProduct":  7,
+                                     "featuredListingsPerMonth":  1,
+                                     "listingDurationDays":  120,
+                                     "maxStaffAccounts":  0
+                                 },
+                      "features":  {
+                                       "canMarkAsSold":  true,
+                                       "hasAnalytics":  true,
+                                       "analyticsLevel":  "basic",
+                                       "hasStoreBanner":  false,
+                                       "hasVerifiedBadge":  true,
+                                       "hasBulkUpload":  false,
+                                       "hasApiAccess":  false,
+                                       "hasPrioritySupport":  true,
+                                       "hasHomepagePromotion":  true,
+                                       "whatsappEnabled":  true,
+                                       "telegramEnabled":  true,
+                                       "phoneEnabled":  true,
+                                       "multipleLocations":  false,
+                                       "customBranding":  false,
+                                       "searchRankingBoost":  80
+                                   },
+                      "metadata":  {
+                                       "colorTheme":  "orange",
+                                       "tagline":  "Get your single item sold instantly."
+                                   },
+                      "_id":  "69b9626b61136e0c5c556b4a",
+                      "planCode":  "PAY_PER_PRODUCT",
+                      "__v":  0,
+                      "createdAt":  "2026-03-17T14:17:15.951Z",
+                      "durationMonths":  4,
+                      "planName":  "Solo Seller (Featured)",
+                      "price":  14889,
+                      "updatedAt":  "2026-03-17T14:30:50.428Z"
+                  },
+                  {
+                      "limits":  {
+                                     "maxActiveListings":  9999,
+                                     "imagesPerProduct":  7,
+                                     "featuredListingsPerMonth":  20,
+                                     "listingDurationDays":  365,
+                                     "maxStaffAccounts":  6
+                                 },
+                      "features":  {
+                                       "canMarkAsSold":  true,
+                                       "hasAnalytics":  true,
+                                       "analyticsLevel":  "custom",
+                                       "hasStoreBanner":  true,
+                                       "hasVerifiedBadge":  true,
+                                       "hasBulkUpload":  false,
+                                       "hasApiAccess":  false,
+                                       "hasPrioritySupport":  true,
+                                       "hasHomepagePromotion":  true,
+                                       "telegramEnabled":  true,
+                                       "phoneEnabled":  true,
+                                       "whatsappEnabled":  true,
+                                       "multipleLocations":  true,
+                                       "customBranding":  true,
+                                       "searchRankingBoost":  50
+                                   },
+                      "metadata":  {
+                                       "colorTheme":  "slate",
+                                       "tagline":  "Market domination"
+                                   },
+                      "_id":  "69af2e8d61136e0c5c556b48",
+                      "planCode":  "ENTERPRISE_SELLER",
+                      "__v":  0,
+                      "createdAt":  "2026-03-09T20:33:17.443Z",
+                      "planName":  "Enterprise Account",
+                      "pricing":  {
+                                      "monthly":  8000,
+                                      "quarterly":  20000,
+                                      "yearly":  72000
+                                  },
+                      "updatedAt":  "2026-03-17T14:30:50.422Z",
+                      "durationMonths":  12,
+                      "price":  21999
+                  }
+              ],
+    "Count":  5
+}

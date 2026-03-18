@@ -21,6 +21,7 @@ export interface ISubscriptionPlan {
         hasApiAccess: boolean;
         hasPrioritySupport: boolean;
         hasHomepagePromotion: boolean;
+        isUrgentEnabled: boolean;
         whatsappEnabled: boolean;
         telegramEnabled: boolean;
         phoneEnabled: boolean;

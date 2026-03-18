@@ -16,6 +16,8 @@ interface ProductCardProps {
         status: string;
         images?: { url: string }[];
         rankingScore?: number;
+        isUrgent?: boolean;
+        isFeatured?: boolean;
     };
     initialIsFavorited?: boolean;
 }
@@ -124,11 +126,24 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
                             <div className="w-full h-full flex items-center justify-center text-6xl opacity-10">📦</div>
                         )}
 
-                        {/* Status Badge - Only for Sold */}
-                        <div className="absolute top-4 left-4">
+                        {/* Status Badges */}
+                        <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                             {product.status === 'sold' && (
-                                <span className="bg-slate-900/90 backdrop-blur-sm text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg">
+                                <span className="bg-slate-900/90 backdrop-blur-sm text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-sm">
                                     Sold Out
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="absolute top-4 right-4 flex flex-col gap-2 z-10 items-end">
+                            {product.isUrgent && (
+                                <span className="bg-amber-500 text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-lg shadow-amber-500/20 italic animate-pulse">
+                                    Urgent
+                                </span>
+                            )}
+                            {product.isFeatured && (
+                                <span className="bg-blue-600 text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-lg shadow-blue-600/20 italic">
+                                    Featured
                                 </span>
                             )}
                         </div>

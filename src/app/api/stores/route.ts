@@ -8,6 +8,8 @@ import { slugify } from "@/lib/utils/slug";
 
 import { uploadImage } from "@/lib/cloudinary";
 
+import { SubscriptionService } from "@/lib/services/subscription-service";
+
 export async function POST(req: Request) {
     try {
         const session = await getServerSession(authOptions);
@@ -22,7 +24,6 @@ export async function POST(req: Request) {
         const storeName = formData.get("storeName") as string;
         const requestedSlug = formData.get("storeSlug") as string;
         const description = formData.get("description") as string;
-        // ... (other fields)
         const category = formData.get("category") as string;
         const phone = formData.get("phone") as string;
         const whatsapp = formData.get("whatsapp") as string;
@@ -127,9 +128,17 @@ export async function GET(req: Request) {
         }
 
         const store = await Store.findOne({ ownerId: session.user.id });
-        return NextResponse.json({ store });
+
+        // Fetch subscription if store exists
+        let subscription = null;
+        if (store) {
+            subscription = await SubscriptionService.getStoreSubscription(store._id.toString());
+        }
+
+        return NextResponse.json({ store, subscription });
     } catch (error: any) {
         console.error("GET_STORES_ERROR:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
+

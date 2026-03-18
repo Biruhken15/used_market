@@ -10,6 +10,7 @@ export type ActionState = {
     success?: boolean;
     error?: string;
     details?: string;
+    productId?: string;
 };
 
 export async function createProductAction(formData: FormData): Promise<ActionState> {
@@ -20,19 +21,20 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
         }
 
         const storeId = formData.get("storeId") as string;
-        const storeSlug = formData.get("storeSlug") as string || "general";
+        let storeSlug = formData.get("storeSlug") as string || "personal";
 
-        if (!storeId) {
-            return { error: "Missing Store ID", details: "Could not identify your store." };
-        }
+        // storeId can be null for Pay-Per-Product flow
 
         // 1. Enforce Server-Side Multi-Image Limits
         const imageFiles = formData.getAll("images") as File[];
-        const { SubscriptionService } = await import("../services/subscription-service");
-        const imageCheck = await SubscriptionService.validateImageCount(storeId, imageFiles.length);
 
-        if (!imageCheck.allowed) {
-            return { error: "Limit Exceeded", details: imageCheck.reason };
+        if (storeId) {
+            const { SubscriptionService } = await import("../services/subscription-service");
+            const imageCheck = await SubscriptionService.validateImageCount(storeId, imageFiles.length);
+
+            if (!imageCheck.allowed) {
+                return { error: "Limit Exceeded", details: imageCheck.reason };
+            }
         }
 
         const uploadedImages: any[] = [];
@@ -41,7 +43,7 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
             if (file && file.size > 0 && typeof file !== 'string') {
                 try {
                     // Organization: products/[store-slug]/[file]
-                    const uploadResult = await UploadService.uploadFile(file, `products/${storeSlug}`);
+                    const uploadResult = await UploadService.uploadFile(file, `products/${storeSlug || 'personal'}`);
                     uploadedImages.push({
                         url: uploadResult.url,
                         publicId: uploadResult.publicId,
@@ -65,8 +67,25 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
         const condition = formData.get("condition") as any;
         const quantity = Number(formData.get("quantity") || 1);
         const isFeatured = formData.get("isFeatured") === "true";
+        const isUrgent = formData.get("isUrgent") === "true";
 
-        const productData = {
+        // Determine status: if it's Solo Flow (no active sub for this specific product yet), it might be pending
+        // But for simplicity, we let the service handle status and just pass the flag.
+        // Actually, the user wants status: 'pending' if in Solo flow.
+
+        // Check if user has active sub to determine initial status
+        let initialStatus: 'active' | 'pending' = 'active';
+        if (storeId) {
+            const { SubscriptionService } = await import("../services/subscription-service");
+            const sub = await SubscriptionService.getStoreSubscription(storeId);
+            if (!sub || sub.status !== 'active') {
+                initialStatus = 'pending';
+            }
+        } else {
+            initialStatus = 'pending';
+        }
+
+        const product = await ProductService.createProduct({
             title,
             description,
             price,
@@ -75,23 +94,24 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
             condition,
             quantity,
             isFeatured,
+            isUrgent,
+            status: initialStatus,
+            storeId: storeId as any,
+            ownerId: session.user.id as any,
+            images: uploadedImages,
             sourceOwner: {
                 name: formData.get("sourceOwnerName") as string,
                 phone: formData.get("sourceOwnerPhone") as string,
                 telegram: formData.get("sourceOwnerTelegram") as string,
                 address: formData.get("sourceOwnerAddress") as string,
                 otherInfo: formData.get("sourceOwnerOtherInfo") as string,
-            },
-            images: uploadedImages,
-            thumbnail: uploadedImages[0].url
-        };
+            }
+        });
 
-        await ProductService.createProduct(session.user.id, storeId, productData);
-
-        revalidatePath("/dashboard");
         revalidatePath("/seller/mystore");
+        revalidatePath("/products");
 
-        return { success: true };
+        return { success: true, productId: (product as any)._id.toString() };
     } catch (error: any) {
         console.error("[createProductAction] Error:", error);
         return {
@@ -143,6 +163,7 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
         const condition = formData.get("condition") as any;
         const quantity = Number(formData.get("quantity") || 1);
         const isFeatured = formData.get("isFeatured") === "true";
+        const isUrgent = formData.get("isUrgent") === "true";
 
         const updateData: any = {
             title,
@@ -153,6 +174,7 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
             condition,
             quantity,
             isFeatured,
+            isUrgent,
             sourceOwner: {
                 name: formData.get("sourceOwnerName") as string,
                 phone: formData.get("sourceOwnerPhone") as string,

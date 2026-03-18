@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 
 interface Plan {
@@ -32,11 +31,12 @@ interface Plan {
         hasApiAccess: boolean;
         hasPrioritySupport: boolean;
         hasHomepagePromotion: boolean;
+        isUrgentEnabled: boolean;
         multipleLocations: boolean;
         customBranding: boolean;
     };
     metadata: {
-        colorTheme: "emerald" | "blue" | "purple" | "gold" | "slate";
+        colorTheme: "emerald" | "blue" | "purple" | "gold" | "slate" | "orange";
         tagline: string;
     };
 }
@@ -51,8 +51,8 @@ export default function PricingSection() {
             try {
                 const res = await fetch('/api/subscriptions/plans');
                 const data = await res.json();
-                console.log('Fetched Plans:', data);
                 if (Array.isArray(data)) {
+                    console.log("Subscription Plans Loaded:", data.map(p => p.planCode));
                     setPlans(data);
                 }
             } catch (error) {
@@ -64,116 +64,189 @@ export default function PricingSection() {
         fetchPlans();
     }, []);
 
-    const themeColors: Record<string, { bg: string, text: string, border: string, btn: string }> = {
-        emerald: { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-100", btn: "bg-emerald-600 hover:bg-emerald-700" },
-        blue: { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100", btn: "bg-blue-600 hover:bg-blue-700" },
-        purple: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-100", btn: "bg-purple-600 hover:bg-purple-700" },
-        gold: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100", btn: "bg-amber-600 hover:bg-amber-700" },
-        slate: { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-100", btn: "bg-slate-800 hover:bg-slate-900" },
-    };
-
     if (loading) {
         return (
             <section className="w-full py-20 px-4 bg-white flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E91E63]"></div>
             </section>
         );
     }
 
+    // Row 1: Free Trial and Pay-Per-Product
+    const row1Plans = plans.filter(p => p.planCode === 'FREE_TRIAL' || p.planCode === 'PAY_PER_PRODUCT');
+    // Row 2: All other seller plans
+    const row2Plans = plans.filter(p => !['FREE_TRIAL', 'PAY_PER_PRODUCT', 'DEFAULT'].includes(p.planCode));
+
     return (
-        <section id="pricing" className="w-full py-32 px-6 bg-white">
+        <section id="pricing" className="w-full py-24 px-6 bg-[#F8F9FA]">
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-20 space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-lg border border-accent/20">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-accent">Monetize Your Store</span>
-                    </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">
-                        Simple, Professional <span className="gradient-text">Pricing.</span>
+                <div className="text-center mb-16 space-y-4">
+                    <h2 className="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">
+                        Choose Your <span className="text-[#E91E63]">Growth Plan</span>
                     </h2>
                     <p className="text-slate-500 font-medium text-lg max-w-2xl mx-auto">
-                        Choose the plan that fits your business scale. No hidden fees, just growth.
+                        Transparent pricing tailored for every stage of your business.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {plans.map((plan) => {
-                        const theme = themeColors[plan.metadata.colorTheme] || themeColors.blue;
-                        const recommended = plan.planCode === 'PRO_SELLER';
+                {/* Row 1: Starter & Individual Plans */}
+                <div className="flex flex-col md:flex-row justify-center gap-8 mb-12 max-w-3xl mx-auto">
+                    {row1Plans.map((plan) => (
+                        <div key={plan._id} className="w-full md:w-1/2">
+                            <PlanCard plan={plan} />
+                        </div>
+                    ))}
+                    {row1Plans.length === 1 && (
+                        <div className="hidden md:block w-1/2" /> // Spacer if only one card exists
+                    )}
+                </div>
 
-                        return (
-                            <div
-                                key={plan._id}
-                                className={`premium-card p-1 relative flex flex-col ${recommended ? 'shadow-2xl shadow-accent/20 border-accent ring-2 ring-accent/10 scale-[1.05] z-10' : ''}`}
-                            >
-                                {recommended && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
-                                        Best Value
-                                    </div>
-                                )}
-
-                                <div className="p-8 flex-grow flex flex-col">
-                                    <div className="mb-8">
-                                        <div className={`w-10 h-10 ${theme.bg} ${theme.text} rounded-xl flex items-center justify-center text-xl mb-4`}>
-                                            {plan.planCode === 'FREE_TRIAL' ? '🌱' : plan.planCode === 'BASIC_SELLER' ? '🚀' : plan.planCode === 'PRO_SELLER' ? '💎' : '👑'}
-                                        </div>
-                                        <h3 className="text-xl font-extrabold text-slate-900">{plan.planName}</h3>
-                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{plan.metadata.tagline}</p>
-                                    </div>
-
-                                    <div className="mb-10 flex items-baseline gap-1">
-                                        <span className="text-4xl font-black text-slate-900">{(plan.price ?? 0).toLocaleString()}</span>
-                                        <span className="text-slate-400 font-bold text-sm uppercase">ETB / {plan.durationMonths === 1 ? 'mo' : plan.durationMonths === 3 ? '3mo' : 'yr'}</span>
-                                    </div>
-
-                                    <div className="space-y-4 mb-10 flex-grow">
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between items-center text-xs font-bold p-3 bg-slate-50 rounded-xl">
-                                                <span className="text-slate-400 uppercase tracking-widest">Listings</span>
-                                                <span className="text-slate-900">{plan.limits.maxActiveListings > 1000 ? 'Unlimited' : plan.limits.maxActiveListings}</span>
-                                            </div>
-                                            {plan.features.searchRankingBoost > 0 && (
-                                                <div className="flex justify-between items-center text-xs font-bold p-3 bg-accent/5 rounded-xl border border-accent/10">
-                                                    <span className="text-accent uppercase tracking-widest">Boost</span>
-                                                    <span className="text-accent">+{plan.features.searchRankingBoost}%</span>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <ul className="space-y-3 pt-2">
-                                            {[
-                                                { text: `${plan.limits.imagesPerProduct} Images per Listing`, included: true },
-                                                { text: 'Verified Store Badge', included: plan.features.hasVerifiedBadge },
-                                                { text: 'Premium Analytics', included: plan.features.hasAnalytics },
-                                                { text: 'Bulk List Tools', included: plan.features.hasBulkUpload },
-                                                { text: 'Store Banner', included: plan.features.hasStoreBanner },
-                                                { text: 'Priority Support', included: plan.features.hasPrioritySupport },
-                                                { text: 'Telegram & Phone', included: plan.features.telegramEnabled || plan.features.phoneEnabled },
-                                                { text: 'WhatsApp Direct', included: plan.features.whatsappEnabled },
-                                            ].filter((f, i) => {
-                                                // Only show 6 relevant features to keep it clean
-                                                if (plan.planCode === 'FREE_TRIAL') return i < 4;
-                                                return true;
-                                            }).slice(0, 6).map((feature, idx) => (
-                                                <li key={idx} className={`flex items-center gap-3 text-[11px] font-bold ${feature.included ? 'text-slate-600' : 'text-slate-300'}`}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={feature.included ? 'text-emerald-500' : 'text-slate-200'}><polyline points="20 6 9 17 4 12" /></svg>
-                                                    {feature.text}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-
-                                    <Button
-                                        onClick={() => router.push(`/seller/checkout?planId=${plan._id}`)}
-                                        className={`w-full !h-10 rounded-xl font-medium text-[11px] uppercase tracking-widest text-white border-none transition-all ${theme.btn} shadow-lg shadow-slate-100`}
-                                    >
-                                        Get Started
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    })}
+                {/* Row 2: Multi-Seller/Business Plans */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {row2Plans.map((plan) => (
+                        <PlanCard key={plan._id} plan={plan} />
+                    ))}
                 </div>
             </div>
         </section>
+    );
+}
+
+function PlanCard({ plan }: { plan: Plan }) {
+    const router = useRouter();
+    return (
+        <div
+            className="bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-slate-100 flex flex-col h-full transition-all hover:shadow-xl hover:-translate-y-1"
+        >
+            {/* Header Section */}
+            <div className="p-8 pb-4 text-center">
+                <h3 className="text-2xl font-bold text-slate-500 mb-2 uppercase tracking-tight">
+                    {plan.planName.split(' ')[0]}
+                </h3>
+                <div className="flex flex-col items-center justify-center">
+                    <div className="flex items-baseline">
+                        <span className="text-4xl font-black text-slate-800">
+                            {plan.price === 0 ? "Free" : plan.price.toLocaleString()}
+                        </span>
+                    </div>
+                    <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">
+                        ETB / {plan.durationMonths === 12 ? 'Year' : plan.durationMonths === 1 ? 'Month' : `${plan.durationMonths} Months`}
+                    </p>
+                </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-slate-50 mx-4" />
+
+            {/* Content Section */}
+            <div className="p-8 pt-6 flex-grow flex flex-col space-y-8">
+                {/* Plan Limit Section */}
+                <div className="space-y-4">
+                    <h4 className="text-[13px] font-bold text-slate-800 text-center mb-4">Plan Limit</h4>
+                    <div className="space-y-3">
+                        <LimitItem label={`${plan.limits.maxActiveListings > 1000 ? 'Unlimited' : plan.limits.maxActiveListings} Posts`} />
+                        <LimitItem label={`${plan.limits.imagesPerProduct} Images Per Product`} />
+                        <LimitItem label={`${plan.limits.listingDurationDays} Days Visibility`} />
+                        <LimitItem label={`${plan.limits.maxStaffAccounts} Staff Accounts`} />
+                        <LimitItem label={`${plan.limits.featuredListingsPerMonth} Featured Listings / Mo`} />
+                    </div>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-slate-50 w-full" />
+
+                {/* Plan Feature Section */}
+                <div className="space-y-4 flex-grow">
+                    <h4 className="text-[13px] font-bold text-slate-800 text-center mb-4">Plan Feature</h4>
+                    <div className="space-y-3">
+                        <FeatureItem label="Telegram Integration" active={plan.features.telegramEnabled} />
+                        <FeatureItem label="Store Banner" active={plan.features.hasStoreBanner} />
+                        <FeatureItem label="Verified Badge" active={plan.features.hasVerifiedBadge} />
+                        <FeatureItem label="Multiple Locations" active={plan.features.multipleLocations} />
+                        <FeatureItem label="Homepage Promotion" active={plan.features.hasHomepagePromotion} />
+                        <FeatureItem label="Urgent Post Badge" active={plan.features.isUrgentEnabled} />
+                        {plan.features.searchRankingBoost > 0 && (
+                            <FeatureItem label={`Search Boost (${plan.features.searchRankingBoost}%)`} active={true} />
+                        )}
+                    </div>
+                </div>
+
+                {/* Bottom Section */}
+                <div className="pt-4 mt-auto flex flex-col items-center">
+                    <p className="text-[11px] text-slate-400 font-medium text-center mb-4">
+                        Designed for your {plan.planName.toLowerCase()} needs
+                    </p>
+                    <Button
+                        onClick={async () => {
+                            if (plan.planCode === 'PAY_PER_PRODUCT') {
+                                router.push(`/seller/mystore/add-product?planCode=PAY_PER_PRODUCT&planId=${plan._id}`);
+                            } else if (plan.planCode === 'FREE_TRIAL') {
+                                try {
+                                    const res = await fetch('/api/stores');
+                                    const data = await res.json();
+                                    if (data.store) {
+                                        router.push('/seller/mystore');
+                                    } else {
+                                        router.push('/stores/create');
+                                    }
+                                } catch (error) {
+                                    console.error("Error checking store:", error);
+                                    router.push('/stores/create'); // Fallback to creation
+                                }
+                            } else {
+                                router.push(`/seller/checkout?planId=${plan._id}`);
+                            }
+                        }}
+                        className="px-8 bg-[#E91E63] hover:bg-[#D81B60] text-white rounded-full h-10 text-[11px] font-bold shadow-md shadow-pink-100 transition-all hover:scale-[1.05] active:scale-[0.95] uppercase tracking-wider"
+                    >
+                        Get Started
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function LimitItem({ label }: { label: string }) {
+    return (
+        <div className="flex items-center justify-start gap-3">
+            <div className="flex-shrink-0">
+                <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <span className="text-[13px] font-medium text-slate-600">{label}</span>
+            <div className="ml-auto flex-shrink-0">
+                <svg className="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+            </div>
+        </div>
+    );
+}
+
+function FeatureItem({ label, active }: { label: string, active: boolean }) {
+    return (
+        <div className="flex items-center justify-start gap-3 opacity-100">
+            <div className="flex-shrink-0">
+                <svg className={`w-4 h-4 ${active ? 'text-emerald-500' : 'text-slate-200'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? "3" : "2"}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <span className={`text-[13px] font-medium ${active ? 'text-slate-600' : 'text-slate-300 line-through'}`}>
+                {label}
+            </span>
+            {active && (
+                <div className="ml-auto flex-shrink-0">
+                    <svg className="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="16" x2="12" y2="12" />
+                        <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                </div>
+            )}
+        </div>
     );
 }
