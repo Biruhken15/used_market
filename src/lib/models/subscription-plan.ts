@@ -32,7 +32,8 @@ const subscriptionPlanSchema = new mongoose.Schema({
         phoneEnabled: { type: Boolean, default: true },
         multipleLocations: { type: Boolean, default: false },
         customBranding: { type: Boolean, default: false },
-        searchRankingBoost: { type: Number, default: 0 } // Percentage boost
+        searchRankingBoost: { type: Number, default: 0 }, // Percentage boost
+        canMarkAsUrgent: { type: Boolean, default: false }
     },
     metadata: {
         colorTheme: { type: String, default: 'blue' },

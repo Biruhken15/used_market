@@ -16,12 +16,14 @@ export interface StoreData {
     email: string;
     sellerName: string;
     city: string;
+    region?: string;
     country: string;
     idType: string;
     logo?: { url: string; publicId: string };
     coverImage?: { url: string; publicId: string };
     idFront?: { url: string; publicId: string };
     idBack?: { url: string; publicId: string };
+    storeType?: 'standard' | 'broker';
 }
 
 export class StoreService {
@@ -157,5 +159,42 @@ export class StoreService {
             { $pull: { staff: { userId } } },
             { new: true }
         );
+    }
+
+    static async getBrokers() {
+        await connectDB();
+        // Use aggregation to join with User for profile information
+        const brokers = await Store.aggregate([
+            { $match: { storeType: 'broker', status: 'approved' } },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'ownerId',
+                    foreignField: '_id',
+                    as: 'owner'
+                }
+            },
+            { $unwind: '$owner' },
+            {
+                $project: {
+                    storeName: 1,
+                    storeSlug: 1,
+                    description: 1,
+                    category: 1,
+                    country: 1,
+                    city: 1,
+                    region: 1,
+                    logo: 1,
+                    sellerName: 1,
+                    'owner.profile': 1,
+                    'owner.name': 1,
+                    'owner.email': 1
+                }
+            },
+            { $sort: { createdAt: -1 } }
+        ]);
+
+        const { serialize } = await import("../utils/serialize");
+        return serialize(brokers);
     }
 }

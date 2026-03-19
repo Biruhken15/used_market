@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { toggleUrgentAction } from '@/lib/actions/product-actions';
+import { Sparkles, Zap } from 'lucide-react';
 
 interface InventoryListProps {
     initialProducts: any[];
@@ -44,6 +46,20 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
             if (data.error) throw new Error(data.error);
 
             setProducts(products.filter(p => p._id !== productId));
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleToggleUrgent = async (productId: string) => {
+        setLoading(productId);
+        try {
+            const result = await toggleUrgentAction(productId, storeId);
+            if (result.error) throw new Error(result.error);
+
+            setProducts(products.map(p => p._id === productId ? { ...p, isUrgent: !p.isUrgent } : p));
         } catch (err: any) {
             alert(err.message);
         } finally {
@@ -110,6 +126,9 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                         </div>
                                         <div className="flex flex-col items-end gap-1.5 shrink-0 pt-1">
                                             <span className={`w-2 h-2 rounded-full border-2 border-white shadow-sm ${product.status === 'active' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                                            {product.isUrgent && (
+                                                <span className="bg-red-600 text-white text-[6px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-lg shadow-red-100 animate-pulse">Urgent</span>
+                                            )}
                                             {product.isFeatured && (
                                                 <span className="bg-amber-500 text-white text-[6px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-lg shadow-amber-100 animate-pulse">Hot</span>
                                             )}
@@ -144,6 +163,25 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                             Edit
                                         </button>
                                     </Link>
+
+                                    {/* Urgent Toggle - Pro/Enterprise Only */}
+                                    <button
+                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleUrgent(product._id); }}
+                                        disabled={loading === product._id || !subscriptionFeatures?.canMarkAsUrgent}
+                                        className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all border shrink-0 ${product.isUrgent
+                                            ? 'bg-red-600 border-red-600 text-white shadow-lg shadow-red-100'
+                                            : subscriptionFeatures?.canMarkAsUrgent
+                                                ? 'bg-white border-slate-200 text-slate-400 hover:border-red-500 hover:text-red-500'
+                                                : 'bg-slate-50 border-slate-100 text-slate-200 cursor-not-allowed'
+                                            }`}
+                                        title={product.isUrgent ? 'Mark as Not Urgent' : 'Mark as Urgent'}
+                                    >
+                                        {loading === product._id ? (
+                                            <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <Zap size={14} fill={product.isUrgent ? "currentColor" : "none"} strokeWidth={3} />
+                                        )}
+                                    </button>
 
                                     <button
                                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(product._id); }}

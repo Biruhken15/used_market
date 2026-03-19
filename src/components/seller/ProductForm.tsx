@@ -8,14 +8,19 @@ import { X, Bell, Info, AlertTriangle, CheckCircle, Gift, ChevronRight, Sparkles
 
 interface ProductFormProps {
     initialData?: any;
-    isEditing?: boolean;
     productId?: string;
     storeId?: string;
     storeSlug?: string;
-    planLimits?: {
+    planLimits: {
         maxActiveListings: number;
         imagesPerProduct: number;
+        planCode?: string;
+        canMarkAsUrgent?: boolean;
+        canMarkAsFeatured?: boolean;
+        featuredListingsPerMonth?: number;
     };
+    product?: any;
+    isEditing?: boolean;
     onClose?: () => void;
     closeUrl?: string;
     viewType?: 'inline' | 'drawer';
@@ -43,6 +48,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
         condition: initialData?.condition || 'good',
         quantity: initialData?.quantity || '1',
         isFeatured: initialData?.isFeatured || false,
+        isUrgent: initialData?.isUrgent || false,
         sourceOwner: {
             name: initialData?.sourceOwner?.name || '',
             phone: initialData?.sourceOwner?.phone || '',
@@ -119,6 +125,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
             data.append("condition", formData.condition);
             data.append("quantity", formData.quantity);
             data.append("isFeatured", formData.isFeatured.toString());
+            data.append("isUrgent", formData.isUrgent.toString());
 
             data.append("sourceOwnerName", formData.sourceOwner.name);
             data.append("sourceOwnerPhone", formData.sourceOwner.phone);
@@ -295,6 +302,57 @@ export default function ProductForm({ initialData, isEditing = false, productId,
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Premium Listing Features */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Featured Toggle */}
+                    {(planLimits?.featuredListingsPerMonth || 0) > 0 && (
+                        <label className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all ${formData.isFeatured ? 'bg-amber-50 border-amber-200' : 'bg-white border-slate-100'}`}>
+                            <input
+                                type="checkbox"
+                                className="w-5 h-5 accent-amber-600 rounded"
+                                checked={formData.isFeatured}
+                                onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                            />
+                            <div className="flex-1">
+                                <p className="text-[11px] font-black text-amber-900 uppercase tracking-widest">Featured Listing</p>
+                                <p className="text-[9px] font-bold text-amber-900/60 leading-tight">Home carousels & rank boost</p>
+                            </div>
+                        </label>
+                    )}
+
+                    {/* Urgent Toggle - Pro/Enterprise Only */}
+                    {planLimits?.canMarkAsUrgent && (
+                        <label className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all ${formData.isUrgent ? 'bg-red-50 border-red-200' : 'bg-white border-slate-100'}`}>
+                            <input
+                                type="checkbox"
+                                className="w-5 h-5 accent-red-600 rounded"
+                                checked={formData.isUrgent}
+                                onChange={(e) => setFormData({ ...formData, isUrgent: e.target.checked })}
+                            />
+                            <div className="flex-1">
+                                <p className="text-[11px] font-black text-red-900 uppercase tracking-widest leading-none">Urgent Listing ⚡</p>
+                                <p className="text-[9px] font-bold text-red-900/60 leading-tight">Flame badge & top placement</p>
+                            </div>
+                        </label>
+                    )}
+
+                    {/* Featured Toggle - Based on plan limits */}
+                    {planLimits?.canMarkAsFeatured && (
+                        <label className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all ${formData.isFeatured ? 'bg-amber-50 border-amber-200' : 'bg-white border-slate-100'}`}>
+                            <input
+                                type="checkbox"
+                                className="w-5 h-5 accent-amber-500 rounded"
+                                checked={formData.isFeatured}
+                                onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                            />
+                            <div className="flex-1">
+                                <p className="text-[11px] font-black text-amber-900 uppercase tracking-widest leading-none">Featured Slot ⭐</p>
+                                <p className="text-[9px] font-bold text-amber-900/60 leading-tight">Featured carousels & rankings</p>
+                            </div>
+                        </label>
+                    )}
                 </div>
             </div>
 

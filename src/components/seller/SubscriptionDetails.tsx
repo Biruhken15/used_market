@@ -30,7 +30,23 @@ interface SubscriptionDetailsProps {
 }
 
 export function SubscriptionDetails({ subscription, plan }: SubscriptionDetailsProps) {
-    if (!plan) return null;
+    if (!plan) return (
+        <div className="bg-white p-12 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/50 text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center text-4xl mx-auto mb-6">
+                🎫
+            </div>
+            <div className="space-y-2">
+                <h3 className="text-3xl font-black text-slate-900 tracking-tight">You don't have an active plan</h3>
+                <p className="text-slate-500 font-bold max-w-md mx-auto">Access to premium features and increased listing limits requires an active merchant protocol.</p>
+            </div>
+            <Link href="/pricing" className="block max-w-xs mx-auto">
+                <button className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center gap-3">
+                    Upgrade Now
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                </button>
+            </Link>
+        </div>
+    );
 
     const startDate = new Date(subscription?.currentPeriodStart || subscription?.createdAt);
     const expiryDate = new Date(subscription?.currentPeriodEnd);

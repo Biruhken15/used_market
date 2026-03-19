@@ -27,6 +27,11 @@ const storeSchema = new mongoose.Schema({
         type: [String],
         required: true  // [Electronics, Phones]
     },
+    storeType: {
+        type: String,
+        enum: ['standard', 'broker'],
+        default: 'standard'
+    },
 
     // Approval status - DEFAULT APPROVED
     status: {
@@ -55,6 +60,7 @@ const storeSchema = new mongoose.Schema({
         required: true
     },
     city: String,
+    region: String,
     country: String,
 
     // Identity Verification

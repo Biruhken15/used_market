@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { createStoreAction } from "@/lib/actions/store-actions";
 import { X, Camera, Globe, Phone, Mail, MapPin, CheckCircle, Store, Send, ChevronRight, User } from "lucide-react";
+import { ethiopianRegions } from "@/lib/constants/regions";
 
 const categories = ["Electronics", "Phones", "Real Estate", "Vehicles", "Houses", "Furniture", "Fashion", "Sports", "Books", "Other"];
 
@@ -29,7 +30,8 @@ export function StoreForm() {
         address: "",
         email: "",
         sellerName: "",
-        city: "Addis Ababa",
+        city: "",
+        region: "",
         country: "Ethiopia",
         idType: "National ID",
         logo: null as File | null,
@@ -173,8 +175,8 @@ export function StoreForm() {
                         <Camera size={20} />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight italic uppercase">Marketplace Identification</h3>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Brand Visuals & Logic</p>
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight italic uppercase">Store Logo & Cover</h3>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Brand visuals for your store</p>
                     </div>
                 </div>
 
@@ -230,14 +232,14 @@ export function StoreForm() {
                         <Globe size={20} />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight italic uppercase">Store Architecture</h3>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Public Information Vector</p>
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight italic uppercase">Store information</h3>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Your product will be filtered by this</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className={labelClasses}>Display Name</label>
+                        <label className={labelClasses}>Store Name</label>
                         <input
                             required
                             className={inputClasses}
@@ -248,7 +250,7 @@ export function StoreForm() {
                     </div>
 
                     <div>
-                        <label className={labelClasses}>Operational URL</label>
+                        <label className={labelClasses}>Store Web Address (URL)</label>
                         <div className="relative">
                             <input
                                 required
@@ -262,7 +264,7 @@ export function StoreForm() {
                     </div>
 
                     <div className="md:col-span-2">
-                        <label className={labelClasses}>Business Mission / Description</label>
+                        <label className={labelClasses}>Store Description</label>
                         <textarea
                             required
                             rows={3}
@@ -274,7 +276,7 @@ export function StoreForm() {
                     </div>
 
                     <div className="md:col-span-2 space-y-4">
-                        <label className={labelClasses}>Active Channels (Categories)</label>
+                        <label className={labelClasses}>Store Category</label>
                         <div className="flex flex-wrap gap-2">
                             {categories.map(cat => {
                                 const isSelected = formData.category.includes(cat);
@@ -299,6 +301,43 @@ export function StoreForm() {
                             })}
                         </div>
                     </div>
+
+                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label className={labelClasses}>Country</label>
+                            <input
+                                required
+                                className={inputClasses}
+                                placeholder="e.g. Ethiopia"
+                                value={formData.country}
+                                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <label className={labelClasses}>Region</label>
+                            <select
+                                required
+                                className={inputClasses}
+                                value={formData.region}
+                                onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                            >
+                                <option value="" disabled>Select Region</option>
+                                {ethiopianRegions.map(region => (
+                                    <option key={region} value={region}>{region}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className={labelClasses}>City</label>
+                            <input
+                                required
+                                className={inputClasses}
+                                placeholder="e.g. Addis Ababa"
+                                value={formData.city}
+                                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -309,14 +348,14 @@ export function StoreForm() {
                         <User size={20} />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight italic uppercase">Entity Verification</h3>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Formal Access & Contact</p>
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight italic uppercase">Seller information</h3>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">The buyer will contact you with below info</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className={labelClasses}>Full Legal Name</label>
+                        <label className={labelClasses}>Seller Full Name</label>
                         <input
                             required
                             className={inputClasses}
@@ -326,7 +365,7 @@ export function StoreForm() {
                         />
                     </div>
                     <div>
-                        <label className={labelClasses}>Primary Phone</label>
+                        <label className={labelClasses}>Phone Number</label>
                         <input
                             required
                             className={inputClasses}
@@ -336,7 +375,7 @@ export function StoreForm() {
                         />
                     </div>
                     <div>
-                        <label className={labelClasses}>Contact Email</label>
+                        <label className={labelClasses}>Email Address</label>
                         <input
                             required
                             type="email"
@@ -347,7 +386,7 @@ export function StoreForm() {
                         />
                     </div>
                     <div>
-                        <label className={labelClasses}>Address Info</label>
+                        <label className={labelClasses}>Specific Address</label>
                         <input
                             required
                             className={inputClasses}
@@ -442,7 +481,7 @@ export function StoreForm() {
                         <>Wait...</>
                     ) : (
                         <>
-                            Initialize Profile
+                            Create Store
                             <Send size={18} />
                         </>
                     )}

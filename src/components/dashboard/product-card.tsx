@@ -16,6 +16,9 @@ interface ProductCardProps {
         status: string;
         images?: { url: string }[];
         rankingScore?: number;
+        isUrgent?: boolean;
+        isFeatured?: boolean;
+        condition?: string;
     };
     initialIsFavorited?: boolean;
 }
@@ -96,106 +99,78 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
     return (
         <>
             <Link href={`/products/${product._id}`} className="block group h-full">
-                <Card className="premium-card h-full flex flex-col overflow-hidden bg-white border-slate-100 transition-all duration-500 relative shadow-sm hover:shadow-2xl hover:shadow-accent/5 rounded-[1.5rem] border-none">
+                <div className="h-full flex flex-col bg-white border border-slate-100 transition-all duration-300 relative rounded-xl overflow-hidden hover:shadow-xl group-hover:border-slate-200">
+                    
+                    {/* Condition Badge (Very Top) */}
+                    <div className="bg-slate-50 border-b border-slate-100 py-1.5 px-3 flex items-center justify-between">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                            {product.condition || "Marketplace Item"}
+                        </span>
+                        {product.status === 'sold' && (
+                            <span className="text-[9px] font-black text-rose-500 uppercase tracking-wider">Sold Out</span>
+                        )}
+                    </div>
 
                     {/* Image Section */}
-                    <div className="aspect-[4/5] bg-slate-50 relative overflow-hidden shrink-0">
+                    <div className="aspect-square bg-slate-50 relative overflow-hidden shrink-0 p-4">
                         {images.length > 0 ? (
-                            <>
-                                <img
-                                    src={images[currentImageIndex].url}
-                                    alt={product.title}
-                                    className="w-full h-full object-contain transition-transform duration-1000 group-hover:scale-105"
-                                />
-
-                                {/* Navigation Arrows */}
-                                {images.length > 1 && (
-                                    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            onClick={nextImage}
-                                            className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-900 shadow-lg active:scale-90"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-                                        </button>
-                                    </div>
-                                )}
-                            </>
+                            <img
+                                src={images[currentImageIndex].url}
+                                alt={product.title}
+                                className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                            />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-6xl opacity-10">📦</div>
+                            <div className="w-full h-full flex items-center justify-center text-4xl opacity-10">📦</div>
                         )}
 
-                        {/* Status Badge - Only for Sold */}
-                        <div className="absolute top-4 left-4">
-                            {product.status === 'sold' && (
-                                <span className="bg-slate-900/90 backdrop-blur-sm text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg">
-                                    Sold Out
+                        {/* Status Tags (Top Left of Image) */}
+                        <div className="absolute top-4 left-4 flex flex-col gap-1">
+                            {product.isUrgent && (
+                                <span className="bg-blue-600 text-white text-[9px] font-black uppercase tracking-tighter px-2 py-1 rounded-sm shadow-sm">
+                                    Urgent
+                                </span>
+                            )}
+                            {product.isFeatured && (
+                                <span className="bg-green-500 text-white text-[9px] font-black uppercase tracking-tighter px-2 py-1 rounded-sm shadow-sm">
+                                    Top Pick
+                                </span>
+                            )}
+                            {product.category === 'real-estate' && (
+                                <span className="bg-amber-500 text-white text-[9px] font-black uppercase tracking-tighter px-2 py-1 rounded-sm shadow-sm">
+                                    Property
+                                </span>
+                            )}
+                            {product.category === 'vehicles' && (
+                                <span className="bg-slate-700 text-white text-[9px] font-black uppercase tracking-tighter px-2 py-1 rounded-sm shadow-sm">
+                                    Vehicle
                                 </span>
                             )}
                         </div>
                     </div>
 
                     {/* Content Section */}
-                    <div className="p-5 flex flex-col flex-1">
-                        {/* Row 1: Title & Price */}
-                        <div className="flex justify-between items-start gap-3 mb-2">
-                            <h3 className="text-[17px] font-bold text-slate-900 leading-tight group-hover:text-accent transition-colors line-clamp-2">
-                                {product.title}
-                            </h3>
-                            <div className="flex items-baseline gap-0.5 shrink-0">
-                                <span className="text-[17px] font-medium text-slate-900 tracking-tighter">
-                                    {product.price.toLocaleString()}
+                    <div className="p-4 flex flex-col flex-1 gap-2">
+                        <h3 className="text-[13px] font-bold text-slate-700 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
+                            {product.title}
+                        </h3>
+                        
+                        <div className="space-y-0.5 mt-auto">
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-lg font-black text-slate-900 tracking-tight">
+                                    {product.price.toLocaleString()} <span className="text-[10px] opacity-70">ETB</span>
                                 </span>
-                                <span className="text-[9px] font-bold text-slate-400 uppercase">ETB</span>
                             </div>
-                        </div>
-
-                        {/* Row 2: Status & Category */}
-                        <div className="flex items-center gap-3 mb-6">
+                            
+                            {/* Location & Meta info */}
                             <div className="flex items-center gap-1.5">
-                                <div className={`w-1.5 h-1.5 rounded-full ${product.status === 'sold' ? 'bg-slate-300' : 'bg-green-400'}`}></div>
-                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                                    {product.status === 'sold' ? 'Sold' : 'Active'}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">
+                                    {product.category || "General"}
                                 </span>
                             </div>
-                            <span className="text-[9px] font-bold text-slate-400 border border-slate-50 px-2 py-0.5 rounded-md uppercase tracking-widest bg-slate-50/50">
-                                {product.category || "Used"}
-                            </span>
-                        </div>
-
-                        {/* Row 3: Buttons - Visible to all, Guest triggers redirect */}
-                        <div className="mt-auto flex gap-2 pt-3 border-t border-slate-50">
-                            <button
-                                onClick={handleFavorite}
-                                disabled={isThinking}
-                                className={`flex-1 h-10 rounded-xl border border-slate-100 flex items-center justify-center transition-all active:scale-95 ${isFavorited
-                                    ? 'text-rose-500 border-rose-100 bg-rose-50'
-                                    : 'text-slate-500 hover:text-rose-500 hover:border-rose-100 hover:bg-rose-50'
-                                    }`}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill={isFavorited ? "currentColor" : "none"}
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className={isThinking ? "animate-pulse" : ""}
-                                >
-                                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                                </svg>
-                            </button>
-                            <button
-                                onClick={handleShare}
-                                className="flex-1 h-10 rounded-xl border border-slate-100 flex items-center justify-center text-slate-500 hover:text-accent hover:border-accent/10 hover:bg-accent/5 transition-all active:scale-95"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" x2="12" y1="2" y2="15" /></svg>
-                            </button>
                         </div>
                     </div>
-                </Card>
+                </div>
             </Link>
 
             {/* Share Modal */}

@@ -80,7 +80,7 @@ export const Navbar = () => {
     return (
         <nav className="fixed top-0 w-full z-50 px-4 pt-6">
             <div className={`max-w-7xl mx-auto glass-panel rounded-2xl px-6 py-3 flex items-center justify-between shadow-lg shadow-slate-200/50 border border-white/50 bg-white/80 backdrop-blur-md`}>
-                <Link href={session ? "/dashboard" : "/"} className="flex items-center gap-3 group">
+                <Link href="/" className="flex items-center gap-3 group">
                     <div className="w-10 h-10 flex items-center justify-center transition-transform group-hover:rotate-6">
                         <img src="/ethiopian-mascot.png" alt="Used Market Logo" className="w-full h-full object-contain" />
                     </div>
@@ -92,15 +92,15 @@ export const Navbar = () => {
 
                 {/* Main Navigation */}
                 <div className="hidden md:flex items-center gap-8 text-[11px] font-black uppercase tracking-widest text-slate-400">
+                    <Link href="/" className="text-accent hover:underline decoration-2 underline-offset-4">Marketplace</Link>
                     {!session ? (
                         <>
                             <Link href="/#pricing" className="hover:text-accent transition-colors">Pricing</Link>
                             <Link href="/#about" className="hover:text-accent transition-colors">About Us</Link>
-                            <Link href="/dashboard" className="text-accent hover:underline decoration-2 underline-offset-4">Marketplace</Link>
                         </>
                     ) : (
                         <div className="flex items-center gap-2">
-                            <Link href="/dashboard" className="hover:text-accent transition-colors">Marketplace</Link>
+                            <Link href="/#pricing" className="hover:text-accent transition-colors">Pricing</Link>
                         </div>
                     )}
                 </div>

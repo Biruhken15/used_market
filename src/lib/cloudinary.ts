@@ -28,7 +28,10 @@ export const uploadFromBuffer = async (
     folder: string,
     timestamp?: number
 ): Promise<{ url: string; publicId: string }> => {
-    return new Promise((resolve, reject) => {
+    try {
+        // Convert buffer to Base64 data URI
+        const base64Image = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+
         const options: any = {
             folder: `ethio-market/${folder}`,
             resource_type: 'auto',
@@ -38,25 +41,16 @@ export const uploadFromBuffer = async (
             options.timestamp = timestamp;
         }
 
-        const uploadStream = cloudinary.uploader.upload_stream(
-            options,
-            (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
-                if (error) {
-                    console.error('Cloudinary Stream Upload Error:', error);
-                    return reject(error);
-                }
-                if (!result) {
-                    return reject(new Error('Cloudinary upload resulting in empty response'));
-                }
-                resolve({
-                    url: result.secure_url,
-                    publicId: result.public_id,
-                });
-            }
-        );
+        const result = await cloudinary.uploader.upload(base64Image, options);
 
-        uploadStream.end(buffer);
-    });
+        return {
+            url: result.secure_url,
+            publicId: result.public_id,
+        };
+    } catch (error: any) {
+        console.error('Cloudinary Upload Error:', error);
+        throw error;
+    }
 };
 
 export const deleteImage = async (publicId: string) => {

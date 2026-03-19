@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
+import { ethiopianRegions } from "@/lib/constants/regions";
 import { Input } from '@/components/ui/input';
 import {
     updateStoreAction,
@@ -78,7 +79,9 @@ export default function StoreSettings({ store }: StoreSettingsProps) {
             whatsapp: store.whatsapp || '',
             telegram: store.telegram || '',
             address: store.address,
-            city: store.city
+            city: store.city,
+            region: store.region || '',
+            country: store.country || 'Ethiopia'
         }
     });
 
@@ -240,8 +243,8 @@ export default function StoreSettings({ store }: StoreSettingsProps) {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as Tab)}
                             className={`w-full flex items-center gap-4 p-4 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all ${activeTab === tab.id
-                                    ? "bg-white text-blue-600 shadow-md border border-slate-100"
-                                    : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+                                ? "bg-white text-blue-600 shadow-md border border-slate-100"
+                                : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
                                 }`}
                         >
                             <span className={activeTab === tab.id ? "text-blue-600" : "text-slate-300"}>
@@ -304,7 +307,23 @@ export default function StoreSettings({ store }: StoreSettingsProps) {
                                         <Input {...register("storeName", { required: true })} className="h-14 rounded-2xl font-black text-slate-700 bg-slate-50/50 border-none focus:ring-2 focus:ring-blue-600 transition-all shadow-inner" />
                                     </div>
                                     <div className="space-y-3">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Operation City</label>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Country</label>
+                                        <Input {...register("country", { required: true })} className="h-14 rounded-2xl font-black text-slate-700 bg-slate-50/50 border-none focus:ring-2 focus:ring-blue-600 transition-all shadow-inner" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Region</label>
+                                        <select
+                                            {...register("region", { required: true })}
+                                            className="w-full h-14 rounded-2xl font-black text-slate-700 bg-slate-50/50 border-none focus:ring-2 focus:ring-blue-600 transition-all shadow-inner px-4 outline-none appearance-none"
+                                        >
+                                            <option value="" disabled>Select Region</option>
+                                            {ethiopianRegions.map(region => (
+                                                <option key={region} value={region}>{region}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">City</label>
                                         <Input {...register("city", { required: true })} className="h-14 rounded-2xl font-black text-slate-700 bg-slate-50/50 border-none focus:ring-2 focus:ring-blue-600 transition-all shadow-inner" />
                                     </div>
                                     <div className="md:col-span-2 space-y-3">

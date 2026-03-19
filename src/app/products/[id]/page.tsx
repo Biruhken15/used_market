@@ -89,6 +89,7 @@ export default function ProductDetailPage() {
                     <div className="lg:col-span-5 space-y-12">
                         {/* Essential Info (Title, Price, Badges, Description) */}
                         <ProductEssentials
+                            productId={product._id}
                             title={product.title}
                             price={product.price}
                             status={product.status}

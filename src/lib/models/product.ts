@@ -28,6 +28,8 @@ export interface IProduct extends Document {
     };
     createdAt: Date;
     updatedAt: Date;
+    isUrgent: boolean;
+    isFeatured: boolean;
 }
 
 const productSchema = new Schema<IProduct>({
@@ -150,6 +152,16 @@ const productSchema = new Schema<IProduct>({
         telegram: { type: String, trim: true },
         address: { type: String, trim: true },
         otherInfo: { type: String, trim: true }
+    },
+
+    // Promotional flags
+    isUrgent: {
+        type: Boolean,
+        default: false
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true,

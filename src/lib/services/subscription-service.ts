@@ -23,7 +23,7 @@ export class SubscriptionService {
                 price: 0,
                 durationMonths: 1,
                 limits: {
-                    maxActiveListings: 3,
+                    maxActiveListings: 50,
                     imagesPerProduct: 3,
                     featuredListingsPerMonth: 0,
                     listingDurationDays: 60,
@@ -44,7 +44,8 @@ export class SubscriptionService {
                     whatsappEnabled: false,
                     multipleLocations: false,
                     customBranding: false,
-                    searchRankingBoost: 0
+                    searchRankingBoost: 0,
+                    canMarkAsUrgent: false
                 },
                 metadata: { colorTheme: 'emerald', tagline: 'Try before you buy' }
             },
@@ -54,7 +55,7 @@ export class SubscriptionService {
                 price: 2999,
                 durationMonths: 1,
                 limits: {
-                    maxActiveListings: 20,
+                    maxActiveListings: 200,
                     imagesPerProduct: 5,
                     featuredListingsPerMonth: 0,
                     listingDurationDays: 60,
@@ -75,7 +76,8 @@ export class SubscriptionService {
                     whatsappEnabled: false,
                     multipleLocations: false,
                     customBranding: false,
-                    searchRankingBoost: 10
+                    searchRankingBoost: 10,
+                    canMarkAsUrgent: false
                 },
                 metadata: { colorTheme: 'blue', tagline: 'Perfect for starting out' }
             },
@@ -83,12 +85,12 @@ export class SubscriptionService {
                 planCode: 'PRO_SELLER',
                 planName: 'Pro Seller',
                 price: 11999,
-                durationMonths: 3,
+                durationMonths: 6,
                 limits: {
-                    maxActiveListings: 100,
-                    imagesPerProduct: 7,
+                    maxActiveListings: 500,
+                    imagesPerProduct: 5,
                     featuredListingsPerMonth: 5,
-                    listingDurationDays: 90,
+                    listingDurationDays: 180,
                     maxStaffAccounts: 4
                 },
                 features: {
@@ -106,7 +108,8 @@ export class SubscriptionService {
                     whatsappEnabled: true,
                     multipleLocations: true,
                     customBranding: false,
-                    searchRankingBoost: 25
+                    searchRankingBoost: 25,
+                    canMarkAsUrgent: true
                 },
                 metadata: { colorTheme: 'purple', tagline: 'For serious sellers' }
             },
@@ -117,10 +120,10 @@ export class SubscriptionService {
                 durationMonths: 12,
                 limits: {
                     maxActiveListings: 9999,
-                    imagesPerProduct: 15,
+                    imagesPerProduct: 7,
                     featuredListingsPerMonth: 20,
                     listingDurationDays: 365,
-                    maxStaffAccounts: 10
+                    maxStaffAccounts: 5
                 },
                 features: {
                     canMarkAsSold: true,
@@ -137,7 +140,8 @@ export class SubscriptionService {
                     whatsappEnabled: true,
                     multipleLocations: true,
                     customBranding: true,
-                    searchRankingBoost: 50
+                    searchRankingBoost: 50,
+                    canMarkAsUrgent: true
                 },
                 metadata: { colorTheme: 'slate', tagline: 'Market domination' }
             }

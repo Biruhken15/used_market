@@ -65,6 +65,30 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
         const condition = formData.get("condition") as any;
         const quantity = Number(formData.get("quantity") || 1);
         const isFeatured = formData.get("isFeatured") === "true";
+        const isUrgent = formData.get("isUrgent") === "true";
+
+        // 2. Validate Subscription for Featured/Urgent
+        if (isFeatured || isUrgent) {
+            const subscription = await SubscriptionService.getStoreSubscription(storeId);
+            const plan = subscription?.planId as any;
+
+            if (isUrgent && !plan?.features?.canMarkAsUrgent) {
+                return { error: "Permission Denied", details: "Your current plan does not support marking products as Urgent." };
+            }
+
+            if (isFeatured) {
+                const featuredLimit = plan?.limits?.featuredListingsPerMonth || 0;
+                if (featuredLimit === 0) {
+                    return { error: "Upgrade Required", details: "Your current plan does not support Featured listings." };
+                }
+
+                // Count current featured products
+                const featuredCount = await ProductService.getStoreFeaturedCount(storeId);
+                if (featuredCount >= featuredLimit) {
+                    return { error: "Limit Reached", details: `You have reached your limit of ${featuredLimit} featured listings.` };
+                }
+            }
+        }
 
         const productData = {
             title,
@@ -75,6 +99,7 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
             condition,
             quantity,
             isFeatured,
+            isUrgent,
             sourceOwner: {
                 name: formData.get("sourceOwnerName") as string,
                 phone: formData.get("sourceOwnerPhone") as string,
@@ -143,6 +168,34 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
         const condition = formData.get("condition") as any;
         const quantity = Number(formData.get("quantity") || 1);
         const isFeatured = formData.get("isFeatured") === "true";
+        const isUrgent = formData.get("isUrgent") === "true";
+
+        // Validate Subscription for Featured/Urgent on Update
+        if (isFeatured || isUrgent) {
+            const { SubscriptionService } = await import("../services/subscription-service");
+            const subscription = await SubscriptionService.getStoreSubscription(storeId);
+            const plan = subscription?.planId as any;
+
+            if (isUrgent && !plan?.features?.canMarkAsUrgent) {
+                return { error: "Permission Denied", details: "Your current plan does not support marking products as Urgent." };
+            }
+
+            if (isFeatured) {
+                const featuredLimit = plan?.limits?.featuredListingsPerMonth || 0;
+                if (featuredLimit === 0) {
+                    return { error: "Upgrade Required", details: "Your current plan does not support Featured listings." };
+                }
+
+                // Only check limit if it's being CHANGED to featured
+                const currentProduct = await ProductService.getProductById(productId);
+                if (!currentProduct.isFeatured) {
+                    const featuredCount = await ProductService.getStoreFeaturedCount(storeId);
+                    if (featuredCount >= featuredLimit) {
+                        return { error: "Limit Reached", details: `You have reached your limit of ${featuredLimit} featured listings.` };
+                    }
+                }
+            }
+        }
 
         const updateData: any = {
             title,
@@ -153,6 +206,7 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
             condition,
             quantity,
             isFeatured,
+            isUrgent,
             sourceOwner: {
                 name: formData.get("sourceOwnerName") as string,
                 phone: formData.get("sourceOwnerPhone") as string,
@@ -178,6 +232,44 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
         console.error("[updateProductAction] Error:", error);
         return {
             error: "Update Failed",
+            details: error.message || "An unexpected error occurred."
+        };
+    }
+}
+
+export async function toggleUrgentAction(productId: string, storeId: string): Promise<ActionState> {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user) {
+            return { error: "Unauthorized" };
+        }
+
+        const { SubscriptionService } = await import("../services/subscription-service");
+        const subscription = await SubscriptionService.getStoreSubscription(storeId);
+        const plan = subscription?.planId as any;
+
+        if (!plan?.features?.canMarkAsUrgent) {
+            return { error: "Permission Denied", details: "Your current plan does not support marking products as Urgent." };
+        }
+
+        const product = await ProductService.getProductById(productId);
+        if (!product) {
+            return { error: "Not Found", details: "Listing not found." };
+        }
+
+        await ProductService.updateProduct(productId, session.user.id, {
+            isUrgent: !product.isUrgent
+        });
+
+        revalidatePath("/dashboard");
+        revalidatePath("/seller/mystore");
+        revalidatePath(`/products/${productId}`);
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("[toggleUrgentAction] Error:", error);
+        return {
+            error: "Toggle Failed",
             details: error.message || "An unexpected error occurred."
         };
     }

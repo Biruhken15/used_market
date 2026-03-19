@@ -34,7 +34,55 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
     const store = await StoreService.getStoreByOwner(session.user.id);
 
     if (!store) {
-        redirect("/stores/create");
+        return (
+            <div className="min-h-screen bg-slate-50/50 flex items-center justify-center p-6">
+                <div className="max-w-3xl w-full bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <div className="relative h-48 bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center overflow-hidden">
+                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                        <div className="relative w-24 h-24 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center text-5xl shadow-2xl border border-white/30">
+                            🏪
+                        </div>
+                    </div>
+
+                    <div className="p-10 md:p-16 text-center space-y-10">
+                        <div className="space-y-4">
+                            <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-tight">
+                                Your <span className="text-blue-600">Professional</span> Presence Starts Here
+                            </h1>
+                            <p className="text-slate-500 font-bold text-lg max-w-xl mx-auto leading-relaxed">
+                                To start selling and managing products, you first need to establish your store identity on our protocol.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                            {[
+                                { title: "Reach Buyers", desc: "Showcase products to thousands of active shoppers.", icon: "🎯" },
+                                { title: "Brand Identity", desc: "Build trust with a custom logo and professional cover.", icon: "✨" },
+                                { title: "Full Control", desc: "Manage inventory, staff, and analytics in one place.", icon: "🛠️" }
+                            ].map((benefit) => (
+                                <div key={benefit.title} className="p-6 bg-slate-50 rounded-3xl border border-slate-100/50 space-y-3">
+                                    <div className="text-2xl">{benefit.icon}</div>
+                                    <h3 className="font-black text-slate-900 text-sm uppercase tracking-tight">{benefit.title}</h3>
+                                    <p className="text-slate-500 text-xs font-medium leading-relaxed">{benefit.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="pt-6">
+                            <Link href="/stores/create">
+                                <Button className="w-full md:w-auto !h-16 !px-12 rounded-2xl bg-blue-600 text-white font-black text-sm uppercase tracking-[0.2em] hover:bg-black transition-all shadow-2xl shadow-blue-100 border-none flex items-center justify-center gap-4 group active:scale-95">
+                                    Create Store for Free
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
+                                </Button>
+                            </Link>
+                            <p className="mt-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                Join +500 Successful Merchants Today
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     // Parallelize data fetching for better performance
@@ -139,7 +187,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                                 { name: "Inventory", mode: null },
                                 { name: "Analytics", mode: "analytics" },
                                 { name: "Staff", mode: "staff" },
-                                { name: "Billing", mode: "billing" },
+                                { name: "Your Plan", mode: "billing" },
                                 { name: "Settings", mode: "settings" }
                             ].map((tab) => {
                                 const isActive = (tab.mode === null && !isAddingProduct && !isAnalytics && !isSettings && !isBilling && !isStaff) ||
@@ -240,7 +288,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                 ) : isBilling ? (
                     <div className="py-12 space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="text-center">
-                            <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">Billing <span className="text-blue-600">Infrastructure</span></h2>
+                            <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">Your Plan & <span className="text-blue-600">Billing</span></h2>
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol Subscriptions & Receipts</p>
                         </div>
                         <SubscriptionDetails
@@ -262,6 +310,6 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                     </>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

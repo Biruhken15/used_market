@@ -53,122 +53,85 @@ export default function Dashboard() {
 
     return (
         <div className="w-full pb-20 bg-slate-50/30">
-            {/* Search & Tabs Section */}
-            <div className="bg-white border-b border-slate-100 pt-32">
+            {/* Header Section */}
+            <div className="bg-white border-b border-slate-100 pt-32 pb-16">
                 <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-10">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                         <div>
-                            <h1 className="text-4xl font-extrabold text-slate-900 tracking-tighter mb-2">Marketplace</h1>
-                            <p className="text-slate-500 font-medium">Discover quality products and verified stores across Ethiopia.</p>
+                            <h1 className="text-4xl font-black text-slate-900 tracking-tighter mb-2 italic uppercase">Partner Stores</h1>
+                            <p className="text-slate-400 font-bold text-sm">Discover and follow verified merchants across Ethiopia.</p>
                         </div>
-                        {session && (
-                            <div className="inline-flex bg-slate-100 p-1.5 rounded-2xl">
-                                <button
-                                    onClick={() => setActiveTab("products")}
-                                    className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'products' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                >
-                                    Products
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab("stores")}
-                                    className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'stores' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                >
-                                    Stores
-                                </button>
-                            </div>
-                        )}
+                        <div className="flex items-center gap-4">
+                            <Link href="/">
+                                <Button variant="outline" className="h-12 px-8 rounded-xl border-2 border-slate-200 font-black text-xs uppercase tracking-widest hover:border-slate-950 transition-all">
+                                    Browse Products
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
-                    <SearchFilter />
                 </div>
             </div>
 
             {/* Content Area */}
             <div className="max-w-7xl mx-auto px-6 py-12">
-                {activeTab === "products" ? (
-                    <ProductGrid />
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {allStores.map((s) => (
-                            <Link key={s._id} href={`/stores/${s.storeSlug}`} className="premium-card p-6 bg-white hover:border-accent transition-all group">
-                                <div className="flex items-start gap-4 mb-6">
-                                    <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-3xl shadow-inner group-hover:bg-accent/5 group-hover:scale-105 transition-all">
-                                        {s.logo?.url ? <img src={s.logo.url} alt={s.storeName} className="w-full h-full object-cover rounded-2xl" /> : "🏪"}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h3 className="text-xl font-extrabold text-slate-900 truncate group-hover:text-accent transition-colors">{s.storeName}</h3>
-                                        <p className="text-sm font-bold text-slate-400">@{s.sellerName}</p>
-                                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {allStores.map((s) => (
+                        <Link key={s._id} href={`/stores/${s.storeSlug}`} className="bg-white border border-slate-100 rounded-[2.5rem] p-8 hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-500 group border-2 hover:border-slate-900">
+                            <div className="flex items-start gap-5 mb-8">
+                                <div className="w-20 h-20 rounded-[1.5rem] bg-slate-50 border border-slate-100 flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition-transform duration-500 overflow-hidden">
+                                    {s.logo?.url ? <img src={s.logo.url} alt={s.storeName} className="w-full h-full object-cover" /> : "🏪"}
                                 </div>
-                                <p className="text-slate-500 text-sm line-clamp-2 mb-6 font-medium leading-relaxed">
-                                    {s.description}
-                                </p>
-                                <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-50">
-                                    <span className="px-3 py-1 bg-slate-50 text-slate-500 text-[10px] font-bold rounded-lg uppercase tracking-wider">{s.city}</span>
-                                    <span className="px-3 py-1 bg-accent/5 text-accent text-[10px] font-bold rounded-lg uppercase tracking-wider">Verified</span>
+                                <div className="flex-1 min-w-0 pt-1">
+                                    <h3 className="text-xl font-black text-slate-900 tracking-tight truncate group-hover:text-blue-600 transition-colors uppercase italic">{s.storeName}</h3>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Managed by {s.sellerName}</p>
                                 </div>
-                            </Link>
-                        ))}
-                        {allStores.length === 0 && !loading && (
-                            <div className="col-span-full py-20 text-center">
-                                <p className="text-slate-400 font-bold">No stores found yet.</p>
                             </div>
-                        )}
-                    </div>
-                )}
+
+                            <p className="text-slate-500 text-sm font-medium leading-relaxed line-clamp-2 h-10 mb-8">
+                                {s.description}
+                            </p>
+
+                            <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+                                <div className="flex items-center gap-2">
+                                    <span className="px-3 py-1 bg-slate-100 text-slate-500 text-[9px] font-black rounded-full uppercase tracking-widest">{s.city}</span>
+                                    {s.storeType === 'broker' && (
+                                        <span className="px-3 py-1 bg-purple-50 text-purple-600 text-[9px] font-black rounded-full uppercase tracking-widest border border-purple-100 italic">Broker</span>
+                                    )}
+                                </div>
+                                <span className="text-blue-600 group-hover:translate-x-1 transition-transform">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
+                                </span>
+                            </div>
+                        </Link>
+                    ))}
+                    {allStores.length === 0 && !loading && (
+                        <div className="col-span-full py-40 text-center space-y-4">
+                            <div className="text-6xl grayscale opacity-20">🏪</div>
+                            <p className="text-slate-400 font-black uppercase tracking-widest text-sm italic">Establishing network...</p>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Pricing Section for Guests */}
-            {!session && (
-                <div className="mt-12">
-                    <PricingSection />
+            {/* Bottom CTA */}
+            {!store && (
+                <div className="max-w-7xl mx-auto px-6 mt-12 pb-24">
+                    <div className="bg-slate-900 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+                        <div className="absolute inset-0 opacity-10">
+                            <img src="/market-narrative-1.png" alt="Background" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="relative z-10 space-y-8 max-w-2xl mx-auto text-white">
+                            <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase">Become a Merchant</h2>
+                            <p className="text-white/50 text-lg font-bold">Open your digital storefront and start reaching buyers across Ethiopia today.</p>
+                            <Link href="/stores/create" className="inline-block">
+                                <Button className="h-16 px-12 bg-white text-slate-950 hover:bg-blue-600 hover:text-white font-black text-lg rounded-2xl transition-all shadow-2xl border-none uppercase">
+                                    Create My Store
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             )}
-
-            {/* Action Section - Refined for Guest vs Logged In */}
-            <div className="max-w-7xl mx-auto px-6 mt-12 pb-24">
-                <div className="bg-slate-900 rounded-[3rem] p-12 md:p-16 text-white relative overflow-hidden shadow-2xl shadow-slate-200">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-accent/20 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3"></div>
-                    <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                        <div>
-                            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter leading-[1.1]">
-                                {session ? "Scale your business with Us." : "Join the professional marketplace."}
-                            </h2>
-                            <p className="text-slate-400 text-lg font-medium mb-10 leading-relaxed max-w-lg">
-                                {session
-                                    ? "Manage your listings, analyze store performance, and reach thousands of buyers across the country."
-                                    : "Start trading today to access exclusive products, follow your favorite stores, and open your own digital shop."}
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                {session ? (
-                                    <>
-                                        <Link href={store ? "/listings/create" : "/stores/create"}>
-                                            <Button className="bg-accent text-white hover:bg-accent-dark px-10 h-14 rounded-2xl font-bold shadow-xl shadow-accent/20 border-none w-full sm:w-auto transition-transform hover:scale-105 active:scale-95">
-                                                Post New Listing
-                                            </Button>
-                                        </Link>
-                                        <Link href={store ? `/seller/mystore` : "/stores/create"}>
-                                            <Button variant="outline" className="border-2 border-slate-700 hover:border-white text-white hover:bg-white/5 px-10 h-14 rounded-2xl font-bold transition-all w-full sm:w-auto">
-                                                {store ? "Manage My Store" : "Create Store Profile"}
-                                            </Button>
-                                        </Link>
-                                    </>
-                                ) : (
-                                    <Link href="/auth/register">
-                                        <Button className="bg-accent text-white hover:bg-accent-dark px-12 h-16 text-lg rounded-2xl font-black shadow-2xl shadow-accent/30 border-none w-full sm:w-auto transition-all hover:scale-105 active:scale-95">
-                                            Start Your Journey
-                                        </Button>
-                                    </Link>
-                                )}
-                            </div>
-                        </div>
-                        <div className="hidden lg:flex justify-end">
-                            <div className="w-64 h-64 bg-white/5 rounded-[2.5rem] border border-white/10 flex items-center justify-center text-9xl shadow-2xl shadow-black/20">
-                                👜
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 }

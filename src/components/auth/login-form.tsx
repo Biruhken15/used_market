@@ -40,11 +40,7 @@ export const LoginForm = () => {
                 return;
             }
 
-            if (isInvited) {
-                router.replace("/seller/mystore");
-            } else {
-                router.replace("/dashboard");
-            }
+            router.replace("/dashboard");
         } catch (err) {
             setError("An unexpected error occurred. Please try again.");
             setIsLoading(false);

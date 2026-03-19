@@ -63,7 +63,8 @@ export async function createStoreAction(formData: FormData): Promise<ActionState
         }
 
         const storeName = formData.get("storeName") as string;
-        const storeSlug = (formData.get("storeSlug") as string).toLowerCase();
+        const storeSlug = formData.get("storeSlug") as string;
+        const storeType = formData.get("storeType") as 'standard' | 'broker';
         const description = formData.get("description") as string;
         const category = formData.getAll("category") as string[];
         const phone = formData.get("phone") as string;
@@ -73,6 +74,7 @@ export async function createStoreAction(formData: FormData): Promise<ActionState
         const email = formData.get("email") as string;
         const sellerName = formData.get("sellerName") as string;
         const city = formData.get("city") as string;
+        const region = formData.get("region") as string;
         const country = formData.get("country") as string;
         const idType = formData.get("idType") as string;
 
@@ -89,12 +91,14 @@ export async function createStoreAction(formData: FormData): Promise<ActionState
             email,
             sellerName,
             city,
+            region,
             country,
             idType,
             logo,
             coverImage,
             idFront,
-            idBack
+            idBack,
+            storeType
         };
 
         await StoreService.createStore(storeData);
@@ -125,7 +129,7 @@ export async function updateStoreAction(formData: FormData): Promise<ActionState
         const updateData: any = {};
 
         // Basic fields
-        const fields = ["storeName", "description", "phone", "whatsapp", "telegram", "address", "city"];
+        const fields = ["storeName", "description", "phone", "whatsapp", "telegram", "address", "city", "region", "country"];
         fields.forEach(field => {
             const val = formData.get(field);
             if (val !== null) updateData[field] = val;

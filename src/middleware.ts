@@ -17,7 +17,7 @@ export async function middleware(req: any) {
     });
 
     if (token && (path === "/auth/login" || path === "/auth/register")) {
-        return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+        return NextResponse.redirect(new URL("/", req.nextUrl));
     }
 
     if (!isPublicPath && !token) {

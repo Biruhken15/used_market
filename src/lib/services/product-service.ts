@@ -3,6 +3,7 @@ import Product from '../models/product';
 import UserSubscription from '../models/user-subscription';
 import { SubscriptionService } from './subscription-service';
 import mongoose from 'mongoose';
+import { serialize } from '../utils/serialize';
 
 /**
  * Service to manage product listings and marketplace logic.
@@ -39,14 +40,36 @@ export class ProductService {
     }
 
     /**
-     * Fetch products for the marketplace with search ranking boost.
+     * Fetch products for the marketplace with search ranking boost and special filters.
      */
     static async getMarketplaceProducts(filters: any = {}, page = 1, limit = 20) {
         await dbConnect();
 
-        // We use aggregation to join with UserSubscription and SubscriptionPlan for ranking
+        const matchStage: any = { status: 'active' };
+
+        // Handle special filters
+        if (filters.last24Hours) {
+            const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            matchStage.createdAt = { $gte: yesterday };
+            delete filters.last24Hours;
+        }
+
+        // Apply remaining filters
+        Object.assign(matchStage, filters);
+
+        // We use aggregation to join with UserSubscription and SubscriptionPlan for ranking and promotions
         const products = await Product.aggregate([
-            { $match: { status: 'active', ...filters } },
+            { $match: matchStage },
+            // Join with Store to get store information (like storeType)
+            {
+                $lookup: {
+                    from: 'stores',
+                    localField: 'storeId',
+                    foreignField: '_id',
+                    as: 'store'
+                }
+            },
+            { $unwind: { path: '$store', preserveNullAndEmptyArrays: true } },
             // Join with UserSubscription to get the plan
             {
                 $lookup: {
@@ -57,7 +80,7 @@ export class ProductService {
                 }
             },
             { $unwind: { path: '$subscription', preserveNullAndEmptyArrays: true } },
-            // Join with SubscriptionPlan to get the boost
+            // Join with SubscriptionPlan to get the boost and features
             {
                 $lookup: {
                     from: 'subscriptionplans',
@@ -67,6 +90,10 @@ export class ProductService {
                 }
             },
             { $unwind: { path: '$plan', preserveNullAndEmptyArrays: true } },
+
+            // Filter by hasPromotedPlan if requested
+            ...(filters.hasPromotedPlan ? [{ $match: { 'plan.features.hasHomepagePromotion': true } }] : []),
+
             // Calculate a score for sorting
             {
                 $addFields: {
@@ -75,7 +102,8 @@ export class ProductService {
                             { $ifNull: ['$plan.features.searchRankingBoost', 0] },
                             // Add other factors here (e.g., recency, verified badge)
                             { $cond: [{ $eq: ['$plan.features.hasVerifiedBadge', true] }, 10, 0] },
-                            { $cond: [{ $eq: ['$isFeatured', true] }, 25, 0] }
+                            { $cond: [{ $eq: ['$isFeatured', true] }, 25, 0] },
+                            { $cond: [{ $eq: ['$isUrgent', true] }, 30, 0] }
                         ]
                     }
                 }
@@ -86,7 +114,7 @@ export class ProductService {
             { $limit: limit }
         ]);
 
-        return products;
+        return serialize(products);
     }
 
     /**
@@ -94,33 +122,8 @@ export class ProductService {
      */
     static async getStoreProducts(storeId: string) {
         await dbConnect();
-        return await Product.find({ storeId: new mongoose.Types.ObjectId(storeId) }).sort({ createdAt: -1 });
-    }
-
-    /**
-     * Mark a product as sold with subscription enforcement.
-     */
-    static async markAsSold(productId: string, storeId: string) {
-        await dbConnect();
-
-        const subscription = await SubscriptionService.getStoreSubscription(storeId);
-        const plan = subscription?.planId as any;
-
-        if (!plan?.features?.canMarkAsSold) {
-            throw new Error(`The ${plan?.planName || 'Free'} plan does not support marking items as sold. Please upgrade.`);
-        }
-
-        const product = await Product.findOneAndUpdate(
-            { _id: productId, storeId: new mongoose.Types.ObjectId(storeId) },
-            { status: 'sold' },
-            { new: true }
-        );
-
-        if (!product) {
-            throw new Error('Product not found or access denied');
-        }
-
-        return product;
+        const products = await Product.find({ storeId: new mongoose.Types.ObjectId(storeId) }).sort({ createdAt: -1 });
+        return serialize(products);
     }
 
     /**
@@ -187,5 +190,27 @@ export class ProductService {
         }
 
         return { success: true, message: 'Product deleted successfully' };
+    }
+
+    /**
+     * Get the number of featured products for a store.
+     */
+    static async getStoreFeaturedCount(storeId: string) {
+        await dbConnect();
+        return await Product.countDocuments({
+            storeId: new mongoose.Types.ObjectId(storeId),
+            isFeatured: true,
+            status: 'active'
+        });
+    }
+
+    /**
+     * Get a single product by ID.
+     */
+    static async getProductById(productId: string) {
+        await dbConnect();
+        const product = await Product.findById(productId);
+        if (!product) throw new Error('Product not found');
+        return serialize(product);
     }
 }
