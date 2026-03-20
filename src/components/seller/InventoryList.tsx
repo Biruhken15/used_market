@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { toggleUrgentAction } from '@/lib/actions/product-actions';
-import { Sparkles, Zap } from 'lucide-react';
+import { toggleUrgentAction, toggleFeaturedAction } from '@/lib/actions/product-actions';
+import { Sparkles, Zap, Star } from 'lucide-react';
 
 interface InventoryListProps {
     initialProducts: any[];
@@ -60,6 +60,20 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
             if (result.error) throw new Error(result.error);
 
             setProducts(products.map(p => p._id === productId ? { ...p, isUrgent: !p.isUrgent } : p));
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleToggleFeatured = async (productId: string) => {
+        setLoading(productId);
+        try {
+            const result = await toggleFeaturedAction(productId, storeId);
+            if (result.error) throw new Error(result.error);
+
+            setProducts(products.map(p => p._id === productId ? { ...p, isFeatured: !p.isFeatured } : p));
         } catch (err: any) {
             alert(err.message);
         } finally {
@@ -130,7 +144,7 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                                 <span className="bg-red-600 text-white text-[6px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-lg shadow-red-100 animate-pulse">Urgent</span>
                                             )}
                                             {product.isFeatured && (
-                                                <span className="bg-amber-500 text-white text-[6px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-lg shadow-amber-100 animate-pulse">Hot</span>
+                                                <span className="bg-emerald-500 text-white text-[6px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-lg shadow-emerald-100 animate-pulse">Featured</span>
                                             )}
                                         </div>
                                     </div>
@@ -180,6 +194,25 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                             <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
                                         ) : (
                                             <Zap size={14} fill={product.isUrgent ? "currentColor" : "none"} strokeWidth={3} />
+                                        )}
+                                    </button>
+
+                                    {/* Featured Toggle - Pro/Enterprise Only */}
+                                    <button
+                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleFeatured(product._id); }}
+                                        disabled={loading === product._id || (subscriptionFeatures?.featuredListingsPerMonth === 0)}
+                                        className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all border shrink-0 ${product.isFeatured
+                                            ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-100'
+                                            : (subscriptionFeatures?.featuredListingsPerMonth > 0)
+                                                ? 'bg-white border-slate-200 text-slate-400 hover:border-emerald-500 hover:text-emerald-500'
+                                                : 'bg-slate-50 border-slate-100 text-slate-200 cursor-not-allowed'
+                                            }`}
+                                        title={product.isFeatured ? 'Mark as Not Featured' : 'Mark as Featured'}
+                                    >
+                                        {loading === product._id ? (
+                                            <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <Star size={14} fill={product.isFeatured ? "currentColor" : "none"} strokeWidth={3} />
                                         )}
                                     </button>
 

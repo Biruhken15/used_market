@@ -47,20 +47,78 @@ export class ProductService {
 
         const matchStage: any = { status: 'active' };
 
+        // Handle Price Range
+        if (filters.minPrice || filters.maxPrice) {
+            matchStage.price = {};
+            if (filters.minPrice) matchStage.price.$gte = Number(filters.minPrice);
+            if (filters.maxPrice) matchStage.price.$lte = Number(filters.maxPrice);
+        }
+
+        // Handle Region
+        if (filters.region && filters.region !== 'All Regions') {
+            matchStage.region = filters.region;
+        }
+
+        // Handle Category
+        if (filters.category && filters.category !== 'All Categories') {
+            matchStage.category = filters.category;
+        }
+
+        // Handle Keyword Search
+        if (filters.keyword) {
+            matchStage.$or = [
+                { title: { $regex: filters.keyword, $options: 'i' } },
+                { description: { $regex: filters.keyword, $options: 'i' } }
+            ];
+        }
+
         // Handle special filters
         if (filters.last24Hours) {
             const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
             matchStage.createdAt = { $gte: yesterday };
-            delete filters.last24Hours;
         }
 
-        // Apply remaining filters
-        Object.assign(matchStage, filters);
+        // Apply remaining filters (like isFeatured, isUrgent, storeId, etc.)
+        // Filter out handled ones to avoid conflicts
+        const { minPrice, maxPrice, region, category, keyword, last24Hours, ...rest } = filters;
+        Object.assign(matchStage, rest);
 
-        // We use aggregation to join with UserSubscription and SubscriptionPlan for ranking and promotions
-        const products = await Product.aggregate([
+        // 1. Get total count for pagination
+        // If hasPromotedPlan is true, we need to account for the join in the count
+        let total = 0;
+        if (filters.hasPromotedPlan) {
+            // For promoted plans, we do a join count
+            const promoCount = await Product.aggregate([
+                { $match: matchStage },
+                {
+                    $lookup: {
+                        from: 'usersubscriptions',
+                        localField: 'storeId',
+                        foreignField: 'storeId',
+                        as: 'subscription'
+                    }
+                },
+                { $unwind: '$subscription' },
+                {
+                    $lookup: {
+                        from: 'subscriptionplans',
+                        localField: 'subscription.planId',
+                        foreignField: '_id',
+                        as: 'plan'
+                    }
+                },
+                { $unwind: '$plan' },
+                { $match: { 'plan.features.hasHomepagePromotion': true } },
+                { $count: 'total' }
+            ]);
+            total = promoCount[0]?.total || 0;
+        } else {
+            total = await Product.countDocuments(matchStage);
+        }
+
+        // 2. Fetch products
+        let products = await Product.aggregate([
             { $match: matchStage },
-            // Join with Store to get store information (like storeType)
             {
                 $lookup: {
                     from: 'stores',
@@ -70,17 +128,15 @@ export class ProductService {
                 }
             },
             { $unwind: { path: '$store', preserveNullAndEmptyArrays: true } },
-            // Join with UserSubscription to get the plan
             {
                 $lookup: {
-                    from: 'usersubscriptions', // Mongoose model name lowercase + s
+                    from: 'usersubscriptions',
                     localField: 'storeId',
                     foreignField: 'storeId',
                     as: 'subscription'
                 }
             },
             { $unwind: { path: '$subscription', preserveNullAndEmptyArrays: true } },
-            // Join with SubscriptionPlan to get the boost and features
             {
                 $lookup: {
                     from: 'subscriptionplans',
@@ -91,30 +147,108 @@ export class ProductService {
             },
             { $unwind: { path: '$plan', preserveNullAndEmptyArrays: true } },
 
-            // Filter by hasPromotedPlan if requested
             ...(filters.hasPromotedPlan ? [{ $match: { 'plan.features.hasHomepagePromotion': true } }] : []),
 
-            // Calculate a score for sorting
             {
                 $addFields: {
                     rankingScore: {
                         $add: [
                             { $ifNull: ['$plan.features.searchRankingBoost', 0] },
-                            // Add other factors here (e.g., recency, verified badge)
                             { $cond: [{ $eq: ['$plan.features.hasVerifiedBadge', true] }, 10, 0] },
                             { $cond: [{ $eq: ['$isFeatured', true] }, 25, 0] },
                             { $cond: [{ $eq: ['$isUrgent', true] }, 30, 0] }
                         ]
+                    },
+                    isUrgentExpired: {
+                        $cond: {
+                            if: { $and: [{ $eq: ["$isUrgent", true] }, { $ne: ["$urgentSetAt", null] }] },
+                            then: {
+                                $gt: [
+                                    { $divide: [{ $subtract: [new Date(), "$urgentSetAt"] }, 86400000] },
+                                    { $ifNull: ["$plan.limits.urgentDurationDays", 0] }
+                                ]
+                            },
+                            else: false
+                        }
                     }
                 }
             },
-            // Sort by rankingScore DESC, then createdAt DESC
             { $sort: { rankingScore: -1, createdAt: -1 } },
             { $skip: (page - 1) * limit },
             { $limit: limit }
         ]);
 
-        return serialize(products);
+        // 3. Fallback: If promoted batch is requested but empty, return featured products as promotions
+        if (filters.hasPromotedPlan && products.length === 0) {
+            const fallbackFilters = { ...matchStage, isFeatured: true };
+            // Get total for featured fallback
+            total = await Product.countDocuments(fallbackFilters);
+            // Fetch featured as fallback
+            products = await Product.aggregate([
+                { $match: fallbackFilters },
+                {
+                    $lookup: {
+                        from: 'stores',
+                        localField: 'storeId',
+                        foreignField: '_id',
+                        as: 'store'
+                    }
+                },
+                { $unwind: { path: '$store', preserveNullAndEmptyArrays: true } },
+                {
+                    $lookup: {
+                        from: 'usersubscriptions',
+                        localField: 'storeId',
+                        foreignField: 'storeId',
+                        as: 'subscription'
+                    }
+                },
+                { $unwind: { path: '$subscription', preserveNullAndEmptyArrays: true } },
+                {
+                    $lookup: {
+                        from: 'subscriptionplans',
+                        localField: 'subscription.planId',
+                        foreignField: '_id',
+                        as: 'plan'
+                    }
+                },
+                { $unwind: { path: '$plan', preserveNullAndEmptyArrays: true } },
+                {
+                    $addFields: {
+                        rankingScore: {
+                            $add: [
+                                { $ifNull: ['$plan.features.searchRankingBoost', 0] },
+                                { $cond: [{ $eq: ['$plan.features.hasVerifiedBadge', true] }, 10, 0] },
+                                { $cond: [{ $eq: ['$isFeatured', true] }, 25, 0] },
+                                { $cond: [{ $eq: ['$isUrgent', true] }, 30, 0] }
+                            ]
+                        },
+                        isUrgentExpired: {
+                            $cond: {
+                                if: { $and: [{ $eq: ["$isUrgent", true] }, { $ne: ["$urgentSetAt", null] }] },
+                                then: {
+                                    $gt: [
+                                        { $divide: [{ $subtract: [new Date(), "$urgentSetAt"] }, 86400000] },
+                                        { $ifNull: ["$plan.limits.urgentDurationDays", 0] }
+                                    ]
+                                },
+                                else: false
+                            }
+                        }
+                    }
+                },
+                { $sort: { rankingScore: -1, createdAt: -1 } },
+                { $skip: (page - 1) * limit },
+                { $limit: limit }
+            ]);
+        }
+
+        return {
+            products: serialize(products),
+            total,
+            page,
+            totalPages: Math.ceil(total / limit)
+        };
     }
 
     /**

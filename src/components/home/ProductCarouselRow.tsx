@@ -27,14 +27,14 @@ export function ProductCarouselRow({ title, products, filterUrl }: ProductCarous
     if (!products || products.length === 0) return null;
 
     return (
-        <div className="w-full py-8 px-4 md:px-8 bg-transparent overflow-hidden">
-            <div className="max-w-7xl mx-auto space-y-6">
+        <div className="w-full py-2 px-4 md:px-10 bg-transparent overflow-hidden">
+            <div className="w-full space-y-2">
                 <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight italic">
+                    <h2 className="text-xl md:text-2xl font-black text-rose-500 tracking-tighter italic">
                         {title}
                     </h2>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 scale-75 origin-right">
                         <button
                             onClick={() => scroll("left")}
                             className="p-2 border-2 border-slate-100 rounded-lg hover:border-slate-950 transition-colors shadow-sm"
@@ -54,7 +54,7 @@ export function ProductCarouselRow({ title, products, filterUrl }: ProductCarous
                     ref={scrollRef}
                     className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-1"
                 >
-                    {products.map((product) => (
+                    {Array.isArray(products) && products.map((product) => (
                         <div key={product._id} className="min-w-[200px] w-1/6 shrink-0 transition-all hover:scale-[1.02]">
                             <ProductCard product={product} />
                         </div>

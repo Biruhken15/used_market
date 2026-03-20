@@ -90,6 +90,7 @@ export class SubscriptionService {
                     maxActiveListings: 500,
                     imagesPerProduct: 5,
                     featuredListingsPerMonth: 5,
+                    urgentDurationDays: 7,
                     listingDurationDays: 180,
                     maxStaffAccounts: 4
                 },
@@ -122,6 +123,7 @@ export class SubscriptionService {
                     maxActiveListings: 9999,
                     imagesPerProduct: 7,
                     featuredListingsPerMonth: 20,
+                    urgentDurationDays: 15,
                     listingDurationDays: 365,
                     maxStaffAccounts: 5
                 },

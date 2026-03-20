@@ -100,6 +100,7 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
             quantity,
             isFeatured,
             isUrgent,
+            urgentSetAt: isUrgent ? new Date() : undefined,
             sourceOwner: {
                 name: formData.get("sourceOwnerName") as string,
                 phone: formData.get("sourceOwnerPhone") as string,
@@ -216,6 +217,16 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
             }
         };
 
+        // Handle urgent timestamp logic
+        if (isUrgent) {
+            const currentProduct = await ProductService.getProductById(productId);
+            if (!currentProduct.isUrgent) {
+                updateData.urgentSetAt = new Date();
+            }
+        } else {
+            updateData.urgentSetAt = null;
+        }
+
         if (uploadedImages.length > 0) {
             updateData.images = uploadedImages;
             updateData.thumbnail = uploadedImages[0].url;
@@ -257,8 +268,10 @@ export async function toggleUrgentAction(productId: string, storeId: string): Pr
             return { error: "Not Found", details: "Listing not found." };
         }
 
+        const isTurningOn = !product.isUrgent;
         await ProductService.updateProduct(productId, session.user.id, {
-            isUrgent: !product.isUrgent
+            isUrgent: isTurningOn,
+            urgentSetAt: isTurningOn ? new Date() : null
         });
 
         revalidatePath("/dashboard");
@@ -268,6 +281,53 @@ export async function toggleUrgentAction(productId: string, storeId: string): Pr
         return { success: true };
     } catch (error: any) {
         console.error("[toggleUrgentAction] Error:", error);
+        return {
+            error: "Toggle Failed",
+            details: error.message || "An unexpected error occurred."
+        };
+    }
+}
+
+export async function toggleFeaturedAction(productId: string, storeId: string): Promise<ActionState> {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user) {
+            return { error: "Unauthorized" };
+        }
+
+        const { SubscriptionService } = await import("../services/subscription-service");
+        const subscription = await SubscriptionService.getStoreSubscription(storeId);
+        const plan = subscription?.planId as any;
+
+        const featuredLimit = plan?.limits?.featuredListingsPerMonth || 0;
+        if (featuredLimit === 0) {
+            return { error: "Upgrade Required", details: "Your current plan does not support Featured listings." };
+        }
+
+        const product = await ProductService.getProductById(productId);
+        if (!product) {
+            return { error: "Not Found", details: "Listing not found." };
+        }
+
+        // Only check limit if it's being CHANGED to featured
+        if (!product.isFeatured) {
+            const featuredCount = await ProductService.getStoreFeaturedCount(storeId);
+            if (featuredCount >= featuredLimit) {
+                return { error: "Limit Reached", details: `You have reached your limit of ${featuredLimit} featured listings.` };
+            }
+        }
+
+        await ProductService.updateProduct(productId, session.user.id, {
+            isFeatured: !product.isFeatured
+        });
+
+        revalidatePath("/dashboard");
+        revalidatePath("/seller/mystore");
+        revalidatePath(`/products/${productId}`);
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("[toggleFeaturedAction] Error:", error);
         return {
             error: "Toggle Failed",
             details: error.message || "An unexpected error occurred."

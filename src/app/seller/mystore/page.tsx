@@ -108,9 +108,17 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
     // Parse data for client components
     const serializedProducts = JSON.parse(JSON.stringify(products));
     const serializedActivity = JSON.parse(JSON.stringify(recentActivity));
-    const serializedPlanFeatures = JSON.parse(JSON.stringify(plan?.features || { canMarkAsSold: false }));
+    const serializedPlanFeatures = JSON.parse(JSON.stringify({
+        ...(plan?.features || { canMarkAsSold: false }),
+        featuredListingsPerMonth: plan?.limits?.featuredListingsPerMonth || 0
+    }));
     const serializedStaff = JSON.parse(JSON.stringify(store.staff || []));
-    const serializedPlanLimits = JSON.parse(JSON.stringify(plan?.limits || { maxActiveListings: 3, imagesPerProduct: 3 }));
+    const serializedPlanLimits = JSON.parse(JSON.stringify({
+        ...(plan?.limits || { maxActiveListings: 3, imagesPerProduct: 3 }),
+        planCode: plan?.planCode,
+        canMarkAsUrgent: plan?.features?.canMarkAsUrgent,
+        canMarkAsFeatured: (plan?.limits?.featuredListingsPerMonth || 0) > 0
+    }));
 
     return (
         <div className="min-h-screen bg-slate-50/50 pb-24">

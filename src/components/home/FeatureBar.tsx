@@ -12,6 +12,12 @@ import {
 
 const features = [
     {
+        label: "All Products",
+        icon: <Store className="w-4 h-4" />,
+        href: "/products",
+        color: "bg-slate-50 text-slate-600 border-slate-100"
+    },
+    {
         label: "Featured",
         icon: <Star className="w-4 h-4" />,
         href: "/products/featured",
@@ -34,35 +40,27 @@ const features = [
         icon: <Users className="w-4 h-4" />,
         href: "/brokers",
         color: "bg-purple-50 text-purple-600 border-purple-100"
-    },
-    {
-        label: "Create Store",
-        icon: <Store className="w-4 h-4" />,
-        href: "/stores/create",
-        color: "bg-emerald-50 text-emerald-600 border-emerald-100"
     }
 ];
 
 export function FeatureBar() {
     return (
-        <div className="w-full bg-white border-b border-slate-100 py-4 px-4 md:px-8 overflow-x-auto no-scrollbar">
-            <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 min-w-max">
-                <div className="flex items-center gap-3">
-                    {features.map((item) => (
-                        <Link
-                            key={item.label}
-                            href={item.href}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-full border ${item.color} font-bold text-sm hover:shadow-md transition-all active:scale-95`}
-                        >
-                            {item.icon}
-                            {item.label}
-                        </Link>
-                    ))}
-                </div>
+        <div className="w-full bg-white border-b border-slate-100 py-1 px-1 md:px-2 overflow-x-auto no-scrollbar shadow-sm">
+            <div className="max-w-full flex items-center justify-start gap-2.5 min-w-max">
+                {features.map((item) => (
+                    <Link
+                        key={item.label}
+                        href={item.href}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${item.color} font-black text-[11px] uppercase tracking-wider hover:shadow-sm transition-all active:scale-95 whitespace-nowrap shadow-sm`}
+                    >
+                        <span className="opacity-70 scale-90">{item.icon}</span>
+                        {item.label}
+                    </Link>
+                ))}
 
                 <Link
                     href="/products"
-                    className="flex items-center gap-1 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors ml-4"
+                    className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors ml-4 pr-1"
                 >
                     View All Products
                     <ChevronRight className="w-4 h-4" />

@@ -17,6 +17,7 @@ interface ProductCardProps {
         images?: { url: string }[];
         rankingScore?: number;
         isUrgent?: boolean;
+        isUrgentExpired?: boolean;
         isFeatured?: boolean;
         condition?: string;
     };
@@ -99,40 +100,42 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
     return (
         <>
             <Link href={`/products/${product._id}`} className="block group h-full">
-                <div className="h-full flex flex-col bg-white border border-slate-100 transition-all duration-300 relative rounded-xl overflow-hidden hover:shadow-xl group-hover:border-slate-200">
+                <div className="h-full flex flex-col bg-white border border-gray-400/40 shadow-none transition-shadow duration-200 relative rounded-sm overflow-hidden hover:shadow-lg group">
                     
                     {/* Condition Badge (Very Top) */}
-                    <div className="bg-slate-50 border-b border-slate-100 py-1.5 px-3 flex items-center justify-between">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                    <div className="z-10 bg-gray-50 border-b border-gray-400/20 py-1 px-2 flex items-center justify-between">
+                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none">
                             {product.condition || "Marketplace Item"}
                         </span>
                         {product.status === 'sold' && (
-                            <span className="text-[9px] font-black text-rose-500 uppercase tracking-wider">Sold Out</span>
+                            <span className="text-[8px] font-black text-rose-600 uppercase tracking-wider">Sold</span>
                         )}
                     </div>
 
                     {/* Image Section */}
-                    <div className="aspect-square bg-slate-50 relative overflow-hidden shrink-0 p-4">
+                    <div className="aspect-square bg-white relative overflow-hidden shrink-0 p-2 border-b border-gray-400/10">
                         {images.length > 0 ? (
                             <img
                                 src={images[currentImageIndex].url}
                                 alt={product.title}
-                                className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                                className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-4xl opacity-10">📦</div>
                         )}
 
                         {/* Status Tags (Top Left of Image) */}
-                        <div className="absolute top-4 left-4 flex flex-col gap-1">
-                            {product.isUrgent && (
-                                <span className="bg-blue-600 text-white text-[9px] font-black uppercase tracking-tighter px-2 py-1 rounded-sm shadow-sm">
+                        <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
+                            {product.isUrgent && !product.isUrgentExpired && (
+                                <span className="bg-red-600 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-sm shadow-xl shadow-red-100 flex items-center gap-1">
+                                    <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
                                     Urgent
                                 </span>
                             )}
                             {product.isFeatured && (
-                                <span className="bg-green-500 text-white text-[9px] font-black uppercase tracking-tighter px-2 py-1 rounded-sm shadow-sm">
-                                    Top Pick
+                                <span className="bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-sm shadow-xl shadow-emerald-100 flex items-center gap-1">
+                                    <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
+                                    Featured
                                 </span>
                             )}
                             {product.category === 'real-estate' && (
@@ -149,22 +152,22 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
                     </div>
 
                     {/* Content Section */}
-                    <div className="p-4 flex flex-col flex-1 gap-2">
-                        <h3 className="text-[13px] font-bold text-slate-700 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
+                    <div className="p-2 flex flex-col flex-1 gap-1">
+                        <h3 className="text-[11px] font-bold text-gray-800 leading-tight line-clamp-2 group-hover:text-slate-900 transition-colors">
                             {product.title}
                         </h3>
                         
-                        <div className="space-y-0.5 mt-auto">
+                        <div className="space-y-0 mt-auto">
                             <div className="flex items-baseline gap-1">
-                                <span className="text-lg font-black text-slate-900 tracking-tight">
-                                    {product.price.toLocaleString()} <span className="text-[10px] opacity-70">ETB</span>
+                                <span className="text-sm font-black text-gray-900 tracking-tight">
+                                    {product.price.toLocaleString()} <span className="text-[8px] opacity-70">ETB</span>
                                 </span>
                             </div>
                             
                             {/* Location & Meta info */}
-                            <div className="flex items-center gap-1.5">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">
+                            <div className="flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+                                <span className="text-[8px] font-bold text-gray-400 uppercase tracking-wider truncate">
                                     {product.category || "General"}
                                 </span>
                             </div>

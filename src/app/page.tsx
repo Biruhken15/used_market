@@ -9,12 +9,23 @@ import { HomeHeroFilters } from "@/components/home/HomeHeroFilters";
 
 export default async function Home() {
   // Fetch products for different sections in parallel for performance
-  const [promotedProducts, featuredProducts, urgentProducts, newArrivals, electronics, brokerItems] = await Promise.all([
+  const [
+    { products: promotedProducts },
+    { products: featuredProducts },
+    { products: urgentProducts },
+    { products: newArrivals },
+    { products: phoneAndElectronics },
+    { products: realEstate },
+    { products: vehicles },
+    { products: brokerItems }
+  ] = await Promise.all([
     ProductService.getMarketplaceProducts({ hasPromotedPlan: true }, 1, 10),
     ProductService.getMarketplaceProducts({ isFeatured: true }, 1, 10),
     ProductService.getMarketplaceProducts({ isUrgent: true }, 1, 10),
     ProductService.getMarketplaceProducts({ last24Hours: true }, 1, 10),
     ProductService.getMarketplaceProducts({ category: 'electronics' }, 1, 10),
+    ProductService.getMarketplaceProducts({ category: 'real-estate' }, 1, 10),
+    ProductService.getMarketplaceProducts({ category: 'vehicles' }, 1, 10),
     ProductService.getMarketplaceProducts({ 'store.storeType': 'broker' }, 1, 10),
   ]);
 
@@ -24,7 +35,7 @@ export default async function Home() {
       <FeatureBar />
 
       {/* Hero / Promo Section with Filters */}
-      <section className="max-w-7xl mx-auto w-full px-4 md:px-8 py-8">
+      <section className="max-w-7xl mx-auto w-full px-4 md:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left: Sidebar Filters */}
           <div className="lg:col-span-1 h-full">
@@ -43,15 +54,22 @@ export default async function Home() {
       {/* Main Marketplace Sections */}
       <div className="space-y-4 pb-20">
         
+        <header className="px-4 md:px-10 pt-12 pb-4">
+            <h2 className="text-3xl md:text-4xl font-black text-slate-950 italic tracking-tighter">
+                Explore Used Products.
+            </h2>
+            <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px] mt-2">
+                Verified Listings & Handpicked Deals
+            </p>
+        </header>
+
         {/* Promoted Products (Real-time based on Subscription) */}
         {promotedProducts.length > 0 && (
-          <div className="bg-white/50 border-y border-white">
-            <ProductCarouselRow
-              title="Promoted Stores"
-              products={promotedProducts}
-              filterUrl="/products?promoted=true"
-            />
-          </div>
+          <ProductCarouselRow
+            title="Promoted Stores"
+            products={promotedProducts}
+            filterUrl="/products?promoted=true"
+          />
         )}
 
         {/* Featured Products */}
@@ -61,20 +79,11 @@ export default async function Home() {
           filterUrl="/products/featured"
         />
 
-        {/* Urgent Section - High Visibility */}
-        <div className="bg-red-50/50 py-4">
-          <ProductCarouselRow
-            title="Urgent Deals ⚡"
-            products={urgentProducts}
-            filterUrl="/products/urgent"
-          />
-        </div>
-
-        {/* Broker Listings */}
+        {/* Urgent Section */}
         <ProductCarouselRow
-          title="Broker Listings"
-          products={brokerItems}
-          filterUrl="/brokers"
+          title="Urgent Deals ⚡"
+          products={urgentProducts}
+          filterUrl="/products/urgent"
         />
 
         {/* New Arrivals */}
@@ -84,11 +93,32 @@ export default async function Home() {
           filterUrl="/products/new-arrivals"
         />
 
+        {/* Real Estate */}
+        <ProductCarouselRow
+          title="Real Estate & Houses"
+          products={realEstate}
+          filterUrl="/products?category=real-estate"
+        />
+
+        {/* Vehicles */}
+        <ProductCarouselRow
+          title="Vehicles & Cars"
+          products={vehicles}
+          filterUrl="/products?category=vehicles"
+        />
+
         {/* Category: Electronics */}
         <ProductCarouselRow
-          title="Electronics & Tech"
-          products={electronics}
+          title="Phone & Electronics"
+          products={phoneAndElectronics}
           filterUrl="/products?category=electronics"
+        />
+
+        {/* Broker Listings */}
+        <ProductCarouselRow
+          title="Broker Listings"
+          products={brokerItems}
+          filterUrl="/brokers"
         />
 
         {/* Sell CTA Section */}

@@ -3,7 +3,7 @@ import { ProductCard } from "@/components/dashboard/product-card";
 import { FeatureBar } from "@/components/home/FeatureBar";
 
 export default async function FeaturedProductsPage() {
-    const products = await ProductService.getMarketplaceProducts({ isFeatured: true }, 1, 50);
+    const { products } = await ProductService.getMarketplaceProducts({ isFeatured: true }, 1, 50);
 
     return (
         <div className="min-h-screen bg-slate-100 pt-28">
@@ -19,7 +19,7 @@ export default async function FeaturedProductsPage() {
                         </p>
                     </div>
 
-                    {products.length > 0 ? (
+                    {products && products.length > 0 ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                             {products.map((product: any) => (
                                 <ProductCard key={product._id} product={product} />

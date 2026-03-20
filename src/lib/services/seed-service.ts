@@ -169,4 +169,37 @@ export class SeedService {
 
         return { success: true, message: 'Full Marketplace Seeded Successfully' };
     }
+
+    static async cleanup() {
+        await dbConnect();
+
+        const seedEmails = [
+            'admin@ethio.market',
+            'pro@ethio.market',
+            'broker@ethio.market',
+            'user@ethio.market'
+        ];
+
+        // 1. Find seeded users
+        const seededUsers = await User.find({ email: { $in: seedEmails } });
+        const userIds = seededUsers.map(u => u._id);
+
+        // 2. Find seeded stores
+        const seededStores = await Store.find({ ownerId: { $in: userIds } });
+        const storeIds = seededStores.map(s => s._id);
+
+        // 3. Delete products from those stores
+        await Product.deleteMany({ storeId: { $in: storeIds } });
+
+        // 4. Delete subscriptions for those stores
+        await UserSubscription.deleteMany({ storeId: { $in: storeIds } });
+
+        // 5. Delete those stores
+        await Store.deleteMany({ ownerId: { $in: userIds } });
+
+        // 6. Delete those users
+        await User.deleteMany({ email: { $in: seedEmails } });
+
+        return { success: true, message: 'All seeded data has been removed from the database' };
+    }
 }

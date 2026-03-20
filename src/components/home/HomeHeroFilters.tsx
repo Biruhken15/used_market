@@ -1,17 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { 
     MapPin, 
     Layers, 
-    DollarSign, 
     Globe,
     ChevronDown,
     Search
 } from "lucide-react";
 
 export const HomeHeroFilters = () => {
+    const router = useRouter();
+    const [region, setRegion] = useState("All Regions");
+    const [category, setCategory] = useState("All Categories");
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
+
+    const handleApplyFilters = () => {
+        const params = new URLSearchParams();
+        if (region !== "All Regions") params.set("region", region);
+        if (category !== "All Categories") params.set("category", category.toLowerCase());
+        if (minPrice) params.set("minPrice", minPrice);
+        if (maxPrice) params.set("maxPrice", maxPrice);
+        
+        router.push(`/products?${params.toString()}`);
+    };
+
     return (
         <div className="bg-white border border-slate-100 rounded-2xl p-6 h-full flex flex-col shadow-sm">
             <div className="mb-6">
@@ -37,7 +53,11 @@ export const HomeHeroFilters = () => {
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Region</label>
                         <div className="relative group">
                             <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                            <select className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer">
+                            <select 
+                                value={region}
+                                onChange={(e) => setRegion(e.target.value)}
+                                className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer"
+                            >
                                 <option>All Regions</option>
                                 <option>Addis Ababa</option>
                                 <option>Oromia</option>
@@ -54,7 +74,11 @@ export const HomeHeroFilters = () => {
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Category</label>
                         <div className="relative group">
                             <Layers className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                            <select className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer">
+                            <select 
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer"
+                            >
                                 <option>All Categories</option>
                                 <option>Electronics</option>
                                 <option>Fashion</option>
@@ -68,20 +92,37 @@ export const HomeHeroFilters = () => {
 
                     {/* Price Range */}
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Price Max (ETB)</label>
-                        <div className="relative group">
-                            <DollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                            <input 
-                                type="number" 
-                                placeholder="Any price"
-                                className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all"
-                            />
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Price Range (ETB)</label>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="relative">
+                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400">ETB</span>
+                                <input 
+                                    type="number" 
+                                    placeholder="Min"
+                                    value={minPrice}
+                                    onChange={(e) => setMinPrice(e.target.value)}
+                                    className="w-full h-10 pl-8 pr-2 bg-slate-50 border border-transparent rounded-xl text-[11px] font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                                />
+                            </div>
+                            <div className="relative">
+                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400">ETB</span>
+                                <input 
+                                    type="number" 
+                                    placeholder="Max"
+                                    value={maxPrice}
+                                    onChange={(e) => setMaxPrice(e.target.value)}
+                                    className="w-full h-10 pl-8 pr-2 bg-slate-50 border border-transparent rounded-xl text-[11px] font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <Button className="mt-auto w-full h-12 bg-blue-600 hover:bg-slate-950 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-100/50 flex items-center justify-center gap-2">
+            <Button 
+                onClick={handleApplyFilters}
+                className="mt-auto w-full h-12 bg-blue-600 hover:bg-slate-950 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-100/50 flex items-center justify-center gap-2"
+            >
                 <Search className="w-4 h-4" />
                 Apply Filters
             </Button>

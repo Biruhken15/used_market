@@ -29,6 +29,7 @@ export interface IProduct extends Document {
     createdAt: Date;
     updatedAt: Date;
     isUrgent: boolean;
+    urgentSetAt?: Date;
     isFeatured: boolean;
 }
 
@@ -158,6 +159,9 @@ const productSchema = new Schema<IProduct>({
     isUrgent: {
         type: Boolean,
         default: false
+    },
+    urgentSetAt: {
+        type: Date
     },
     isFeatured: {
         type: Boolean,

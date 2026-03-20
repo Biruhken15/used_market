@@ -14,6 +14,7 @@ const subscriptionPlanSchema = new mongoose.Schema({
         maxActiveListings: { type: Number, required: true },
         imagesPerProduct: { type: Number, default: 3 },
         featuredListingsPerMonth: { type: Number, default: 0 },
+        urgentDurationDays: { type: Number, default: 0 },
         listingDurationDays: { type: Number, default: 60 },
         maxStaffAccounts: { type: Number, default: 1 }
     },
