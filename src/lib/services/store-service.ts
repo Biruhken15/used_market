@@ -161,11 +161,80 @@ export class StoreService {
         );
     }
 
-    static async getBrokers() {
+    static async getBrokers(page: number = 1, limit: number = 10) {
         await connectDB();
-        // Use aggregation to join with User for profile information
+        const skip = (page - 1) * limit;
+
         const brokers = await Store.aggregate([
-            { $match: { storeType: 'broker', status: 'approved' } },
+            { $match: { status: 'approved' } }, // All approved store owners as brokers
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'ownerId',
+                    foreignField: '_id',
+                    as: 'owner'
+                }
+            },
+            { $unwind: '$owner' },
+            {
+                $lookup: {
+                    from: 'usersubscriptions',
+                    localField: '_id',
+                    foreignField: 'storeId',
+                    as: 'subscription'
+                }
+            },
+            { $unwind: { path: '$subscription', preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'subscriptionplans',
+                    localField: 'subscription.planId',
+                    foreignField: '_id',
+                    as: 'plan'
+                }
+            },
+            { $unwind: { path: '$plan', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    storeName: 1,
+                    storeSlug: 1,
+                    description: 1,
+                    category: 1,
+                    country: 1,
+                    city: 1,
+                    region: 1,
+                    logo: 1,
+                    sellerName: 1,
+                    'owner.profile': 1,
+                    'owner.name': 1,
+                    'owner.email': 1,
+                    planName: '$plan.planName'
+                }
+            }
+        ]);
+
+        const total = await Store.countDocuments({ status: 'approved' });
+        
+        const { serialize } = await import("../utils/serialize");
+        return {
+            brokers: serialize(brokers),
+            total,
+            pages: Math.ceil(total / limit)
+        };
+    }
+
+    static async getStores(page: number = 1, limit: number = 10) {
+        await connectDB();
+        const skip = (page - 1) * limit;
+
+        const stores = await Store.aggregate([
+            { $match: { status: 'approved' } },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
             {
                 $lookup: {
                     from: 'users',
@@ -181,20 +250,21 @@ export class StoreService {
                     storeSlug: 1,
                     description: 1,
                     category: 1,
-                    country: 1,
                     city: 1,
                     region: 1,
                     logo: 1,
                     sellerName: 1,
-                    'owner.profile': 1,
-                    'owner.name': 1,
-                    'owner.email': 1
                 }
-            },
-            { $sort: { createdAt: -1 } }
+            }
         ]);
 
+        const total = await Store.countDocuments({ status: 'approved' });
+        
         const { serialize } = await import("../utils/serialize");
-        return serialize(brokers);
+        return {
+            stores: serialize(stores),
+            total,
+            pages: Math.ceil(total / limit)
+        };
     }
 }

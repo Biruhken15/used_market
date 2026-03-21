@@ -27,7 +27,8 @@ export class PaymentService {
         await dbConnect();
 
         // 1. Generate a unique transaction reference (tx_ref)
-        const tx_ref = `CHAPA-${params.storeId}-${Date.now()}`;
+        const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const tx_ref = `CHAPA-${params.storeId}-${Date.now()}-${randomStr}`;
 
         // 2. Create a pending transaction in our DB
         const transaction = await Transaction.create({

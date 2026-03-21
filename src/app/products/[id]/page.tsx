@@ -28,6 +28,14 @@ export default function ProductDetailPage() {
                 const res = await fetch(`/api/products/${params.id}`);
                 const data = await res.json();
                 setProduct(data);
+
+                // Trigger viewed notification
+                fetch('/api/notifications/trigger', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'product_viewed', productId: params.id })
+                }).catch(err => console.error("Failed to trigger view notification:", err));
+
             } catch (error) {
                 console.error("Error fetching product:", error);
             } finally {

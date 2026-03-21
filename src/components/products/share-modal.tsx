@@ -10,11 +10,12 @@ import { Button } from "../ui/button";
 interface ShareModalProps {
     isOpen: boolean;
     onClose: () => void;
+    productId: string;
     productTitle: string;
     productUrl: string;
 }
 
-export const ShareModal = ({ isOpen, onClose, productTitle, productUrl }: ShareModalProps) => {
+export const ShareModal = ({ isOpen, onClose, productId, productTitle, productUrl }: ShareModalProps) => {
     const [copied, setCopied] = useState(false);
 
     // Prevent body scroll when modal is open
@@ -30,6 +31,14 @@ export const ShareModal = ({ isOpen, onClose, productTitle, productUrl }: ShareM
     }, [isOpen]);
 
     if (!isOpen) return null;
+
+    const triggerShareNotification = () => {
+        fetch('/api/notifications/trigger', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'product_shared', productId })
+        }).catch(err => console.error("Failed to trigger share notification:", err));
+    };
 
     const encodedTitle = encodeURIComponent(`Check out this ${productTitle} on Used Market!`);
     const encodedUrl = encodeURIComponent(productUrl);
@@ -68,6 +77,7 @@ export const ShareModal = ({ isOpen, onClose, productTitle, productUrl }: ShareM
     const copyToClipboard = () => {
         navigator.clipboard.writeText(productUrl);
         setCopied(true);
+        triggerShareNotification();
         setTimeout(() => setCopied(false), 2000);
     };
 
@@ -98,6 +108,7 @@ export const ShareModal = ({ isOpen, onClose, productTitle, productUrl }: ShareM
                             href={platform.url}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={triggerShareNotification}
                             className={`flex items-center gap-3 p-4 rounded-2xl border border-slate-100 font-bold text-slate-700 hover:border-slate-200 hover:bg-slate-50 transition-all group`}
                         >
                             <span className="text-xl group-hover:scale-110 transition-transform">{platform.icon}</span>

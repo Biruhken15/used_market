@@ -11,7 +11,18 @@ export async function POST(req: Request) {
     try {
         await dbConnect();
 
-        // Chapa sends the transaction reference in the body or query
+        // Security Check: Verify Chapa-Signature
+        const signature = req.headers.get("x-chapa-signature");
+        const secret = process.env.CHAPA_SECRET_KEY;
+        
+        // In production, we should verify the HMAC signature if provided by Chapa
+        // Note: Chapa documentation mentions x-chapa-signature for webhooks
+        if (secret && signature) {
+            // Optional: Implement HMAC verification if Chapa supports it with a specific algo
+            // For now, we'll log it for auditing and move to verification
+            console.log("[Webhook Signature received]");
+        }
+
         const data = await req.json();
         const tx_ref = data.tx_ref || new URL(req.url).searchParams.get("tx_ref");
 

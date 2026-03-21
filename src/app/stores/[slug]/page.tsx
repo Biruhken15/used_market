@@ -16,6 +16,7 @@ export default function StoreProfilePage() {
     const [store, setStore] = useState<any>(null);
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
     useEffect(() => {
         const fetchStoreData = async () => {
@@ -29,6 +30,14 @@ export default function StoreProfilePage() {
 
                 if (foundStore) {
                     setStore(foundStore);
+
+                    // Trigger visited notification
+                    fetch('/api/notifications/trigger', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'store_visited', storeId: foundStore._id })
+                    }).catch(err => console.error("Failed to trigger visit notification:", err));
+
                     // Fetch products for this store
                     const prodRes = await fetch(`/api/stores/${foundStore._id}/products`);
                     const prodData = await prodRes.json();
@@ -95,7 +104,21 @@ export default function StoreProfilePage() {
                                 <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter">{store.storeName}</h1>
                                 <span className="px-4 py-1.5 bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest rounded-full border border-accent/20">Verified Merchant</span>
                             </div>
-                            <p className="text-slate-500 text-lg font-medium max-w-2xl leading-relaxed">{store.description}</p>
+                            <div className="relative w-full max-w-full overflow-hidden">
+                                <p className="text-slate-500 text-lg font-medium max-w-2xl leading-relaxed whitespace-pre-line break-words">
+                                    {(store.description?.length > 200 && !isDescriptionExpanded)
+                                        ? `${store.description.slice(0, 200)}...`
+                                        : store.description}
+                                </p>
+                                {store.description?.length > 200 && (
+                                    <button
+                                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                                        className="mt-2 text-accent text-xs font-black uppercase tracking-widest hover:underline"
+                                    >
+                                        {isDescriptionExpanded ? 'See Less' : 'See More'}
+                                    </button>
+                                )}
+                            </div>
                             <div className="flex flex-wrap gap-6 pt-4">
                                 <div className="flex items-center gap-2">
                                     <span className="text-slate-400">📍</span>

@@ -8,7 +8,7 @@ export class NotificationService {
     static async create(data: {
         userId: string;
         storeId?: string;
-        type: 'subscription_expired' | 'limit_reached' | 'payment_success' | 'system_alert' | 'new_feature' | 'subscription_canceled';
+        type: 'subscription_expired' | 'limit_reached' | 'payment_success' | 'system_alert' | 'new_feature' | 'subscription_canceled' | 'product_favorited' | 'product_shared' | 'product_viewed' | 'store_visited' | 'new_message' | 'price_drop';
         title: string;
         message: string;
         metadata?: any;

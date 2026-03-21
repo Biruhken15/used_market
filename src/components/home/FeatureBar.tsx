@@ -59,11 +59,11 @@ export function FeatureBar() {
                 ))}
 
                 <Link
-                    href="/products"
-                    className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors ml-4 pr-1"
+                    href="/stores/create"
+                    className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 text-white font-black text-[11px] uppercase tracking-wider hover:bg-black transition-all active:scale-95 whitespace-nowrap shadow-md ml-auto"
                 >
-                    View All Products
-                    <ChevronRight className="w-4 h-4" />
+                    Create Store Freely
+                    <ChevronRight className="w-3 h-3" />
                 </Link>
             </div>
         </div>

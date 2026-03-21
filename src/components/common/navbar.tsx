@@ -79,7 +79,7 @@ export const Navbar = () => {
 
     return (
         <nav className="fixed top-0 w-full z-50 px-4 pt-6">
-            <div className={`max-w-7xl mx-auto glass-panel rounded-2xl px-6 py-3 flex items-center justify-between shadow-lg shadow-slate-200/50 border border-white/50 bg-white/80 backdrop-blur-md`}>
+            <div className={`max-w-7xl mx-auto glass-panel rounded-2xl px-6 py-3 flex items-center justify-between shadow-lg shadow-rose-100/50 border border-rose-600/20 bg-white/80 backdrop-blur-md`}>
                 <Link href="/" className="flex items-center gap-3 group">
                     <div className="w-10 h-10 flex items-center justify-center transition-transform group-hover:rotate-6">
                         <img src="/ethiopian-mascot.png" alt="Used Market Logo" className="w-full h-full object-contain" />
