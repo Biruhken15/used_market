@@ -15,16 +15,16 @@ export const SearchFilter = () => {
                 {/* Search Bar Refined */}
                 <div className="max-w-5xl mx-auto mb-10">
                     <div className="relative group">
-                        <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                        <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-400 group-focus-within:text-violet-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
                         </div>
                         <input
                             type="text"
                             placeholder="Search for products, brands, or categories..."
-                            className="w-full h-16 pl-16 pr-32 rounded-2xl bg-white border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50/40 outline-none transition-all duration-300 text-lg font-medium text-slate-900 placeholder:text-slate-400 shadow-sm"
+                            className="w-full h-16 pl-16 pr-32 rounded-2xl bg-white border border-slate-200 focus:border-violet-500 focus:ring-4 focus:ring-violet-50/40 outline-none transition-all duration-300 text-lg font-medium text-slate-900 placeholder:text-slate-400 shadow-sm"
                         />
                         <div className="absolute right-2 top-2 bottom-2">
-                            <button className="h-full px-8 bg-blue-600 text-white rounded-xl font-bold text-base shadow-lg shadow-blue-100 flex items-center gap-2 hover:bg-blue-700 transition-all active:scale-95">
+                            <button className="h-full px-8 bg-gradient-to-r from-violet-600 to-pink-600 text-white rounded-xl font-bold text-base shadow-lg shadow-indigo-100 flex items-center gap-2 hover:brightness-110 hover:scale-[1.02] transition-all active:scale-95">
                                 Search
                             </button>
                         </div>

@@ -1,25 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Navbar } from '@/components/common/navbar';
+import { FiArrowRight } from "react-icons/fi";
+import Link from 'next/link';
 
 export default function AdminDashboard() {
-    const { data: session, status } = useSession();
-    const router = useRouter();
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (status === 'unauthenticated' || (session && (session.user as any).role !== 'admin')) {
-            router.push('/');
-        } else if (session) {
-            fetchStats();
-        }
-    }, [session, status]);
+        fetchStats();
+    }, []);
 
     const fetchStats = async () => {
         try {
@@ -33,73 +26,113 @@ export default function AdminDashboard() {
         }
     };
 
-    if (loading) return <div className="p-20 text-center font-black uppercase text-xs tracking-widest text-foreground/20">Securing Platform...</div>;
+    if (loading) {
+        return (
+            <div className="p-20 text-center flex items-center justify-center">
+                <div className="w-8 h-8 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
-        <main className="min-h-screen bg-[#fcfcfc]">
-            <Navbar />
+        <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-12">
+            <header>
+                <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-slate-900 mb-2">Platform <span className="text-indigo-600">Oversight</span></h1>
+                <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">Administrator Dashboard</p>
+            </header>
 
-            <div className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
-                <header className="mb-12">
-                    <h1 className="text-5xl font-black tracking-tighter text-slate-900 mb-2">Platform <span className="text-blue-600">Oversight</span></h1>
-                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">Administrator Control Panel</p>
-                </header>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {[
-                        { label: 'Total Revenue', value: `${stats.revenue.toLocaleString()} ETB`, color: 'bg-emerald-500 shadow-emerald-200' },
-                        { label: 'Active Sellers', value: stats.stores, color: 'bg-blue-600 shadow-blue-200' },
-                        { label: 'Market Products', value: stats.products, color: 'bg-slate-900 shadow-slate-200' },
-                        { label: 'Subscriptions', value: stats.activeSubscriptions, color: 'bg-indigo-600 shadow-indigo-200' }
-                    ].map((stat) => (
-                        <Card key={stat.label} className="p-8 rounded-[2.5rem] border-none shadow-xl bg-white relative overflow-hidden group">
-                            <div className="relative z-10">
-                                <div className="text-4xl font-black text-slate-900 mb-1">{stat.value}</div>
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                {[
+                    { label: 'Total Revenue', value: `${stats?.revenue?.toLocaleString() || 0} ETB`, color: 'bg-emerald-500 shadow-emerald-200', text: 'text-emerald-600' },
+                    { label: 'Active Sellers', value: stats?.stores || 0, color: 'bg-indigo-600 shadow-indigo-200', text: 'text-indigo-600' },
+                    { label: 'Market Products', value: stats?.products || 0, color: 'bg-slate-900 shadow-slate-200', text: 'text-slate-900' },
+                    { label: 'Subscriptions', value: stats?.activeSubscriptions || 0, color: 'bg-rose-500 shadow-rose-200', text: 'text-rose-500' }
+                ].map((stat) => (
+                    <Card key={stat.label} className="p-6 md:p-8 rounded-[2rem] border-slate-100 shadow-sm bg-white hover:shadow-xl transition-all relative overflow-hidden group">
+                        <div className="relative z-10 flex flex-col justify-between h-full">
+                            <div className="space-y-1">
+                                <div className={`text-3xl md:text-4xl font-black ${stat.text} tracking-tight`}>{stat.value}</div>
                                 <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</div>
                             </div>
-                            <div className={`absolute top-0 right-0 w-2 h-full ${stat.color} opacity-20`} />
-                        </Card>
-                    ))}
+                        </div>
+                        <div className={`absolute -bottom-10 -right-10 w-32 h-32 rounded-full ${stat.color} opacity-5 group-hover:scale-150 transition-transform duration-500`} />
+                    </Card>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
+                {/* Quick Actions / Shortcuts */}
+                <div className="lg:col-span-2 space-y-8">
+                    <section>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Management Hub</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Link href="/admin/users" className="p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-indigo-200 hover:shadow-lg transition-all group flex items-start justify-between">
+                                <div className="space-y-1 block">
+                                    <h4 className="font-bold text-slate-900">Manage Users</h4>
+                                    <p className="text-xs text-slate-400 font-medium">Verify roles, ban spans, edit emails.</p>
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                                    <FiArrowRight />
+                                </div>
+                            </Link>
+                            <Link href="/admin/stores" className="p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-indigo-200 hover:shadow-lg transition-all group flex items-start justify-between">
+                                <div className="space-y-1 block">
+                                    <h4 className="font-bold text-slate-900">Manage Stores</h4>
+                                    <p className="text-xs text-slate-400 font-medium">Review owner IDs, edit limits, verify sellers.</p>
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                                    <FiArrowRight />
+                                </div>
+                            </Link>
+                            <Link href="/admin/products" className="p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-indigo-200 hover:shadow-lg transition-all group flex items-start justify-between">
+                                <div className="space-y-1 block">
+                                    <h4 className="font-bold text-slate-900">Moderate Content</h4>
+                                    <p className="text-xs text-slate-400 font-medium">Clear out spam products or mark as sold.</p>
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                                    <FiArrowRight />
+                                </div>
+                            </Link>
+                            <Link href="/admin/subscriptions" className="p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-indigo-200 hover:shadow-lg transition-all group flex items-start justify-between">
+                                <div className="space-y-1 block">
+                                    <h4 className="font-bold text-slate-900">Platform Plans</h4>
+                                    <p className="text-xs text-slate-400 font-medium">Adjust plan limits globally or for specific users.</p>
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                                    <FiArrowRight />
+                                </div>
+                            </Link>
+                        </div>
+                    </section>
                 </div>
 
-                <div className="mt-20 grid grid-cols-1 lg:grid-cols-3 gap-12">
-                    <div className="lg:col-span-2 space-y-8">
-                        <section>
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-2xl font-black text-slate-900 italic">Recent Stores</h3>
-                                <Button variant="ghost" className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50">View All Stores</Button>
-                            </div>
-                            <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
-                                <div className="p-8 text-center text-slate-400 font-bold text-sm italic">
-                                    Integration Pending: Store management UI will appear here.
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-
-                    <div className="space-y-8">
-                        <section>
-                            <h3 className="text-xl font-black text-slate-900 mb-6 italic tracking-tight">System Status</h3>
-                            <Card className="p-8 rounded-[2.5rem] bg-slate-900 text-white border-none shadow-2xl">
-                                <ul className="space-y-6">
-                                    <li className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Auth Service</span>
-                                        <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]" />
-                                    </li>
-                                    <li className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Payment Proxy</span>
-                                        <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]" />
-                                    </li>
-                                    <li className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">DB Sync</span>
-                                        <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]" />
-                                    </li>
-                                </ul>
-                            </Card>
-                        </section>
-                    </div>
+                {/* System Status */}
+                <div className="space-y-8">
+                    <section>
+                        <h3 className="text-xl font-black text-slate-900 mb-6 tracking-tight">System Status</h3>
+                        <Card className="p-8 rounded-[2rem] bg-slate-900 text-white border-none shadow-2xl relative overflow-hidden">
+                            <ul className="space-y-6 relative z-10">
+                                <li className="flex justify-between items-center">
+                                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Auth Database</span>
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]" />
+                                </li>
+                                <li className="flex justify-between items-center">
+                                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Image Content Delivery</span>
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]" />
+                                </li>
+                                <li className="flex justify-between items-center">
+                                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">API Infrastructure</span>
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]" />
+                                </li>
+                            </ul>
+                            <div className="absolute -bottom-6 -right-6 text-7xl opacity-5">⚙️</div>
+                        </Card>
+                    </section>
                 </div>
             </div>
-        </main>
+        </div>
     );
 }

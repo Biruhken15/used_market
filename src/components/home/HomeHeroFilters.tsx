@@ -29,10 +29,10 @@ export const HomeHeroFilters = () => {
     };
 
     return (
-        <div className="bg-white border border-slate-100 rounded-2xl p-6 h-full flex flex-col shadow-sm">
-            <div className="mb-6">
+        <div className="bg-white border border-slate-100 rounded-2xl p-4 md:p-6 h-full flex flex-col shadow-sm">
+            <div className="mb-4 md:mb-6">
                 <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
-                    <Layers className="w-3 h-3 text-blue-600" />
+                    <Layers className="w-3 h-3 text-violet-600" />
                     Marketplace Filters
                 </h3>
                 <div className="space-y-4">
@@ -56,7 +56,7 @@ export const HomeHeroFilters = () => {
                             <select 
                                 value={region}
                                 onChange={(e) => setRegion(e.target.value)}
-                                className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer"
+                                className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-violet-500 outline-none transition-all appearance-none cursor-pointer"
                             >
                                 <option>All Regions</option>
                                 <option>Addis Ababa</option>
@@ -77,7 +77,7 @@ export const HomeHeroFilters = () => {
                             <select 
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
-                                className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer"
+                                className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-violet-500 outline-none transition-all appearance-none cursor-pointer"
                             >
                                 <option>All Categories</option>
                                 <option>Electronics</option>
@@ -101,7 +101,7 @@ export const HomeHeroFilters = () => {
                                     placeholder="Min"
                                     value={minPrice}
                                     onChange={(e) => setMinPrice(e.target.value)}
-                                    className="w-full h-10 pl-8 pr-2 bg-slate-50 border border-transparent rounded-xl text-[11px] font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                                    className="w-full h-10 pl-8 pr-2 bg-slate-50 border border-transparent rounded-xl text-[11px] font-bold text-slate-900 focus:bg-white focus:border-violet-500 outline-none transition-all placeholder:text-slate-400"
                                 />
                             </div>
                             <div className="relative">
@@ -111,7 +111,7 @@ export const HomeHeroFilters = () => {
                                     placeholder="Max"
                                     value={maxPrice}
                                     onChange={(e) => setMaxPrice(e.target.value)}
-                                    className="w-full h-10 pl-8 pr-2 bg-slate-50 border border-transparent rounded-xl text-[11px] font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                                    className="w-full h-10 pl-8 pr-2 bg-slate-50 border border-transparent rounded-xl text-[11px] font-bold text-slate-900 focus:bg-white focus:border-violet-500 outline-none transition-all placeholder:text-slate-400"
                                 />
                             </div>
                         </div>
@@ -121,7 +121,7 @@ export const HomeHeroFilters = () => {
 
             <Button 
                 onClick={handleApplyFilters}
-                className="mt-auto w-full h-12 bg-blue-600 hover:bg-slate-950 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-100/50 flex items-center justify-center gap-2"
+                className="mt-auto w-full h-12 bg-gradient-to-r from-violet-600 to-pink-600 hover:scale-[1.02] text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-100/50 flex items-center justify-center gap-2"
             >
                 <Search className="w-4 h-4" />
                 Apply Filters

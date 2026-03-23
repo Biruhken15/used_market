@@ -17,6 +17,7 @@ interface Plan {
         maxStaffAccounts: number;
         featuredListingsPerMonth: number;
         listingDurationDays: number;
+        urgentDurationDays?: number;
     };
     features: {
         canMarkAsSold: boolean;
@@ -34,6 +35,7 @@ interface Plan {
         hasHomepagePromotion: boolean;
         multipleLocations: boolean;
         customBranding: boolean;
+        canMarkAsUrgent?: boolean;
     };
     metadata: {
         colorTheme: "emerald" | "blue" | "purple" | "gold" | "slate";
@@ -65,11 +67,11 @@ export default function PricingSection() {
     }, []);
 
     const themeColors: Record<string, { bg: string, text: string, border: string, btn: string }> = {
-        emerald: { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-100", btn: "bg-emerald-600 hover:bg-emerald-700" },
-        blue: { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100", btn: "bg-blue-600 hover:bg-blue-700" },
-        purple: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-100", btn: "bg-purple-600 hover:bg-purple-700" },
-        gold: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100", btn: "bg-amber-600 hover:bg-amber-700" },
-        slate: { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-100", btn: "bg-slate-800 hover:bg-slate-900" },
+        emerald: { bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-100", btn: "bg-pink-600 hover:bg-pink-700 shadow-pink-100" },
+        blue: { bg: "bg-violet-50", text: "text-violet-600", border: "border-violet-100", btn: "bg-violet-600 hover:bg-violet-700 shadow-violet-100" },
+        purple: { bg: "bg-fuchsia-100", text: "text-fuchsia-600", border: "border-fuchsia-200", btn: "bg-gradient-to-r from-violet-600 to-pink-600 hover:brightness-110 shadow-indigo-100" },
+        gold: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100", btn: "bg-amber-600 hover:bg-amber-700 shadow-amber-100" },
+        slate: { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-100", btn: "bg-slate-950 hover:bg-black shadow-slate-200" },
     };
 
     if (loading) {
@@ -103,10 +105,10 @@ export default function PricingSection() {
                         return (
                             <div
                                 key={plan._id}
-                                className={`premium-card p-1 relative flex flex-col ${recommended ? 'shadow-2xl shadow-accent/20 border-accent ring-2 ring-accent/10 scale-[1.05] z-10' : ''}`}
+                                className={`premium-card p-1 relative flex flex-col ${recommended ? 'shadow-2xl shadow-indigo-100/50 border-violet-500 ring-4 ring-violet-500/10 scale-[1.05] z-10' : ''}`}
                             >
                                 {recommended && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-pink-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-violet-200">
                                         Best Value
                                     </div>
                                 )}
@@ -120,50 +122,84 @@ export default function PricingSection() {
                                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{plan.metadata.tagline}</p>
                                     </div>
 
-                                    <div className="mb-10 flex items-baseline gap-1">
+                                    <div className="mb-8 flex items-baseline gap-1">
                                         <span className="text-4xl font-black text-slate-900">{(plan.price ?? 0).toLocaleString()}</span>
-                                        <span className="text-slate-400 font-bold text-sm uppercase">ETB / {plan.durationMonths === 1 ? 'mo' : plan.durationMonths === 3 ? '3mo' : 'yr'}</span>
+                                        <span className="text-slate-400 font-bold text-sm uppercase">ETB / {plan.durationMonths === 1 ? 'mo' : plan.durationMonths === 6 ? '6mo' : plan.durationMonths === 12 ? 'yr' : `${plan.durationMonths}mo`}</span>
                                     </div>
 
-                                    <div className="space-y-4 mb-10 flex-grow">
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between items-center text-xs font-bold p-3 bg-slate-50 rounded-xl">
-                                                <span className="text-slate-400 uppercase tracking-widest">Listings</span>
-                                                <span className="text-slate-900">{plan.limits.maxActiveListings > 1000 ? 'Unlimited' : plan.limits.maxActiveListings}</span>
+                                    <div className="space-y-6 mb-10 flex-grow">
+                                        {/* LIMITS SECTION */}
+                                        <div className="space-y-3 p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 border-b border-slate-200/60 pb-2">Usage Limits</h4>
+                                            
+                                            <div className="flex justify-between items-center text-[11px] font-bold">
+                                                <span className="text-slate-500">Active Listings</span>
+                                                <span className="text-slate-900 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">{plan.limits.maxActiveListings > 1000 ? 'Unlimited' : plan.limits.maxActiveListings}</span>
                                             </div>
-                                            {plan.features.searchRankingBoost > 0 && (
-                                                <div className="flex justify-between items-center text-xs font-bold p-3 bg-accent/5 rounded-xl border border-accent/10">
-                                                    <span className="text-accent uppercase tracking-widest">Boost</span>
-                                                    <span className="text-accent">+{plan.features.searchRankingBoost}%</span>
+                                            <div className="flex justify-between items-center text-[11px] font-bold">
+                                                <span className="text-slate-500">Images Per Listing</span>
+                                                <span className="text-slate-900 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">{plan.limits.imagesPerProduct}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-[11px] font-bold">
+                                                <span className="text-slate-500">Staff Accounts</span>
+                                                <span className="text-slate-900 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">{plan.limits.maxStaffAccounts}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-[11px] font-bold">
+                                                <span className="text-slate-500">Listing Duration</span>
+                                                <span className="text-slate-900 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">{plan.limits.listingDurationDays} Days</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-[11px] font-bold">
+                                                <span className="text-slate-500">Featured Slots / mo</span>
+                                                <span className="text-slate-900 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">{plan.limits.featuredListingsPerMonth}</span>
+                                            </div>
+                                            {plan.limits.urgentDurationDays ? (
+                                                <div className="flex justify-between items-center text-[11px] font-bold">
+                                                    <span className="text-slate-500">Urgent Tag Duration</span>
+                                                    <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded shadow-sm border border-emerald-100">{plan.limits.urgentDurationDays} Days</span>
                                                 </div>
-                                            )}
+                                            ) : null}
                                         </div>
 
-                                        <ul className="space-y-3 pt-2">
-                                            {[
-                                                { text: `${plan.limits.imagesPerProduct} Images per Listing`, included: true },
-                                                { text: 'Verified Store Badge', included: plan.features.hasVerifiedBadge },
-                                                { text: 'Premium Analytics', included: plan.features.hasAnalytics },
-                                                { text: 'Bulk List Tools', included: plan.features.hasBulkUpload },
-                                                { text: 'Store Banner', included: plan.features.hasStoreBanner },
-                                                { text: 'Priority Support', included: plan.features.hasPrioritySupport },
-                                                { text: 'Telegram & Phone', included: plan.features.telegramEnabled || plan.features.phoneEnabled },
-                                                { text: 'WhatsApp Direct', included: plan.features.whatsappEnabled },
-                                            ].filter((f, i) => {
-                                                // Only show 6 relevant features to keep it clean
-                                                if (plan.planCode === 'FREE_TRIAL') return i < 4;
-                                                return true;
-                                            }).slice(0, 6).map((feature, idx) => (
-                                                <li key={idx} className={`flex items-center gap-3 text-[11px] font-bold ${feature.included ? 'text-slate-600' : 'text-slate-300'}`}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={feature.included ? 'text-emerald-500' : 'text-slate-200'}><polyline points="20 6 9 17 4 12" /></svg>
-                                                    {feature.text}
-                                                </li>
-                                            ))}
-                                        </ul>
+                                        {/* FEATURES SECTION */}
+                                        <div className="space-y-4 px-2">
+                                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Included Features</h4>
+                                            <ul className="space-y-3">
+                                                {(() => {
+                                                    const allFeatures = [
+                                                        { text: "Custom Store Banner", included: plan.features.hasStoreBanner },
+                                                        { text: "Mark items as Sold", included: plan.features.canMarkAsSold },
+                                                        { text: "Analytics Dashboard", included: plan.features.hasAnalytics },
+                                                        { text: "Verified Store Badge", included: plan.features.hasVerifiedBadge },
+                                                        { text: "Urgent Priorities", included: plan.features.canMarkAsUrgent },
+                                                        { text: "Multiple Locations", included: plan.features.multipleLocations },
+                                                        { text: "Telegram & Phone Sync", included: plan.features.telegramEnabled || plan.features.phoneEnabled },
+                                                        { text: "WhatsApp Direct Link", included: plan.features.whatsappEnabled },
+                                                        { text: "Priority 24/7 Support", included: plan.features.hasPrioritySupport },
+                                                        { text: "Custom Store Branding", included: plan.features.customBranding },
+                                                        { text: `+${plan.features.searchRankingBoost || 0}% Search Ranking Boost`, included: (plan.features.searchRankingBoost || 0) > 0 },
+                                                    ];
+
+                                                    return allFeatures.map((f, i) => (
+                                                        <li key={i} className={`flex items-start gap-3 text-[11px] font-bold leading-tight ${f.included ? 'text-slate-700' : 'text-slate-300 line-through opacity-60'}`}>
+                                                            {f.included ? (
+                                                                <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600"><polyline points="20 6 9 17 4 12" /></svg>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-slate-300"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                                                </div>
+                                                            )}
+                                                            <span className="flex-1 pt-0.5">{f.text}</span>
+                                                        </li>
+                                                    ));
+                                                })()}
+                                            </ul>
+                                        </div>
                                     </div>
 
                                     <Button
-                                        onClick={() => router.push(`/seller/checkout?planId=${plan._id}`)}
+                                        onClick={() => router.push('/stores/create')}
                                         className={`w-full !h-10 rounded-xl font-medium text-[11px] uppercase tracking-widest text-white border-none transition-all ${theme.btn} shadow-lg shadow-slate-100`}
                                     >
                                         Get Started

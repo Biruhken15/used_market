@@ -87,31 +87,37 @@ export const ProductEssentials = ({
                         <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight leading-tight break-words flex-1">
                             {title}
                         </h1>
-                        <div className="flex items-center gap-6 pt-1">
+                        <div className="flex items-center gap-2 pt-1">
+                            {/* Favorite Button */}
                             <button
                                 onClick={handleFavorite}
                                 disabled={isThinking}
-                                className={`w-14 h-14 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-95 ${
+                                className={`w-10 h-10 rounded-[0.85rem] border flex items-center justify-center transition-all active:scale-95 ${
                                     isFavorited 
                                     ? 'bg-rose-50 border-rose-100 text-rose-500 shadow-sm' 
-                                    : 'bg-white border-slate-100 text-slate-400 hover:text-rose-500 hover:border-rose-100'
+                                    : 'bg-white border-slate-200/80 text-slate-400 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50/50'
                                 }`}
-                                title="Favorite"
+                                title={isFavorited ? "Unfavorite" : "Favorite"}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={isFavorited ? "currentColor" : "none"} stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={isThinking ? "animate-pulse" : ""}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill={isFavorited ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={isThinking ? "animate-pulse" : ""}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                             </button>
+
+                            {/* Share Button */}
                             <button
                                 onClick={handleShare}
-                                className="w-14 h-14 rounded-2xl bg-white border-2 border-slate-100 text-slate-400 hover:text-blue-600 hover:border-blue-100 flex items-center justify-center transition-all active:scale-95 shadow-sm"
+                                className="w-10 h-10 rounded-[0.85rem] bg-white border border-slate-200/80 text-slate-400 hover:text-violet-600 hover:border-violet-200 hover:bg-violet-50/50 flex items-center justify-center transition-all active:scale-95 shadow-sm"
                                 title="Share"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
                             </button>
+
+                            {/* Chat Button */}
                             <button
-                                className="w-14 h-14 rounded-2xl bg-white border-2 border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-100 flex items-center justify-center transition-all active:scale-95 shadow-sm"
+                                className="ml-3 h-10 px-4 rounded-[0.85rem] bg-slate-900 border border-slate-900 text-white hover:bg-slate-800 flex items-center gap-2 transition-all active:scale-95 shadow-md shadow-slate-200/50"
                                 title="Chat with Seller"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                                <span className="text-[10px] font-black uppercase tracking-widest pt-0.5">Chat</span>
                             </button>
                         </div>
                     </div>
@@ -151,7 +157,7 @@ export const ProductEssentials = ({
                         {shouldTruncate && (
                             <button
                                 onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                                className="mt-2 text-accent text-xs font-black uppercase tracking-widest hover:underline"
+                                className="mt-2 text-violet-600 text-xs font-black uppercase tracking-widest hover:underline"
                             >
                                 {isDescriptionExpanded ? 'See Less' : 'See More'}
                             </button>

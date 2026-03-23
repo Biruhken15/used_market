@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/utils/auth";
 import { redirect } from "next/navigation";
@@ -16,6 +17,11 @@ import { StaffList } from "@/components/seller/StaffList";
 import { SubscriptionDetails } from "@/components/seller/SubscriptionDetails";
 import { TransactionHistory } from "@/components/seller/TransactionHistory";
 import { getStoreTransactions } from "@/lib/actions/billing-actions";
+
+export const metadata: Metadata = {
+    title: 'Merchant Dashboard | Manage Your Store',
+    description: 'Manage your listings, view analytics, and grow your business on Ethiopia\'s premier used marketplace.',
+};
 
 export default async function MyStorePage({ searchParams }: { searchParams: Promise<{ mode?: string }> }) {
     const params = await searchParams;
@@ -140,10 +146,10 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                 <div className="absolute inset-0 bg-black/20" />
             </div>
 
-            <div className="max-w-5xl mx-auto px-6 relative">
+            <div className="max-w-5xl mx-auto px-4 md:px-6 relative">
                 {/* Store Profile Section */}
-                <div className="flex flex-col md:flex-row items-end gap-8 -mt-20 relative z-10">
-                    <div className="w-40 h-40 bg-white border-8 border-white rounded-[3rem] shadow-2xl overflow-hidden shrink-0">
+                <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8 -mt-16 md:-mt-20 relative z-10 text-center md:text-left">
+                    <div className="w-32 h-32 md:w-40 md:h-40 bg-white border-4 md:border-8 border-white rounded-[2.5rem] md:rounded-[3rem] shadow-2xl overflow-hidden shrink-0">
                         {store.logo?.url ? (
                             <img
                                 src={store.logo.url}
@@ -151,33 +157,28 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-5xl">
+                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-4xl md:text-5xl">
                                 🏪
                             </div>
                         )}
                     </div>
-                    <div className="flex-1 pb-4 space-y-3">
-                        <div className="flex flex-wrap items-center gap-4">
-                            <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">
+                    <div className="flex-1 pb-2 md:pb-4 space-y-2 md:space-y-3">
+                        <div className="flex flex-col md:flex-row items-center md:items-center gap-3 md:gap-4">
+                            <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter">
                                 {store.storeName}
                             </h1>
                             <div className="flex items-center gap-2">
-                                <span className={`px-4 py-1.5 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg ${plan?.planCode === 'ENTERPRISE_SELLER' ? 'bg-amber-500 shadow-amber-200' :
+                                <span className={`px-4 py-1.5 text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg ${plan?.planCode === 'ENTERPRISE_SELLER' ? 'bg-amber-500 shadow-amber-200' :
                                     plan?.planCode === 'PRO_SELLER' ? 'bg-purple-600 shadow-purple-200' :
                                         'bg-blue-600 shadow-blue-200'
                                     }`}>
                                     {plan?.planName || 'Free Trial'} Plan
                                 </span>
-                                {plan?.features?.hasVerifiedBadge && (
-                                    <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-[9px] font-black uppercase tracking-widest rounded-full border border-emerald-200">
-                                        Verified Store
-                                    </span>
-                                )}
                             </div>
                         </div>
-                        <p className="text-slate-500 font-bold text-base flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                            {Array.isArray(store.category) ? store.category.join(', ') : store.category} • {store.city}, {store.country}
+                        <p className="text-slate-500 font-bold text-sm md:text-base flex items-center justify-center md:justify-start gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                            <span className="truncate">{Array.isArray(store.category) ? store.category.join(', ') : store.category} • {store.city}, {store.country}</span>
                         </p>
                     </div>
                 </div>

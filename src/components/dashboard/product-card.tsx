@@ -1,7 +1,7 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { memo, useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card } from "../ui/card";
@@ -22,10 +22,10 @@ interface ProductCardProps {
         condition?: string;
     };
     initialIsFavorited?: boolean;
+    isLoggedIn?: boolean;
 }
 
-export const ProductCard = ({ product, initialIsFavorited = false }: ProductCardProps) => {
-    const { data: session } = useSession();
+export const ProductCard = memo(({ product, initialIsFavorited = false, isLoggedIn = false }: ProductCardProps) => {
     const router = useRouter();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
@@ -41,7 +41,7 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
         e.preventDefault();
         e.stopPropagation();
 
-        if (!session) {
+        if (!isLoggedIn) {
             alert("Please register first to favorite products.");
             router.push('/auth/register');
             return;
@@ -55,7 +55,6 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
             const data = await res.json();
             if (res.ok) {
                 setIsFavorited(data.favorited);
-                // Dispatch event for Navbar to update count
                 window.dispatchEvent(new Event('favoritesUpdated'));
             }
         } catch (error) {
@@ -68,30 +67,12 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
     const handleShare = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-
-        if (!session) {
+        if (!isLoggedIn) {
             alert("Please register first to share products.");
             router.push('/auth/register');
             return;
         }
-
         setIsShareModalOpen(true);
-    };
-
-    const nextImage = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (product.images && product.images.length > 0) {
-            setCurrentImageIndex((prev) => (prev + 1) % product.images!.length);
-        }
-    };
-
-    const prevImage = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (product.images && product.images.length > 0) {
-            setCurrentImageIndex((prev) => (prev - 1 + product.images!.length) % product.images!.length);
-        }
     };
 
     const images = product.images || [];
@@ -101,8 +82,6 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
         <>
             <Link href={`/products/${product._id}`} className="block group h-full">
                 <div className="h-full flex flex-col bg-white border border-gray-400/40 shadow-none transition-shadow duration-200 relative rounded-sm overflow-hidden hover:shadow-lg group">
-                    
-                    {/* Condition Badge (Very Top) */}
                     <div className="z-10 bg-gray-50 border-b border-gray-400/20 py-1 px-2 flex items-center justify-between">
                         <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none">
                             {product.condition || "Marketplace Item"}
@@ -112,59 +91,46 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
                         )}
                     </div>
 
-                    {/* Image Section */}
                     <div className="aspect-square bg-white relative overflow-hidden shrink-0 p-2 border-b border-gray-400/10">
                         {images.length > 0 ? (
-                            <img
+                            <Image
                                 src={images[currentImageIndex].url}
                                 alt={product.title}
-                                className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                className="object-contain p-2 transition-transform duration-700 group-hover:scale-110"
+                                priority={false}
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-4xl opacity-10">📦</div>
                         )}
 
-                        {/* Status Tags (Top Left of Image) */}
                         <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
                             {product.isUrgent && !product.isUrgentExpired && (
-                                <span className="bg-red-600 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-sm shadow-xl shadow-red-100 flex items-center gap-1">
+                                <span className="bg-rose-600 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-sm shadow-xl shadow-rose-100 flex items-center gap-1">
                                     <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
                                     Urgent
                                 </span>
                             )}
                             {product.isFeatured && (
-                                <span className="bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-sm shadow-xl shadow-emerald-100 flex items-center gap-1">
+                                <span className="bg-fuchsia-600 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-sm shadow-xl shadow-fuchsia-100 flex items-center gap-1">
                                     <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
                                     Featured
-                                </span>
-                            )}
-                            {product.category === 'real-estate' && (
-                                <span className="bg-amber-500 text-white text-[9px] font-black uppercase tracking-tighter px-2 py-1 rounded-sm shadow-sm">
-                                    Property
-                                </span>
-                            )}
-                            {product.category === 'vehicles' && (
-                                <span className="bg-slate-700 text-white text-[9px] font-black uppercase tracking-tighter px-2 py-1 rounded-sm shadow-sm">
-                                    Vehicle
                                 </span>
                             )}
                         </div>
                     </div>
 
-                    {/* Content Section */}
                     <div className="p-2 flex flex-col flex-1 gap-1">
                         <h3 className="text-[11px] font-bold text-gray-800 leading-tight line-clamp-2 group-hover:text-slate-900 transition-colors">
                             {product.title}
                         </h3>
-                        
                         <div className="space-y-0 mt-auto">
                             <div className="flex items-baseline gap-1">
                                 <span className="text-sm font-black text-gray-900 tracking-tight">
                                     {product.price.toLocaleString()} <span className="text-[8px] opacity-70">ETB</span>
                                 </span>
                             </div>
-                            
-                            {/* Location & Meta info */}
                             <div className="flex items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
                                 <span className="text-[8px] font-bold text-gray-400 uppercase tracking-wider truncate">
@@ -176,13 +142,15 @@ export const ProductCard = ({ product, initialIsFavorited = false }: ProductCard
                 </div>
             </Link>
 
-            {/* Share Modal */}
             <ShareModal
                 isOpen={isShareModalOpen}
                 onClose={() => setIsShareModalOpen(false)}
+                productId={product._id}
                 productTitle={product.title}
                 productUrl={productUrl}
             />
         </>
     );
-};
+});
+
+ProductCard.displayName = "ProductCard";

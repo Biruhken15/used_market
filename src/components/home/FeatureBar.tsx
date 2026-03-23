@@ -21,25 +21,25 @@ const features = [
         label: "Featured",
         icon: <Star className="w-4 h-4" />,
         href: "/products/featured",
-        color: "bg-amber-50 text-amber-600 border-amber-100"
+        color: "bg-fuchsia-50 text-fuchsia-600 border-fuchsia-100"
     },
     {
         label: "Urgent",
         icon: <Zap className="w-4 h-4" />,
         href: "/products/urgent",
-        color: "bg-red-50 text-red-600 border-red-100"
+        color: "bg-rose-50 text-rose-600 border-rose-100"
     },
     {
         label: "New Arrival",
         icon: <Clock className="w-4 h-4" />,
         href: "/products/new-arrivals",
-        color: "bg-blue-50 text-blue-600 border-blue-100"
+        color: "bg-indigo-50 text-indigo-600 border-indigo-100"
     },
     {
         label: "Get Brokers",
         icon: <Users className="w-4 h-4" />,
         href: "/brokers",
-        color: "bg-purple-50 text-purple-600 border-purple-100"
+        color: "bg-violet-50 text-violet-600 border-violet-100"
     }
 ];
 

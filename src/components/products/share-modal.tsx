@@ -120,15 +120,18 @@ export const ShareModal = ({ isOpen, onClose, productId, productTitle, productUr
                 {/* Copy Link Section */}
                 <div className="space-y-3">
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Or Copy Link</p>
-                    <div className="flex gap-2 p-2 pl-4 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div 
+                        onClick={copyToClipboard}
+                        className="flex gap-2 p-2 pl-4 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer hover:bg-slate-100 transition-all group"
+                        title="Click to copy link"
+                    >
                         <input
                             readOnly
                             value={productUrl}
-                            className="bg-transparent border-none outline-none text-xs font-bold text-slate-500 flex-1 overflow-hidden transition-all"
+                            className="bg-transparent border-none outline-none text-xs font-bold text-slate-500 flex-1 overflow-hidden transition-all cursor-pointer pointer-events-none"
                         />
                         <Button
-                            onClick={copyToClipboard}
-                            className={`!h-10 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${copied ? 'bg-green-500 hover:bg-green-600' : 'bg-slate-900'}`}
+                            className={`!h-10 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${copied ? 'bg-green-500 hover:bg-green-600' : 'bg-slate-900 group-hover:bg-slate-800'}`}
                         >
                             {copied ? 'Copied!' : 'Copy'}
                         </Button>

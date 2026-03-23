@@ -77,41 +77,46 @@ export const Navbar = () => {
         };
     }, [session]);
 
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // If user is admin, redirect to the admin panel and suppress the marketplace navbar
+    useEffect(() => {
+        if (status === 'authenticated' && (session?.user as any)?.role === 'admin') {
+            router.push('/admin');
+        }
+    }, [session, status, router]);
+
+    if (status === 'authenticated' && (session?.user as any)?.role === 'admin') {
+        return null;
+    }
+
     return (
         <nav className="fixed top-0 w-full z-50 px-4 pt-6">
-            <div className={`max-w-7xl mx-auto glass-panel rounded-2xl px-6 py-3 flex items-center justify-between shadow-lg shadow-rose-100/50 border border-rose-600/20 bg-white/80 backdrop-blur-md`}>
-                <Link href="/" className="flex items-center gap-3 group">
-                    <div className="w-10 h-10 flex items-center justify-center transition-transform group-hover:rotate-6">
+            <div className={`max-w-7xl mx-auto glass-panel rounded-2xl px-6 py-3 flex items-center justify-between shadow-lg shadow-indigo-100/50 border border-indigo-600/20 bg-white/80 backdrop-blur-md relative`}>
+                <Link href="/" className="flex items-center gap-3 group shrink-0">
+                    <div className="w-12 h-12 flex items-center justify-center transition-transform group-hover:rotate-6">
                         <img src="/ethiopian-mascot.png" alt="Used Market Logo" className="w-full h-full object-contain" />
                     </div>
                     <div className="flex flex-col -space-y-1">
-                        <span className="text-xl font-black text-slate-900 tracking-tighter">Used Market</span>
-                        <span className="text-[11px] font-bold text-accent uppercase tracking-widest leading-none ml-0.5 italic">ከሰው እጅ</span>
+                        <span className="text-xl md:text-2xl font-black text-slate-900 tracking-tighter">Used Market</span>
+                        <span className="text-[10px] md:text-[11px] font-bold text-indigo-600 uppercase tracking-widest leading-none ml-0.5 italic">ከሰው እጅ</span>
                     </div>
                 </Link>
 
-                {/* Main Navigation */}
+                {/* Main Navigation (Desktop) */}
                 <div className="hidden md:flex items-center gap-8 text-[11px] font-black uppercase tracking-widest text-slate-400">
-                    <Link href="/" className="text-accent hover:underline decoration-2 underline-offset-4">Marketplace</Link>
-                    {!session ? (
-                        <>
-                            <Link href="/#pricing" className="hover:text-accent transition-colors">Pricing</Link>
-                            <Link href="/#about" className="hover:text-accent transition-colors">About Us</Link>
-                        </>
-                    ) : (
-                        <div className="flex items-center gap-2">
-                            <Link href="/#pricing" className="hover:text-accent transition-colors">Pricing</Link>
-                        </div>
-                    )}
+                    <Link href="/" className={pathname === '/' ? "text-indigo-600 underline decoration-2 underline-offset-4" : "hover:text-indigo-600 transition-colors"}>Marketplace</Link>
+                    <Link href="/brokers" className={pathname === '/brokers' ? "text-indigo-600 underline decoration-2 underline-offset-4" : "hover:text-indigo-600 transition-colors"}>Brokers</Link>
+                    <Link href="/pricing" className={pathname === '/pricing' ? "text-indigo-600 underline decoration-2 underline-offset-4" : "hover:text-indigo-600 transition-colors"}>Pricing</Link>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 md:gap-4">
                     {status === "loading" ? (
                         <div className="w-10 h-10 bg-slate-100 rounded-full animate-pulse"></div>
                     ) : (
-                        <div className="flex items-center gap-6">
-                            {/* Action Icons with Labels - Visible to all, Guest triggers redirect */}
-                            <div className="hidden sm:flex items-center gap-2 mr-2 border-r border-slate-100 pr-4">
+                        <div className="flex items-center gap-2 md:gap-6">
+                            {/* Action Icons - Responsive sizes */}
+                            <div className="flex items-center gap-1 md:gap-2 md:mr-2 md:border-r md:border-slate-100 md:pr-4">
                                 <button
                                     onClick={() => {
                                         if (!session) {
@@ -121,62 +126,86 @@ export const Navbar = () => {
                                             router.push('/favorites');
                                         }
                                     }}
-                                    className="flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav relative"
+                                    className="p-2 md:px-3 md:py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav relative flex flex-col items-center gap-1"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-rose-500 transition-colors"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">Favorites</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-indigo-500 transition-colors"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
+                                    <span className="hidden md:block text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">Favorites</span>
                                     {unreadFavorites > 0 && (
-                                        <div className="absolute top-1.5 right-4 w-4 h-4 bg-rose-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black animate-in zoom-in duration-300">
+                                        <div className="absolute top-1 right-1 w-4 h-4 bg-indigo-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black">
                                             {unreadFavorites}
                                         </div>
                                     )}
                                 </button>
-                                <button
-                                    onClick={() => {
-                                        if (!session) {
-                                            alert("Please register first to access your store.");
-                                            router.push('/auth/register');
-                                        } else {
-                                            router.push('/seller/mystore');
-                                        }
-                                    }}
-                                    className="flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-accent transition-colors"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">My Store</span>
-                                </button>
+                                
                                 {session && (
-                                    <button
-                                        onClick={() => {
-                                            markAllAsRead();
-                                            setIsSidebarOpen(true);
-                                        }}
-                                        className="flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav relative"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-accent transition-colors"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
-                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">Alerts</span>
-                                        {unreadNotifications > 0 && (
-                                            <div className="absolute top-1.5 right-3 w-4 h-4 bg-accent rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black animate-pulse">
-                                                {unreadNotifications}
-                                            </div>
-                                        )}
-                                    </button>
+                                    <>
+                                        <button
+                                            onClick={() => router.push('/seller/mystore')}
+                                            className="p-2 md:px-3 md:py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav flex flex-col items-center gap-1"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-indigo-600 transition-colors"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                                            <span className="hidden md:block text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">My Store</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                markAllAsRead();
+                                                setIsSidebarOpen(true);
+                                            }}
+                                            className="p-2 md:px-3 md:py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav relative flex flex-col items-center gap-1"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-indigo-600 transition-colors"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+                                            <span className="hidden md:block text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">Alerts</span>
+                                            {unreadNotifications > 0 && (
+                                                <div className="absolute top-1 right-1 w-4 h-4 bg-indigo-600 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black animate-pulse">
+                                                    {unreadNotifications}
+                                                </div>
+                                            )}
+                                        </button>
+                                    </>
                                 )}
                             </div>
 
-                            {session ? <ProfileDropdown /> : (
-                                <div className="flex items-center gap-6">
-                                    <Link href="/auth/login" className="text-[11px] font-black text-slate-600 hover:text-accent uppercase tracking-widest transition-colors">Log In</Link>
-                                    <Link href="/auth/register">
-                                        <Button className="!h-11 !px-8 rounded-xl font-black text-sm uppercase tracking-widest bg-slate-900 text-white hover:bg-accent border-none shadow-lg shadow-slate-200 transition-all hover:scale-105 active:scale-95">
-                                            Join Now
-                                        </Button>
-                                    </Link>
-                                </div>
-                            )}
+                            <div className="flex items-center gap-2">
+                                {session ? <ProfileDropdown /> : (
+                                    <>
+                                        <Link href="/auth/login" className="hidden sm:block text-[11px] font-black text-slate-600 hover:text-indigo-600 uppercase tracking-widest">Log In</Link>
+                                        <Link href="/auth/register">
+                                            <Button className="!h-10 md:!h-11 px-4 md:!px-8 rounded-xl font-black text-[10px] md:text-sm uppercase tracking-widest bg-gradient-to-r from-violet-600 to-pink-600 text-white border-none shadow-lg shadow-indigo-100/50 transition-all hover:scale-105 active:scale-95">
+                                                Join
+                                            </Button>
+                                        </Link>
+                                    </>
+                                )}
+                                
+                                {/* Mobile Menu Toggle */}
+                                <button 
+                                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                    className="md:hidden p-2 rounded-xl bg-slate-50 text-slate-900"
+                                >
+                                    {isMobileMenuOpen ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
+
+                {/* Mobile Menu Overlay */}
+                {isMobileMenuOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-4 mx-0 bg-white border border-rose-600/10 rounded-2xl p-6 shadow-2xl animate-in slide-in-from-top-4 duration-300 md:hidden z-40">
+                        <div className="flex flex-col gap-6 text-sm font-black uppercase tracking-widest">
+                            <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b border-slate-50 text-rose-600">Marketplace</Link>
+                            <Link href="/brokers" onClick={() => setIsMobileMenuOpen(false)} className={`py-2 border-b border-slate-50 ${pathname === '/brokers' ? 'text-rose-600' : 'text-slate-400'}`}>Find Brokers</Link>
+                            <Link href="/pricing" onClick={() => setIsMobileMenuOpen(false)} className={`py-2 border-b border-slate-50 ${pathname === '/pricing' ? 'text-rose-600' : 'text-slate-400'}`}>Subscription Plans</Link>
+                            {!session && (
+                                <Link href="/auth/login" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b border-slate-50 text-slate-400 text-blue-600">Login to Account</Link>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <NotificationSidebar

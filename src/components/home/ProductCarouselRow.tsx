@@ -30,20 +30,20 @@ export function ProductCarouselRow({ title, products, filterUrl }: ProductCarous
         <div className="w-full py-2 px-4 md:px-10 bg-transparent overflow-hidden">
             <div className="w-full space-y-2">
                 <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-xl md:text-2xl font-black text-rose-500 tracking-tighter italic">
+                    <h2 className="text-xl md:text-2xl font-black text-violet-600 tracking-tighter italic">
                         {title}
                     </h2>
 
                     <div className="flex items-center gap-2 scale-75 origin-right">
                         <button
                             onClick={() => scroll("left")}
-                            className="p-2 border-2 border-slate-100 rounded-lg hover:border-slate-950 transition-colors shadow-sm"
+                            className="p-2 border-2 border-slate-100 rounded-lg hover:border-violet-600 transition-colors shadow-sm"
                         >
                             <ChevronLeft className="w-5 h-5 text-slate-900" />
                         </button>
                         <button
                             onClick={() => scroll("right")}
-                            className="p-2 border-2 border-slate-100 rounded-lg hover:border-slate-950 transition-colors shadow-sm"
+                            className="p-2 border-2 border-slate-100 rounded-lg hover:border-violet-600 transition-colors shadow-sm"
                         >
                             <ChevronRight className="w-5 h-5 text-slate-900" />
                         </button>

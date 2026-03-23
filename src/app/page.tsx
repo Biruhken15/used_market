@@ -44,8 +44,8 @@ export default async function Home() {
 
           {/* Right: Promotional Carousel */}
           <div className="lg:col-span-3">
-            <div className="h-full rounded-2xl overflow-hidden shadow-sm bg-white">
-                <PromoCarousel />
+            <div className="h-full rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200">
+                <PromoCarousel initialProducts={promotedProducts} />
             </div>
           </div>
         </div>
@@ -136,7 +136,7 @@ export default async function Home() {
               </p>
               <div className="pt-4">
                 <Link href="/stores/create">
-                  <Button className="h-16 px-12 bg-white text-slate-950 hover:bg-blue-600 hover:text-white font-black text-lg rounded-2xl transition-all shadow-2xl">
+                  <Button className="h-16 px-12 bg-white text-slate-950 hover:bg-violet-600 hover:text-white font-black text-lg rounded-2xl transition-all shadow-2xl">
                     Create Your Store Now
                   </Button>
                 </Link>

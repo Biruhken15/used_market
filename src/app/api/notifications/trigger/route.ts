@@ -6,7 +6,26 @@ import dbConnect from "@/lib/db/mongoose";
 import Product from "@/lib/models/product";
 import Store from "@/lib/models/store";
 
+import { rateLimit } from "@/lib/utils/rate-limiter";
+
 export async function POST(req: Request) {
+    const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
+    const limiter = rateLimit(ip, 10, 60000); // 10 requests per minute
+
+    if (!limiter.success) {
+        return NextResponse.json(
+            { message: "Too many requests. Please try again later." },
+            { 
+                status: 429,
+                headers: {
+                    'X-RateLimit-Limit': '10',
+                    'X-RateLimit-Remaining': limiter.remaining.toString(),
+                    'X-RateLimit-Reset': limiter.reset.toString()
+                }
+            }
+        );
+    }
+
     try {
         const session = await getServerSession(authOptions);
         const { type, productId, storeId: targetStoreId } = await req.json();

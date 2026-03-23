@@ -1,9 +1,16 @@
 import dbConnect from '../db/mongoose';
 import Product from '../models/product';
+import Store from '../models/store';
 import UserSubscription from '../models/user-subscription';
 import { SubscriptionService } from './subscription-service';
 import mongoose from 'mongoose';
 import { serialize } from '../utils/serialize';
+
+// Simple TTL Cache for high-volume marketplace queries
+const cache = new Map<string, { data: any, expires: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+import { ProductSchema } from '../utils/validators';
 
 /**
  * Service to manage product listings and marketplace logic.
@@ -14,6 +21,9 @@ export class ProductService {
      * Create a new product listing with subscription enforcement.
      */
     static async createProduct(ownerId: string, storeId: string, data: any) {
+        // 0. Validate Input
+        const validatedData = ProductSchema.parse(data);
+        
         await dbConnect();
 
         // 1. Check listing limits
@@ -43,6 +53,13 @@ export class ProductService {
      * Fetch products for the marketplace with search ranking boost and special filters.
      */
     static async getMarketplaceProducts(filters: any = {}, page = 1, limit = 20) {
+        const cacheKey = `marketplace_${JSON.stringify(filters)}_${page}_${limit}`;
+        const cached = cache.get(cacheKey);
+        
+        if (cached && cached.expires > Date.now()) {
+            return cached.data;
+        }
+
         await dbConnect();
 
         const matchStage: any = { status: 'active' };
@@ -64,12 +81,9 @@ export class ProductService {
             matchStage.category = filters.category;
         }
 
-        // Handle Keyword Search
+        // Handle Keyword Search using MongoDB Text Index
         if (filters.keyword) {
-            matchStage.$or = [
-                { title: { $regex: filters.keyword, $options: 'i' } },
-                { description: { $regex: filters.keyword, $options: 'i' } }
-            ];
+            matchStage.$text = { $search: filters.keyword };
         }
 
         // Handle special filters
@@ -243,12 +257,25 @@ export class ProductService {
             ]);
         }
 
-        return {
+        const result = {
             products: serialize(products),
             total,
             page,
             totalPages: Math.ceil(total / limit)
         };
+
+        // Store in cache
+        cache.set(cacheKey, { data: result, expires: Date.now() + CACHE_TTL });
+
+        // Periodically clean cache (crude but effective for memory safety)
+        if (cache.size > 1000) {
+            const now = Date.now();
+            for (const [key, val] of cache.entries()) {
+                if (val.expires < now) cache.delete(key);
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -343,8 +370,8 @@ export class ProductService {
      */
     static async getProductById(productId: string) {
         await dbConnect();
-        const product = await Product.findById(productId);
-        if (!product) throw new Error('Product not found');
+        const product = await Product.findById(productId).populate('storeId');
+        if (!product) return null;
         return serialize(product);
     }
 }

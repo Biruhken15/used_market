@@ -3,10 +3,11 @@ import { ProductService } from '@/lib/services/product-service';
 
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const products = await ProductService.getStoreProducts(params.id);
+        const { id } = await params;
+        const products = await ProductService.getStoreProducts(id);
         return NextResponse.json(products);
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });

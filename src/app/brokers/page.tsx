@@ -2,9 +2,16 @@ import { StoreService } from "@/lib/services/store-service";
 import { FeatureBar } from "@/components/home/FeatureBar";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Metadata } from 'next';
 
-export default async function BrokersPage({ searchParams }: { searchParams: { page?: string } }) {
-    const page = parseInt(searchParams.page || '1');
+export const metadata: Metadata = {
+    title: 'Professional Brokers | Ethiopia\'s Largest Used Marketplace',
+    description: 'Find and connect with verified professional brokers and agents in Ethiopia. High-quality used products from trusted sellers.',
+};
+
+export default async function BrokersPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+    const { page: pageStr } = await searchParams;
+    const page = parseInt(pageStr || '1');
     const { brokers, total, pages } = await StoreService.getBrokers(page, 10);
 
     return (

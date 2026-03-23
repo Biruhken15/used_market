@@ -3,6 +3,8 @@ import Store from "../models/store";
 import User from "../models/user";
 import { slugify } from "../utils/slug";
 
+import { StoreSchema } from "../utils/validators";
+
 export interface StoreData {
     ownerId: string;
     storeName: string;
@@ -28,6 +30,9 @@ export interface StoreData {
 
 export class StoreService {
     static async createStore(data: StoreData) {
+        // 0. Validate Input
+        const validatedData = StoreSchema.parse(data);
+
         await connectDB();
 
         // 1. Check if user already has a store

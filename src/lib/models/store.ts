@@ -112,7 +112,13 @@ const storeSchema = new mongoose.Schema({
     // Timestamps
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
+
+// Critical Indexes for 1M+ scale
+storeSchema.index({ status: 1, createdAt: -1 });
+storeSchema.index({ category: 1 });
+storeSchema.index({ region: 1, city: 1 });
+storeSchema.index({ storeType: 1 });
 
 // Update the updatedAt timestamp on save
 storeSchema.pre('save', function (next) {

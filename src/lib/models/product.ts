@@ -173,6 +173,26 @@ const productSchema = new Schema<IProduct>({
     toObject: { virtuals: true }
 });
 
+// High-Performance Query Indexes
+productSchema.index({ storeId: 1, status: 1 });
+productSchema.index({ category: 1, status: 1, createdAt: -1 });
+productSchema.index({ ownerId: 1, status: 1 });
+productSchema.index({ isUrgent: 1, status: 1 });
+productSchema.index({ isFeatured: 1, status: 1 });
+productSchema.index({ createdAt: -1 });
+
+// Text Search Index for keyword searches
+productSchema.index({ 
+    title: 'text', 
+    description: 'text' 
+}, {
+    weights: {
+        title: 10,
+        description: 5
+    },
+    name: 'ProductTextIndex'
+});
+
 // Hooks
 productSchema.pre('save', function (next) {
     const product = this as any;
