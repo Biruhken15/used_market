@@ -39,7 +39,26 @@ export default function ProductForm({ initialData, isEditing = false, productId,
     const [imagePreviews, setImagePreviews] = useState<string[]>(initialData?.images?.map((img: any) => img.url) || []);
 
     // Form state
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        title: string;
+        description: string;
+        price: string;
+        priceType: 'fixed' | 'negotiable';
+        category: string;
+        condition: 'new' | 'like-new' | 'good' | 'fair' | 'for-parts';
+        quantity: string;
+        isFeatured: boolean;
+        isUrgent: boolean;
+        saleType: 'sale' | 'rent';
+        sourceOwner: {
+            name: string;
+            phone: string;
+            telegram: string;
+            address: string;
+            otherInfo: string;
+        };
+        region: string;
+    }>({
         title: initialData?.title || '',
         description: initialData?.description || '',
         price: initialData?.price || '',
@@ -49,6 +68,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
         quantity: initialData?.quantity || '1',
         isFeatured: initialData?.isFeatured || false,
         isUrgent: initialData?.isUrgent || false,
+        saleType: initialData?.saleType || 'sale',
         sourceOwner: {
             name: initialData?.sourceOwner?.name || '',
             phone: initialData?.sourceOwner?.phone || '',
@@ -56,6 +76,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
             address: initialData?.sourceOwner?.address || '',
             otherInfo: initialData?.sourceOwner?.otherInfo || '',
         },
+        region: initialData?.region || '',
     });
 
     const categories = ['electronics', 'phones', 'real-estate', 'vehicles', 'houses', 'furniture', 'fashion', 'sports', 'books', 'other'];
@@ -126,6 +147,8 @@ export default function ProductForm({ initialData, isEditing = false, productId,
             data.append("quantity", formData.quantity);
             data.append("isFeatured", formData.isFeatured.toString());
             data.append("isUrgent", formData.isUrgent.toString());
+            data.append("region", formData.region);
+            data.append("saleType", formData.saleType);
 
             data.append("sourceOwnerName", formData.sourceOwner.name);
             data.append("sourceOwnerPhone", formData.sourceOwner.phone);
@@ -185,9 +208,9 @@ export default function ProductForm({ initialData, isEditing = false, productId,
             )}
 
             {error && (
-                <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl">
-                    <h3 className="text-rose-600 font-black text-xs uppercase tracking-widest">{error.message}</h3>
-                    {error.details && <p className="text-rose-600/60 text-[10px] font-bold mt-1">{error.details}</p>}
+                <div className="p-4 bg-violet-50 border border-violet-100 rounded-xl">
+                    <h3 className="text-violet-600 font-black text-xs uppercase tracking-widest">{error.message}</h3>
+                    {error.details && <p className="text-violet-600/60 text-[10px] font-bold mt-1">{error.details}</p>}
                 </div>
             )}
 
@@ -252,7 +275,18 @@ export default function ProductForm({ initialData, isEditing = false, productId,
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className={labelClasses}>Listing Type</label>
+                                <select
+                                    value={formData.saleType}
+                                    onChange={(e) => setFormData({ ...formData, saleType: e.target.value as any })}
+                                    className={inputClasses}
+                                >
+                                    <option value="sale">For Sale</option>
+                                    <option value="rent">For Rent</option>
+                                </select>
+                            </div>
                             <div>
                                 <label className={labelClasses}>Price (ETB)</label>
                                 <input
@@ -300,6 +334,25 @@ export default function ProductForm({ initialData, isEditing = false, productId,
                                     {conditions.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                                 </select>
                             </div>
+                        </div>
+
+                        <div>
+                            <label className={labelClasses}>Region / Market Area</label>
+                            <select
+                                required
+                                className={inputClasses}
+                                value={formData.region}
+                                onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                            >
+                                <option value="">Choose Area</option>
+                                <option value="Addis Ababa">Addis Ababa</option>
+                                <option value="Oromia">Oromia</option>
+                                <option value="Amhara">Amhara</option>
+                                <option value="Dire Dawa">Dire Dawa</option>
+                                <option value="Tigray">Tigray</option>
+                                <option value="SNNPR">SNNPR</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -409,7 +462,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
             <div className="pt-6">
                 <Button
                     disabled={loading || showSuccess}
-                    className="h-14 w-full rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-blue-600 transition-all active:scale-95 shadow-xl shadow-slate-200"
+                    className="h-14 w-full rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 text-white font-black text-[10px] uppercase tracking-[0.2em] hover:brightness-110 shadow-xl shadow-indigo-100 transition-all active:scale-95 border-none"
                 >
                     {loading ? 'Wait...' : showSuccess ? 'Success!' : (isEditing ? 'Update Product' : 'Add Product')}
                 </Button>

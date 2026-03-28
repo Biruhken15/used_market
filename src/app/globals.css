@@ -58,14 +58,19 @@ body {
   font-weight: 700;
   padding: 0.75rem 1.5rem;
   border-radius: 0.75rem;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
 }
 
 .btn-primary:hover {
-  transform: scale(1.02);
+  transform: translateY(-1px);
   filter: brightness(1.1);
   box-shadow: 0 8px 20px rgba(219, 39, 119, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+  filter: brightness(0.95);
 }
 
 .gradient-text {
@@ -77,6 +82,16 @@ body {
 
 .brand-bg {
   background: var(--brand-gradient);
+}
+
+/* Mobile Drawer Animation */
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-drawer-in {
+  animation: slideInFromRight 0.3s cubic-bezier(0, 0, 0.2, 1) forwards;
 }
 
 @keyframes swing {
@@ -103,4 +118,39 @@ body {
 
 .animate-swing {
   animation: swing 2s infinite ease-in-out;
+}
+
+/* Minimalist Global Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent; /* slate-300 */
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1; /* slate-300 */
+  border-radius: 20px;
+  border: 1px solid transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8; /* slate-400 */
+}
+
+/* Custom Thin Scrollbar Utility */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.thin-scrollbar {
+  scrollbar-width: thin;
 }

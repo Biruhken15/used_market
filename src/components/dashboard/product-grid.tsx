@@ -73,12 +73,12 @@ export const ProductGrid = () => {
 
     return (
         <div className="w-full">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-4">
                 <div>
-                    <h2 className="text-3xl font-black tracking-tighter text-slate-900 mb-2 italic uppercase">
+                    <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-slate-900 mb-2 italic uppercase">
                         Marketplace <span className="text-rose-600">Discover</span>
                     </h2>
-                    <p className="text-slate-500 font-bold text-sm">Professional quality products from verified sellers across the SaaS platform.</p>
+                    <p className="text-slate-500 font-bold text-xs md:text-sm">Handpicked quality products from Ethiopia's verified sellers.</p>
                 </div>
             </div>
 

@@ -11,7 +11,7 @@ export const SearchFilter = () => {
 
     return (
         <div className="w-full bg-slate-50/50 border-b border-slate-100 pb-12 pt-16">
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-6xl mx-auto px-4">
                 {/* Search Bar Refined */}
                 <div className="max-w-5xl mx-auto mb-10">
                     <div className="relative group">
@@ -33,7 +33,7 @@ export const SearchFilter = () => {
 
                 {/* Horizontal Categories - Sleek Version */}
                 <div className="max-w-5xl mx-auto overflow-hidden">
-                    <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+                    <div className="flex items-center gap-2 overflow-x-auto pb-2 thin-scrollbar">
                         {categories.map((cat) => (
                             <button
                                 key={cat}

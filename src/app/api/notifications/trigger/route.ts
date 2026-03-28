@@ -5,6 +5,7 @@ import { NotificationService } from "@/lib/services/notification-service";
 import dbConnect from "@/lib/db/mongoose";
 import Product from "@/lib/models/product";
 import Store from "@/lib/models/store";
+import pusher from "@/lib/pusher";
 
 import { rateLimit } from "@/lib/utils/rate-limiter";
 
@@ -78,6 +79,14 @@ export async function POST(req: Request) {
                 title,
                 message,
                 metadata: { productId }
+            });
+
+            // Trigger Pusher for real-time update
+            await pusher.trigger(`user-${recipientId}`, 'notification', {
+                type,
+                title,
+                message,
+                metadata: { productId, storeId: finalStoreId }
             });
         }
 

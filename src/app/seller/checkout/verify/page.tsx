@@ -50,7 +50,7 @@ function VerifyContent() {
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
             <div className="max-w-md w-full bg-white rounded-[3rem] p-12 shadow-2xl border border-slate-100 text-center space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
                 <div className="flex justify-center">
-                    <div className={`w-24 h-24 rounded-[2rem] flex items-center justify-center shadow-lg transition-all duration-500 ${status === 'loading' ? 'bg-blue-50 text-blue-600 animate-pulse' :
+                    <div className={`w-24 h-24 rounded-[2rem] flex items-center justify-center shadow-lg transition-all duration-500 ${status === 'loading' ? 'bg-violet-50 text-violet-600 animate-pulse' :
                             status === 'success' ? 'bg-emerald-50 text-emerald-600' :
                                 'bg-red-50 text-red-600'
                         }`}>
@@ -73,10 +73,10 @@ function VerifyContent() {
                 {status === 'loading' && (
                     <div className="pt-4 flex flex-col items-center gap-3">
                         <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                            <div className="bg-blue-600 h-full w-2/3 rounded-full animate-pulse" />
+                            <div className="bg-gradient-to-r from-violet-600 to-pink-600 h-full w-2/3 rounded-full animate-pulse" />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                            Encryption Phase: Syncing
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-600">
+                            Encryption Phase: ከሰው እጅ Syncing
                         </span>
                     </div>
                 )}
@@ -84,7 +84,7 @@ function VerifyContent() {
                 {status !== 'loading' && (
                     <div className="pt-4 space-y-4">
                         <Link href="/seller/mystore" className="block w-full">
-                            <Button className="w-full !h-14 rounded-2xl bg-slate-900 text-white font-black text-sm uppercase tracking-widest hover:bg-accent transition-all shadow-xl shadow-slate-200 border-none">
+                            <Button className="w-full !h-14 rounded-2xl bg-gradient-to-r from-violet-600 to-pink-600 text-white font-black text-sm uppercase tracking-widest hover:brightness-110 shadow-xl shadow-indigo-100 transition-all border-none">
                                 Go to Store Dashboard
                             </Button>
                         </Link>
@@ -111,7 +111,7 @@ export default function VerifyPage() {
     return (
         <Suspense fallback={
             <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+                <Loader2 className="w-12 h-12 animate-spin text-violet-600" />
             </div>
         }>
             <VerifyContent />

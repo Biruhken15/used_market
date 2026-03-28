@@ -30,24 +30,29 @@ export default async function Home() {
   ]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-100 pt-28">
+    <div className="flex flex-col min-h-screen bg-slate-100 pt-36">
       {/* Top Navigation below Navbar */}
       <FeatureBar />
 
       {/* Hero / Promo Section with Filters */}
-      <section className="max-w-7xl mx-auto w-full px-4 md:px-8 py-4">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left: Sidebar Filters */}
-          <div className="lg:col-span-1 h-full">
+      <section className="max-w-6xl mx-auto w-full px-4 md:px-8 py-4">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-4 gap-6">
+          {/* Left: Sidebar Filters (Desktop only or Drawer on Mobile) */}
+          <div className="hidden lg:block lg:col-span-1 h-full">
             <HomeHeroFilters />
           </div>
 
-          {/* Right: Promotional Carousel */}
+          {/* Right: Promotional Carousel (Top on Mobile) */}
           <div className="lg:col-span-3">
-            <div className="h-full rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200">
+            <div className="h-full rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-sm bg-white border border-slate-200">
                 <PromoCarousel initialProducts={promotedProducts} />
             </div>
           </div>
+        </div>
+
+        {/* Mobile Quick Filters Button */}
+        <div className="lg:hidden mt-4">
+             <HomeHeroFilters isMobile={true} />
         </div>
       </section>
 
@@ -56,7 +61,7 @@ export default async function Home() {
         
         <header className="px-4 md:px-10 pt-12 pb-4">
             <h2 className="text-3xl md:text-4xl font-black text-slate-950 italic tracking-tighter">
-                Explore Used Products.
+                Discover Used Products.
             </h2>
             <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px] mt-2">
                 Verified Listings & Handpicked Deals
@@ -122,7 +127,7 @@ export default async function Home() {
         />
 
         {/* Sell CTA Section */}
-        <section className="max-w-7xl mx-auto px-4 md:px-8 py-20">
+        <section className="max-w-6xl mx-auto px-4 md:px-8 py-20">
           <div className="relative rounded-[3rem] overflow-hidden bg-slate-950 p-12 md:p-20 text-center text-white">
             <div className="absolute inset-0 opacity-20">
               <img src="/market-narrative-1.png" alt="Overlay" className="w-full h-full object-cover" />
@@ -148,7 +153,7 @@ export default async function Home() {
 
       {/* Statistics */}
       <section className="w-full py-20 px-6 bg-white border-t border-slate-100">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
           {[
             { label: 'Active Listings', value: '18k+' },
             { label: 'Verified Stores', value: '2.5k+' },

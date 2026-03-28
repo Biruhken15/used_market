@@ -53,7 +53,7 @@ export const NotificationSidebar = ({ isOpen, onClose, notifications, onMarkAllA
                     {/* Header */}
                     <div className="p-6 border-b border-slate-100 bg-white/50 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg">
+                            <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-pink-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-100">
                                 <Bell size={20} className="animate-swing" />
                             </div>
                             <div>

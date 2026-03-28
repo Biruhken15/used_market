@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { ShareModal } from "./share-modal";
+import { useChatContext } from "@/components/chat/ChatManager";
 
 /**
  * ProductEssentials Component
@@ -10,6 +11,7 @@ import { ShareModal } from "./share-modal";
  */
 interface ProductEssentialsProps {
     productId: string;
+    ownerId: string;
     title: string;
     price: number;
     status: string;
@@ -23,6 +25,7 @@ interface ProductEssentialsProps {
 
 export const ProductEssentials = ({
     productId,
+    ownerId,
     title,
     price,
     status,
@@ -35,6 +38,7 @@ export const ProductEssentials = ({
 }: ProductEssentialsProps) => {
     const { data: session } = useSession();
     const router = useRouter();
+    const { openChat } = useChatContext();
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -113,6 +117,14 @@ export const ProductEssentials = ({
 
                             {/* Chat Button */}
                             <button
+                                onClick={() => {
+                                    if (!session) {
+                                        alert("Please register first to chat with the seller.");
+                                        router.push('/auth/register');
+                                    } else {
+                                        openChat(ownerId, productId);
+                                    }
+                                }}
                                 className="ml-3 h-10 px-4 rounded-[0.85rem] bg-slate-900 border border-slate-900 text-white hover:bg-slate-800 flex items-center gap-2 transition-all active:scale-95 shadow-md shadow-slate-200/50"
                                 title="Chat with Seller"
                             >

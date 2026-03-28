@@ -8,8 +8,10 @@ export async function middleware(req: any) {
         path === "/auth/login" ||
         path === "/auth/register" ||
         path === "/" ||
-        path.startsWith("/dashboard") ||
-        path.startsWith("/products");
+        path.startsWith("/products") ||
+        path.startsWith("/stores") ||
+        path.startsWith("/brokers") ||
+        path.startsWith("/api");
 
     const token = await getToken({
         req,
@@ -17,9 +19,10 @@ export async function middleware(req: any) {
     });
 
     if (token && (path === "/auth/login" || path === "/auth/register")) {
-        return NextResponse.redirect(new URL("/", req.nextUrl));
+        return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
     }
 
+    // Protect all non-public paths
     if (!isPublicPath && !token) {
         return NextResponse.redirect(new URL("/auth/login", req.nextUrl));
     }

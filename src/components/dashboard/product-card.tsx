@@ -20,6 +20,7 @@ interface ProductCardProps {
         isUrgentExpired?: boolean;
         isFeatured?: boolean;
         condition?: string;
+        saleType?: 'sale' | 'rent';
     };
     initialIsFavorited?: boolean;
     isLoggedIn?: boolean;
@@ -82,10 +83,19 @@ export const ProductCard = memo(({ product, initialIsFavorited = false, isLogged
         <>
             <Link href={`/products/${product._id}`} className="block group h-full">
                 <div className="h-full flex flex-col bg-white border border-gray-400/40 shadow-none transition-shadow duration-200 relative rounded-sm overflow-hidden hover:shadow-lg group">
-                    <div className="z-10 bg-gray-50 border-b border-gray-400/20 py-1 px-2 flex items-center justify-between">
-                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none">
-                            {product.condition || "Marketplace Item"}
-                        </span>
+                    <div className="z-10 bg-gray-50 border-b border-gray-400/20 py-1 px-2 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                                {product.condition || "Item"}
+                            </span>
+                            <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-sm border ${
+                                product.saleType === 'rent' 
+                                ? 'bg-orange-50 text-orange-600 border-orange-100' 
+                                : 'bg-blue-50 text-blue-600 border-blue-100'
+                            }`}>
+                                {product.saleType === 'rent' ? 'For Rent' : 'For Sale'}
+                            </span>
+                        </div>
                         {product.status === 'sold' && (
                             <span className="text-[8px] font-black text-rose-600 uppercase tracking-wider">Sold</span>
                         )}
@@ -121,19 +131,21 @@ export const ProductCard = memo(({ product, initialIsFavorited = false, isLogged
                         </div>
                     </div>
 
-                    <div className="p-2 flex flex-col flex-1 gap-1">
-                        <h3 className="text-[11px] font-bold text-gray-800 leading-tight line-clamp-2 group-hover:text-slate-900 transition-colors">
+                    <div className="p-3 md:p-4 flex flex-col flex-1 gap-1.5">
+                        <h3 className="text-sm md:text-base font-bold text-gray-800 leading-tight line-clamp-2 md:line-clamp-1 group-hover:text-indigo-600 transition-colors">
                             {product.title}
                         </h3>
-                        <div className="space-y-0 mt-auto">
+                        <div className="space-y-1 mt-auto">
                             <div className="flex items-baseline gap-1">
-                                <span className="text-sm font-black text-gray-900 tracking-tight">
-                                    {product.price.toLocaleString()} <span className="text-[8px] opacity-70">ETB</span>
+                                <span className="text-lg md:text-xl font-black text-slate-950 tracking-tight">
+                                    {product.price.toLocaleString()} <span className="text-[10px] opacity-70">ETB</span>
                                 </span>
                             </div>
-                            <div className="flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
-                                <span className="text-[8px] font-bold text-gray-400 uppercase tracking-wider truncate">
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-4 h-4 rounded-full bg-slate-50 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+                                </div>
+                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest truncate">
                                     {product.category || "General"}
                                 </span>
                             </div>

@@ -58,6 +58,7 @@ export const authOptions: AuthOptions = {
 
                 // ADDED: Fetch subscription and store mapping on login
                 try {
+                    await connectDB();
                     const sub = await UserSubscription.findOne({ userId: user.id }).populate('planId');
                     if (sub) {
                         token.storeId = sub.storeId?.toString();

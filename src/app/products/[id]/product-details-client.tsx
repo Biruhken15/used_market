@@ -7,6 +7,7 @@ import { ProductSellerCard } from "@/components/products/product-seller-card";
 import { RelatedProducts } from "@/components/products/related-products";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { MobileProductActions } from "@/components/products/MobileProductActions";
 
 interface ProductDetailsClientProps {
     product: any;
@@ -29,7 +30,7 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
             <Navbar />
 
             {/* Top Navigation Bar */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 md:pt-32">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 md:pt-32">
                 <button
                     onClick={() => router.back()}
                     className="group mb-8 md:mb-12 flex items-center gap-2 text-slate-400 hover:text-accent transition-colors"
@@ -41,10 +42,10 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
                 </button>
 
                 {/* Main Product Layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-10 items-start">
 
                     {/* Left: Product Media Gallery */}
-                    <div className="lg:col-span-7">
+                    <div className="lg:col-span-6">
                         <ProductGallery
                             images={product.images || []}
                             title={product.title}
@@ -52,9 +53,10 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
                     </div>
 
                     {/* Right: Product Info & Seller Contact */}
-                    <div className="lg:col-span-5 space-y-12">
+                    <div className="lg:col-span-4 space-y-10">
                         <ProductEssentials
                             productId={product._id}
+                            ownerId={product.ownerId}
                             title={product.title}
                             price={product.price}
                             status={product.status}
@@ -65,12 +67,14 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
                             location={product.city || product.storeId?.city || "Addis Ababa"}
                         />
 
-                        <ProductSellerCard
-                            store={product.storeId}
-                            productTitle={product.title}
-                            productPrice={product.price}
-                            pageUrl={typeof window !== 'undefined' ? window.location.href : ''}
-                        />
+                        <div className="hidden lg:block">
+                            <ProductSellerCard
+                                store={product.storeId}
+                                productTitle={product.title}
+                                productPrice={product.price}
+                                pageUrl={typeof window !== 'undefined' ? window.location.href : ''}
+                            />
+                        </div>
 
                         {product.sourceOwner && (
                             <div className="p-8 rounded-[2.5rem] bg-white border-2 border-slate-100 space-y-6 shadow-sm relative overflow-hidden">
@@ -118,6 +122,12 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
                     />
                 </div>
             </div>
+
+            <MobileProductActions 
+                store={product.storeId}
+                productTitle={product.title}
+                productPrice={product.price}
+            />
         </div>
     );
 }

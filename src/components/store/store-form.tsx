@@ -157,13 +157,13 @@ export function StoreForm() {
             )}
 
             {error && (
-                <div className="p-5 bg-rose-50 border border-rose-100 rounded-2xl flex gap-4 items-center animate-in slide-in-from-top-4">
-                    <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white shrink-0">
+                <div className="p-5 bg-violet-50 border border-violet-100 rounded-2xl flex gap-4 items-center animate-in slide-in-from-top-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-pink-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-100">
                         <X size={20} strokeWidth={3} />
                     </div>
                     <div>
-                        <h3 className="text-rose-900 font-black text-xs uppercase tracking-widest">{error.message}</h3>
-                        {error.details && <p className="text-rose-600/70 text-[10px] font-bold mt-0.5">{error.details}</p>}
+                        <h3 className="text-violet-900 font-black text-xs uppercase tracking-widest">{error.message}</h3>
+                        {error.details && <p className="text-violet-600/70 text-[10px] font-bold mt-0.5">{error.details}</p>}
                     </div>
                 </div>
             )}
@@ -228,12 +228,12 @@ export function StoreForm() {
             {/* Section 2: Details */}
             <div className="space-y-8 pt-8 border-t border-slate-100">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-pink-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-100">
                         <Globe size={20} />
                     </div>
                     <div>
                         <h3 className="text-xl font-black text-slate-900 tracking-tight italic uppercase">Store information</h3>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Your product will be filtered by this</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">ከሰው እጅ - Managed Inventory</p>
                     </div>
                 </div>
 
@@ -254,7 +254,7 @@ export function StoreForm() {
                         <div className="relative">
                             <input
                                 required
-                                className={`${inputClasses} font-mono text-rose-600`}
+                                className={`${inputClasses} font-mono text-violet-600`}
                                 placeholder="addis-luxury"
                                 value={formData.storeSlug}
                                 onChange={handleSlugChange}
@@ -291,7 +291,7 @@ export function StoreForm() {
                                             setFormData({ ...formData, category: newCats });
                                         }}
                                         className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${isSelected
-                                            ? "bg-rose-600 border-rose-600 text-white shadow-lg"
+                                            ? "bg-gradient-to-r from-violet-600 to-pink-600 border-transparent text-white shadow-lg shadow-indigo-100"
                                             : "bg-white border-slate-100 text-slate-400 hover:border-slate-300"
                                             }`}
                                     >
@@ -344,7 +344,7 @@ export function StoreForm() {
             {/* Section 3: Owner & Verification */}
             <div className="space-y-8 pt-8 border-t border-slate-100">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-pink-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-100">
                         <User size={20} />
                     </div>
                     <div>
@@ -436,7 +436,7 @@ export function StoreForm() {
                 <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-3">
                         <label className={labelClasses}>ID Front Matrix</label>
-                        <div className="relative aspect-[3/2] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden hover:border-rose-500 transition-all group">
+                        <div className="relative aspect-[3/2] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden hover:border-violet-500 transition-all group">
                             {previews.idFront ? (
                                 <img src={previews.idFront} alt="ID Front" className="w-full h-full object-cover" />
                             ) : (
@@ -453,7 +453,7 @@ export function StoreForm() {
                     </div>
                     <div className="space-y-3">
                         <label className={labelClasses}>ID Back Matrix</label>
-                        <div className="relative aspect-[3/2] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden hover:border-rose-500 transition-all group">
+                        <div className="relative aspect-[3/2] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden hover:border-violet-500 transition-all group">
                             {previews.idBack ? (
                                 <img src={previews.idBack} alt="ID Back" className="w-full h-full object-cover" />
                             ) : (
@@ -475,10 +475,13 @@ export function StoreForm() {
                 <Button
                     type="submit"
                     disabled={loading}
-                    className="h-16 px-12 lg:px-16 rounded-2xl bg-rose-600 text-white font-black text-xs uppercase tracking-[0.3em] hover:bg-rose-700 transition-all active:scale-95 shadow-2xl shadow-rose-200 flex items-center gap-4 border-none"
+                    className="h-16 px-12 lg:px-16 rounded-2xl bg-gradient-to-r from-violet-600 to-pink-600 text-white font-black text-xs uppercase tracking-[0.3em] hover:brightness-110 transition-all active:scale-95 shadow-2xl shadow-indigo-200 flex items-center gap-4 border-none"
                 >
                     {loading ? (
-                        <>Wait...</>
+                        <div className="flex items-center gap-3">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <span>Validating...</span>
+                        </div>
                     ) : (
                         <>
                             Create Store

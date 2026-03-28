@@ -18,8 +18,12 @@ export default function CreateStorePage() {
 
     if (status === "loading") {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
-                <div className="w-12 h-12 border-4 border-rose-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white space-y-6">
+                <div className="w-16 h-16 border-4 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="flex flex-col items-center">
+                    <span className="text-2xl font-black text-slate-900 tracking-tighter italic">ከሰው እጅ</span>
+                    <span className="text-[10px] font-bold text-violet-600 uppercase tracking-[0.3em] mt-1">Authenticating Protocol</span>
+                </div>
             </div>
         );
     }
@@ -27,10 +31,10 @@ export default function CreateStorePage() {
     if (!session) return null;
 
     const benefits = [
-        { icon: <Rocket className="w-5 h-5 text-rose-500" />, title: "SAAS Marketplace", desc: "A professional SaaS infrastructure for high-velocity used product trading." },
-        { icon: <TrendingUp className="w-5 h-5 text-rose-500" />, title: "Sell Anything", desc: "List and manage your used inventory with advanced merchant tools." },
-        { icon: <ShieldCheck className="w-5 h-5 text-rose-500" />, title: "Buy with Trust", desc: "Secure environment for buyers to find quality pre-owned goods." },
-        { icon: <CheckCircle2 className="w-5 h-5 text-rose-500" />, title: "Real-time Protocol", desc: "Instant matching of buyer demand with seller supply across Ethiopia." }
+        { icon: <Rocket className="w-5 h-5 text-violet-500" />, title: "SAAS Marketplace", desc: "A professional SaaS infrastructure for high-velocity used product trading." },
+        { icon: <TrendingUp className="w-5 h-5 text-violet-500" />, title: "Sell Anything", desc: "List and manage your used inventory with advanced merchant tools." },
+        { icon: <ShieldCheck className="w-5 h-5 text-violet-500" />, title: "Buy with Trust", desc: "Secure environment for buyers to find quality pre-owned goods." },
+        { icon: <CheckCircle2 className="w-5 h-5 text-violet-500" />, title: "Real-time Protocol", desc: "Instant matching of buyer demand with seller supply across Ethiopia." }
     ];
 
     return (
@@ -40,12 +44,12 @@ export default function CreateStorePage() {
                     {/* Sidebar - 25% */}
                     <aside className="lg:w-[30%] space-y-10 lg:sticky lg:top-44 h-fit">
                         <div className="space-y-4">
-                            <span className="inline-block px-4 py-1.5 rounded-full bg-rose-600 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-rose-200">
+                            <span className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-violet-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-indigo-100">
                                 ETHIO MARKETPLACE
                             </span>
                             <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">
                                 Used Product <br />
-                                <span className="text-rose-600">SAAS Platform</span>
+                                <span className="bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">SAAS Platform</span>
                             </h1>
                             <p className="text-slate-500 font-bold text-sm leading-relaxed max-w-sm">
                                 The professional standard for buying and selling quality used products. Our SaaS infrastructure empowers sellers to scale and buyers to find value.
@@ -69,7 +73,7 @@ export default function CreateStorePage() {
                         <div className="p-6 rounded-[2rem] bg-slate-900 text-white space-y-3 shadow-2xl">
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Need Assistance?</p>
                             <p className="text-xs font-bold text-slate-200">Our dedicated support team is ready to help you set up your professional profile.</p>
-                            <button className="text-xs font-black uppercase tracking-widest text-rose-500 hover:text-rose-400 transition-colors">Contact Support →</button>
+                            <button className="text-xs font-black uppercase tracking-widest text-violet-500 hover:text-pink-500 transition-colors">Contact Support →</button>
                         </div>
                     </aside>
 
@@ -82,7 +86,7 @@ export default function CreateStorePage() {
                         <div className="mt-8 flex justify-center lg:justify-start">
                             <button
                                 onClick={() => router.back()}
-                                className="flex items-center gap-2 text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-rose-600 transition-colors group"
+                                className="flex items-center gap-2 text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-violet-600 transition-colors group"
                             >
                                 <span className="group-hover:-translate-x-1 transition-transform">←</span>
                                 Exit Protocol

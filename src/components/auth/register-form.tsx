@@ -90,7 +90,7 @@ export const RegisterForm = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {error && (
-                        <div className="bg-rose-50 border-2 border-rose-100 text-rose-600 text-[11px] font-black uppercase tracking-widest py-4 px-4 rounded-xl text-center">
+                        <div className="bg-violet-50 border-2 border-violet-100 text-violet-600 text-[11px] font-black uppercase tracking-widest py-4 px-4 rounded-xl text-center">
                             {error}
                         </div>
                     )}
@@ -147,7 +147,7 @@ export const RegisterForm = () => {
                             type="submit"
                             fullWidth
                             disabled={isLoading}
-                            className="h-14 rounded-lg bg-slate-950 text-white font-bold text-base hover:bg-slate-800 transition-all"
+                            className="h-14 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 text-white font-bold text-base hover:brightness-110 shadow-lg shadow-indigo-100 transition-all border-none"
                         >
                             {isLoading ? "Creating Account..." : "Register"}
                         </Button>

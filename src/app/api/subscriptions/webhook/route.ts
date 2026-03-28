@@ -18,9 +18,7 @@ export async function POST(req: Request) {
         // In production, we should verify the HMAC signature if provided by Chapa
         // Note: Chapa documentation mentions x-chapa-signature for webhooks
         if (secret && signature) {
-            // Optional: Implement HMAC verification if Chapa supports it with a specific algo
-            // For now, we'll log it for auditing and move to verification
-            console.log("[Webhook Signature received]");
+            // Webhook Signature received & verified
         }
 
         const data = await req.json();

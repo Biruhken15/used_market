@@ -5,7 +5,7 @@ import Link from "next/link";
 
 function SearchIcon() {
     return (
-        <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-slate-900" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" strokeLinecap="round"/>
         </svg>
     );
@@ -69,7 +69,7 @@ export function AdminSearch() {
     return (
         <div ref={containerRef} className="relative w-full max-w-xl">
             {/* Search Input */}
-            <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus-within:border-indigo-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
+            <div className="flex items-center gap-2.5 bg-white border border-slate-200 rounded-xl px-4 py-2.5 focus-within:border-slate-950 focus-within:bg-white focus-within:ring-4 focus-within:ring-slate-950/5 transition-all">
                 {loading ? <SpinnerIcon /> : <SearchIcon />}
                 <input
                     type="text"
@@ -77,7 +77,7 @@ export function AdminSearch() {
                     onChange={handleInput}
                     onFocus={() => results && setOpen(true)}
                     placeholder="Search by name, ID, store, product…"
-                    className="flex-1 bg-transparent text-sm text-slate-700 font-medium placeholder:text-slate-400 focus:outline-none"
+                    className="flex-1 bg-transparent text-sm text-slate-900 font-bold placeholder:text-slate-400 focus:outline-none"
                 />
                 {query && (
                     <button onClick={() => { setQuery(""); setResults(null); setOpen(false); }} className="text-slate-300 hover:text-slate-500 transition-colors">

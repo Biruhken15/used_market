@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Navbar } from "@/components/common/navbar";
 import { StoreReviews } from "@/components/store/StoreReviews";
 import { StoreReviewForm } from "@/components/store/StoreReviewForm";
+import { ProductCard } from "@/components/dashboard/product-card";
 import Link from "next/link";
 
 /**
@@ -89,14 +90,14 @@ export default function StoreProfilePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 relative -mt-32 z-10">
-                <div className="bg-white rounded-[3.5rem] p-8 md:p-16 shadow-2xl shadow-slate-200/50 border border-slate-100">
-                    <div className="flex flex-col lg:flex-row gap-12 items-start lg:items-end mb-16">
-                        <div className="w-48 h-48 bg-white rounded-[3rem] border-8 border-white -mt-24 shadow-2xl overflow-hidden shrink-0">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 relative -mt-20 md:-mt-32 z-10">
+                <div className="bg-white rounded-3xl md:rounded-[3.5rem] p-6 md:p-16 shadow-2xl shadow-slate-200/50 border border-slate-100">
+                    <div className="flex flex-col lg:flex-row gap-8 md:gap-12 items-start lg:items-end mb-12 md:mb-16">
+                        <div className="w-32 h-32 md:w-48 md:h-48 bg-white rounded-2xl md:rounded-[3rem] border-4 md:border-8 border-white -mt-16 md:-mt-24 shadow-2xl overflow-hidden shrink-0">
                             {store.logo?.url ? (
                                 <img src={store.logo.url} alt="Logo" className="w-full h-full object-cover" />
                             ) : (
-                                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-6xl">🏪</div>
+                                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-4xl md:text-6xl">🏪</div>
                             )}
                         </div>
                         <div className="flex-1 space-y-4">
@@ -133,21 +134,13 @@ export default function StoreProfilePage() {
                     </div>
 
                     {/* Content Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 border-t border-slate-100 pt-16">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16 border-t border-slate-100 pt-12 md:pt-16">
                         {/* Left: Products */}
-                        <div className="lg:col-span-12 space-y-12">
-                            <h2 className="text-3xl font-black text-slate-900 tracking-tighter">Merchant Inventory</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        <div className="lg:col-span-12 space-y-8 md:space-y-12">
+                            <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter italic uppercase">Merchant Inventory</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-8">
                                 {products.map((p) => (
-                                    <Link key={p._id} href={`/products/${p._id}`} className="group space-y-4 bg-slate-50/50 p-4 rounded-3xl hover:bg-white hover:shadow-xl transition-all">
-                                        <div className="aspect-[4/5] bg-white rounded-2xl overflow-hidden shadow-inner">
-                                            {p.images?.[0]?.url && <img src={p.images[0].url} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />}
-                                        </div>
-                                        <div className="px-2 pb-2">
-                                            <h4 className="text-sm font-black text-slate-900 truncate uppercase tracking-tight">{p.title}</h4>
-                                            <p className="text-accent font-black">{p.price.toLocaleString()} ETB</p>
-                                        </div>
-                                    </Link>
+                                    <ProductCard key={p._id} product={p} />
                                 ))}
                             </div>
                             {products.length === 0 && (
@@ -159,12 +152,12 @@ export default function StoreProfilePage() {
                     </div>
 
                     {/* Trust Section: Reviews */}
-                    <div className="mt-24 border-t border-slate-100 pt-24">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
-                            <div className="space-y-12">
+                    <div className="mt-16 md:mt-24 border-t border-slate-100 pt-16 md:pt-24">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-start">
+                            <div className="space-y-8 md:space-y-12">
                                 <div>
-                                    <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-4">Merchant Feedback</h2>
-                                    <p className="text-slate-500 font-medium">Verify the credibility of this merchant through buyer experiences.</p>
+                                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter mb-4 italic uppercase">Merchant Feedback</h2>
+                                    <p className="text-slate-500 font-medium text-sm md:text-base">Verify the credibility of this merchant through buyer experiences.</p>
                                 </div>
                                 <StoreReviews reviews={store.reviews || []} storeName={store.storeName} />
                             </div>

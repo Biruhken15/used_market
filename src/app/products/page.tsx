@@ -2,6 +2,9 @@ import { ProductService } from "@/lib/services/product-service";
 import { ProductCard } from "@/components/dashboard/product-card";
 import { FeatureBar } from "@/components/home/FeatureBar";
 import { Pagination } from "@/components/ui/pagination";
+import { ProductSearch } from "@/components/common/ProductSearch";
+import { ProductFilters } from "@/components/products/ProductFilters";
+import { Sparkles, Trophy, Zap, Star, Package } from "lucide-react";
 
 export default async function AllProductsPage({
     searchParams,
@@ -15,63 +18,79 @@ export default async function AllProductsPage({
         q?: string 
     };
 }) {
-    const page = parseInt(searchParams.page || "1");
-    const limit = 10;
+    const params = await searchParams;
+    const page = parseInt(params.page || "1");
+    const limit = 20; // Increased limit for 5-column grid
     
     // Construct filter object from query params
     const filters: any = {};
-    if (searchParams.category) filters.category = searchParams.category;
-    if (searchParams.region) filters.region = searchParams.region;
-    if (searchParams.minPrice) filters.minPrice = searchParams.minPrice;
-    if (searchParams.maxPrice) filters.maxPrice = searchParams.maxPrice;
-    if (searchParams.q) filters.keyword = searchParams.q;
+    if (params.category) filters.category = params.category;
+    if (params.region) filters.region = params.region;
+    if (params.minPrice) filters.minPrice = params.minPrice;
+    if (params.maxPrice) filters.maxPrice = params.maxPrice;
+    if (params.q) filters.keyword = params.q;
 
     const { products, total, totalPages } = await ProductService.getMarketplaceProducts(filters, page, limit);
 
     return (
-        <div className="min-h-screen bg-slate-100 pt-28">
+        <div className="min-h-screen bg-slate-50/50 pt-32">
             <FeatureBar />
             
-            <main className="w-full px-4 md:px-10 py-12">
-                <div className="flex flex-col gap-8">
+            {/* SEARCH SECTION - Dedicated and compact */}
+            <section className="bg-white border-b border-slate-100 py-10 px-4">
+                <div className="max-w-4xl mx-auto text-center space-y-6">
+                    <div className="space-y-1">
+                        <h2 className="text-3xl md:text-4xl font-black text-slate-950 italic tracking-tighter uppercase leading-none">
+                            Discover Used Products
+                        </h2>
+                        <p className="text-slate-400 font-bold uppercase tracking-[0.4em] text-[10px]">Verify, Buy, Sell & Scale</p>
+                    </div>
+                    <ProductSearch />
+                </div>
+            </section>
+
+            {/* HORIZONTAL FILTERS - Now centralized and non-sidebar */}
+            <ProductFilters />
+            
+            <main className="max-w-[1600px] mx-auto px-4 md:px-10 pb-24">
+                <div className="space-y-8">
                     {/* Header */}
-                    <div className="flex flex-col gap-2">
-                        <header className="pb-4">
-                            <h1 className="text-3xl md:text-4xl font-black text-slate-950 italic tracking-tighter uppercase leading-none">
-                                {searchParams.category ? `${searchParams.category} Products` : 'All Products'}
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-8">
+                        <div className="space-y-1">
+                            <h1 className="text-3xl font-black text-slate-950 italic tracking-tighter uppercase leading-none">
+                                {params.category ? `${params.category}` : 'Marketplace'}
                             </h1>
-                            <div className="flex flex-col gap-1 mt-3">
-                                <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px]">
-                                    {searchParams.region ? <span className="text-blue-600">Region: {searchParams.region} &bull; </span> : null}
-                                    {(searchParams.minPrice || searchParams.maxPrice) ? (
-                                        <span className="text-blue-600 uppercase">
-                                            Price: {searchParams.minPrice || "0"} - {searchParams.maxPrice || "Any"} ETB &bull; {" "}
-                                        </span>
-                                    ) : null}
-                                    Ethiopia's Premium Marketplace
-                                </p>
-                                <p className="text-slate-500 font-medium text-sm">
-                                    Showing <span className="font-black text-slate-900">{products.length}</span> of <span className="font-black text-slate-900">{total}</span> verified listings
-                                </p>
-                            </div>
-                        </header>
+                            <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest opacity-60">
+                                {total} Listings Available
+                            </p>
+                        </div>
+                        
+                        <div className="flex items-center gap-4">
+                            <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+                                Page {page} of {totalPages || 1}
+                            </p>
+                        </div>
                     </div>
 
-                    {/* Products Grid */}
+                    {/* Products Grid - 5 COLUMNS ON LARGE SCREENS */}
                     {products && products.length > 0 ? (
-                        <>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                        <div className="space-y-12">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                                 {products.map((product: any) => (
                                     <ProductCard key={product._id} product={product} />
                                 ))}
                             </div>
                             
                             {/* Pagination */}
-                            <Pagination currentPage={page} totalPages={totalPages} />
-                        </>
+                            <div className="pt-12 border-t border-slate-100">
+                                <Pagination currentPage={page} totalPages={totalPages} />
+                            </div>
+                        </div>
                     ) : (
-                        <div className="bg-white rounded-3xl p-20 text-center border border-slate-200">
-                            <p className="text-slate-400 font-bold text-xl uppercase tracking-tighter">No products found at the moment.</p>
+                        <div className="py-32 text-center bg-white rounded-[3rem] border border-dashed border-slate-200">
+                            <Package className="w-16 h-16 text-slate-200 mx-auto mb-6" />
+                            <h3 className="text-xl font-black text-slate-950 tracking-tighter italic uppercase">No items found</h3>
+                            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-2">Try adjusting your filters or search keywords.</p>
                         </div>
                     )}
                 </div>

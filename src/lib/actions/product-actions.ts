@@ -66,6 +66,8 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
         const quantity = Number(formData.get("quantity") || 1);
         const isFeatured = formData.get("isFeatured") === "true";
         const isUrgent = formData.get("isUrgent") === "true";
+        const region = formData.get("region") as string || "Addis Ababa";
+        const saleType = formData.get("saleType") as 'sale' | 'rent' || 'sale';
 
         // 2. Validate Subscription for Featured/Urgent
         if (isFeatured || isUrgent) {
@@ -100,6 +102,8 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
             quantity,
             isFeatured,
             isUrgent,
+            region,
+            saleType,
             urgentSetAt: isUrgent ? new Date() : undefined,
             sourceOwner: {
                 name: formData.get("sourceOwnerName") as string,
@@ -170,6 +174,8 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
         const quantity = Number(formData.get("quantity") || 1);
         const isFeatured = formData.get("isFeatured") === "true";
         const isUrgent = formData.get("isUrgent") === "true";
+        const region = formData.get("region") as string;
+        const saleType = formData.get("saleType") as 'sale' | 'rent' || 'sale';
 
         // Validate Subscription for Featured/Urgent on Update
         if (isFeatured || isUrgent) {
@@ -189,7 +195,7 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
 
                 // Only check limit if it's being CHANGED to featured
                 const currentProduct = await ProductService.getProductById(productId);
-                if (!currentProduct.isFeatured) {
+                if (currentProduct && !currentProduct.isFeatured) {
                     const featuredCount = await ProductService.getStoreFeaturedCount(storeId);
                     if (featuredCount >= featuredLimit) {
                         return { error: "Limit Reached", details: `You have reached your limit of ${featuredLimit} featured listings.` };
@@ -208,6 +214,8 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
             quantity,
             isFeatured,
             isUrgent,
+            region,
+            saleType,
             sourceOwner: {
                 name: formData.get("sourceOwnerName") as string,
                 phone: formData.get("sourceOwnerPhone") as string,
@@ -220,7 +228,7 @@ export async function updateProductAction(formData: FormData): Promise<ActionSta
         // Handle urgent timestamp logic
         if (isUrgent) {
             const currentProduct = await ProductService.getProductById(productId);
-            if (!currentProduct.isUrgent) {
+            if (currentProduct && !currentProduct.isUrgent) {
                 updateData.urgentSetAt = new Date();
             }
         } else {

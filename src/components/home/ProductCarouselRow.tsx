@@ -52,7 +52,7 @@ export function ProductCarouselRow({ title, products, filterUrl }: ProductCarous
 
                 <div
                     ref={scrollRef}
-                    className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-1"
+                    className="flex gap-4 overflow-x-auto thin-scrollbar scroll-smooth pb-4 px-1"
                 >
                     {Array.isArray(products) && products.map((product) => (
                         <div key={product._id} className="min-w-[200px] w-1/6 shrink-0 transition-all hover:scale-[1.02]">

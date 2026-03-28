@@ -31,6 +31,8 @@ export interface IProduct extends Document {
     isUrgent: boolean;
     urgentSetAt?: Date;
     isFeatured: boolean;
+    region: 'Addis Ababa' | 'Oromia' | 'Amhara' | 'Dire Dawa' | 'Tigray' | 'SNNPR' | 'Other';
+    saleType: 'sale' | 'rent';
 }
 
 const productSchema = new Schema<IProduct>({
@@ -166,6 +168,18 @@ const productSchema = new Schema<IProduct>({
     isFeatured: {
         type: Boolean,
         default: false
+    },
+    region: {
+        type: String,
+        required: [true, 'Location region is required'],
+        enum: ['Addis Ababa', 'Oromia', 'Amhara', 'Dire Dawa', 'Tigray', 'SNNPR', 'Other'],
+        default: 'Addis Ababa'
+    },
+    saleType: {
+        type: String,
+        enum: ['sale', 'rent'],
+        required: true,
+        default: 'sale'
     }
 }, {
     timestamps: true,
@@ -184,11 +198,15 @@ productSchema.index({ createdAt: -1 });
 // Text Search Index for keyword searches
 productSchema.index({ 
     title: 'text', 
+    category: 'text',
+    region: 'text',
     description: 'text' 
 }, {
     weights: {
         title: 10,
-        description: 5
+        category: 5,
+        region: 5,
+        description: 2
     },
     name: 'ProductTextIndex'
 });

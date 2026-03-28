@@ -71,14 +71,14 @@ export class ProductService {
             if (filters.maxPrice) matchStage.price.$lte = Number(filters.maxPrice);
         }
 
-        // Handle Region
+        // Handle Region (Case-insensitive)
         if (filters.region && filters.region !== 'All Regions') {
-            matchStage.region = filters.region;
+            matchStage.region = { $regex: `^${filters.region}$`, $options: 'i' };
         }
 
-        // Handle Category
+        // Handle Category (Case-insensitive)
         if (filters.category && filters.category !== 'All Categories') {
-            matchStage.category = filters.category;
+            matchStage.category = { $regex: `^${filters.category}$`, $options: 'i' };
         }
 
         // Handle Keyword Search using MongoDB Text Index

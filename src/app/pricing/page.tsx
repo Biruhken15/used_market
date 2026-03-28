@@ -7,7 +7,7 @@ import PricingSection from "@/components/pricing-section";
 
 export default function PricingPage() {
     return (
-        <div className="max-w-7xl mx-auto px-4 py-10 text-slate-900">
+        <div className="max-w-6xl mx-auto px-4 py-10 text-slate-900">
             <PricingSection />
 
             <div className="mt-20 text-center bg-slate-50 rounded-[3rem] p-12 md:p-20 border border-slate-100">

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 interface Plan {
     _id: string;
@@ -46,6 +47,7 @@ interface Plan {
 export default function PricingSection() {
     const [plans, setPlans] = useState<Plan[]>([]);
     const [loading, setLoading] = useState(true);
+    const { data: session } = useSession();
     const router = useRouter();
 
     useEffect(() => {
@@ -69,7 +71,7 @@ export default function PricingSection() {
     const themeColors: Record<string, { bg: string, text: string, border: string, btn: string }> = {
         emerald: { bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-100", btn: "bg-pink-600 hover:bg-pink-700 shadow-pink-100" },
         blue: { bg: "bg-violet-50", text: "text-violet-600", border: "border-violet-100", btn: "bg-violet-600 hover:bg-violet-700 shadow-violet-100" },
-        purple: { bg: "bg-fuchsia-100", text: "text-fuchsia-600", border: "border-fuchsia-200", btn: "bg-gradient-to-r from-violet-600 to-pink-600 hover:brightness-110 shadow-indigo-100" },
+        purple: { bg: "bg-fuchsia-50", text: "text-fuchsia-600", border: "border-fuchsia-100", btn: "bg-gradient-to-r from-violet-600 to-pink-600 hover:brightness-110 shadow-indigo-100" },
         gold: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100", btn: "bg-amber-600 hover:bg-amber-700 shadow-amber-100" },
         slate: { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-100", btn: "bg-slate-950 hover:bg-black shadow-slate-200" },
     };
@@ -84,7 +86,7 @@ export default function PricingSection() {
 
     return (
         <section id="pricing" className="w-full py-32 px-6 bg-white">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-20 space-y-4">
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-lg border border-accent/20">
                         <span className="text-[10px] font-black uppercase tracking-widest text-accent">Monetize Your Store</span>
@@ -199,7 +201,14 @@ export default function PricingSection() {
                                     </div>
 
                                     <Button
-                                        onClick={() => router.push('/stores/create')}
+                                        onClick={() => {
+                                            const storeId = (session?.user as any)?.storeId;
+                                            if (storeId) {
+                                                router.push(`/seller/checkout?planId=${plan._id}`);
+                                            } else {
+                                                router.push(`/stores/create?planId=${plan._id}`);
+                                            }
+                                        }}
                                         className={`w-full !h-10 rounded-xl font-medium text-[11px] uppercase tracking-widest text-white border-none transition-all ${theme.btn} shadow-lg shadow-slate-100`}
                                     >
                                         Get Started

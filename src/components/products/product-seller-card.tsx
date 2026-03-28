@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useChatContext } from "@/components/chat/ChatManager";
 
 /**
  * ProductSellerCard Component
@@ -29,6 +30,7 @@ interface ProductSellerCardProps {
 export const ProductSellerCard = ({ store, productTitle, productPrice, pageUrl }: ProductSellerCardProps) => {
     const { data: session } = useSession();
     const router = useRouter();
+    const { openChat } = useChatContext();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -130,7 +132,17 @@ export const ProductSellerCard = ({ store, productTitle, productPrice, pageUrl }
 
                 {/* In-App Chat Backup - Visible to all, Guest triggers redirect */}
                 <Button
-                    onClick={(e) => handleGuestAction(e, "message the seller")}
+                    onClick={(e) => {
+                        if (!session) {
+                            e.preventDefault();
+                            alert(`Please register first to message the seller.`);
+                            router.push('/auth/register');
+                        } else {
+                            // Using the seller's ownerId from the store object if available, 
+                            // otherwise we might need to pass the ownerId explicitly
+                            openChat((store as any).ownerId || (store as any).userId, ""); 
+                        }
+                    }}
                     className="w-full !h-14 bg-gradient-to-r from-violet-600 to-pink-600 text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-100 mt-2 hover:brightness-110 transition-all hover:scale-[1.02] active:scale-95"
                 >
                     Message in Marketplace

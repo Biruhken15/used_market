@@ -25,9 +25,9 @@ async function connectDB() {
     if (!cached.promise) {
         const opts = {
             bufferCommands: false,
-            maxPoolSize: 100, // Handle high concurrency for 1M+ users
-            connectTimeoutMS: 10000, // 10s timeout
-            socketTimeoutMS: 45000, // 45s socket timeout
+            maxPoolSize: 10, // Reduced for stability
+            connectTimeoutMS: 30000, // 30s timeout
+            socketTimeoutMS: 60000, // 60s socket timeout
             family: 4 // Use IPv4
         };
 

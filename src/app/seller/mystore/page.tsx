@@ -208,7 +208,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                                     <Link
                                         key={tab.name}
                                         href={tab.mode ? `/seller/mystore?mode=${tab.mode}` : '/seller/mystore'}
-                                        className={`pb-4 text-sm font-black uppercase tracking-[0.2em] transition-all border-b-2 ${isActive ? "border-blue-600 text-blue-600" : "border-transparent text-slate-400 hover:text-slate-600"}`}
+                                        className={`pb-4 text-sm font-medium md:font-black uppercase tracking-widest md:tracking-[0.2em] transition-all border-b-2 ${isActive ? "border-blue-600 text-blue-600" : "border-transparent text-slate-400 hover:text-slate-600"}`}
                                     >
                                         {tab.name}
                                     </Link>

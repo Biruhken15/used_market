@@ -20,6 +20,7 @@ export const ProductSchema = z.object({
     city: z.string().optional(),
     region: z.string().optional(),
     tags: z.array(z.string()).optional(),
+    saleType: z.enum(['sale', 'rent']).default('sale'),
 });
 
 // Store Validation Schema
