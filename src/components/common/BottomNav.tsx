@@ -35,9 +35,9 @@ export const BottomNav = ({ unreadNotifications = 0, unreadFavorites = 0 }) => {
                         <Link 
                             key={item.label} 
                             href={item.href}
-                            className={`relative flex flex-col items-center justify-center flex-1 py-1 transition-all active:scale-90 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`}
+                            className={`relative flex flex-col items-center justify-center flex-1 py-1 transition-all active:scale-90 ${isActive ? 'text-violet-600' : 'text-slate-400'}`}
                         >
-                            <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-indigo-50' : ''}`}>
+                            <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-violet-50' : ''}`}>
                                 <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-2'}`} />
                             </div>
                             <span className={`text-[9px] font-black uppercase tracking-tighter mt-0.5 ${isActive ? 'opacity-100' : 'opacity-60'}`}>

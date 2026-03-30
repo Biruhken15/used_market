@@ -76,7 +76,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
 
                         <div className="pt-6">
                             <Link href="/stores/create">
-                                <Button className="w-full md:w-auto !h-16 !px-12 rounded-2xl bg-blue-600 text-white font-black text-sm uppercase tracking-[0.2em] hover:bg-black transition-all shadow-2xl shadow-blue-100 border-none flex items-center justify-center gap-4 group active:scale-95">
+                                <Button className="w-full md:w-auto !h-16 !px-12 rounded-2xl bg-gradient-to-r from-violet-600 to-pink-600 text-white font-black text-sm uppercase tracking-[0.2em] hover:brightness-110 transition-all shadow-2xl shadow-indigo-100 border-none flex items-center justify-center gap-4 group active:scale-95">
                                     Create Store for Free
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
                                 </Button>
@@ -208,7 +208,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                                     <Link
                                         key={tab.name}
                                         href={tab.mode ? `/seller/mystore?mode=${tab.mode}` : '/seller/mystore'}
-                                        className={`pb-4 text-sm font-medium md:font-black uppercase tracking-widest md:tracking-[0.2em] transition-all border-b-2 ${isActive ? "border-blue-600 text-blue-600" : "border-transparent text-slate-400 hover:text-slate-600"}`}
+                                        className={`pb-4 text-sm font-medium md:font-black uppercase tracking-widest md:tracking-[0.2em] transition-all border-b-2 ${isActive ? "border-violet-600 text-violet-600" : "border-transparent text-slate-400 hover:text-slate-600"}`}
                                     >
                                         {tab.name}
                                     </Link>
@@ -232,7 +232,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                             </div>
                         ) : (
                             <Link href="/seller/mystore?mode=add-product">
-                                <Button className="!h-10 !px-6 rounded-xl bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 border-none flex items-center gap-2">
+                                <Button className="!h-10 !px-6 rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 text-white font-black text-[10px] uppercase tracking-widest hover:brightness-110 transition-all shadow-lg shadow-indigo-100 border-none flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
                                     Add Product
                                 </Button>
@@ -240,7 +240,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                         )
                     )}
                     <Link href="/pricing">
-                        <Button variant="outline" className="!h-10 !px-6 rounded-xl border-2 border-blue-600 text-blue-600 font-black text-[10px] uppercase tracking-widest hover:bg-blue-50 transition-all">
+                        <Button variant="outline" className="!h-10 !px-6 rounded-xl border-2 border-violet-600 text-violet-600 font-black text-[10px] uppercase tracking-widest hover:bg-violet-50 transition-all">
                             {plan ? 'Upgrade Plan' : 'Go Premium'}
                         </Button>
                     </Link>

@@ -67,7 +67,7 @@ export function ProductFilters() {
                 : "bg-white text-slate-600 border-slate-200 hover:border-slate-900 hover:text-slate-900"
             }`}
         >
-            {Icon && <Icon size={14} className={value ? "text-indigo-400" : "text-slate-300"} />}
+            {Icon && <Icon size={14} className={value ? "text-violet-400" : "text-slate-300"} />}
             {value || label}
             <ChevronDown size={14} className={`transition-transform duration-300 ${activeDropdown === id ? "rotate-180" : ""}`} />
         </button>
@@ -93,7 +93,7 @@ export function ProductFilters() {
                         <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-slate-100 rounded-2xl shadow-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
                             <button onClick={() => updateFilter("category", "")} className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-[10px] font-bold uppercase tracking-widest flex items-center justify-between group">
                                 All Categories
-                                {!searchParams.get("category") && <Check size={14} className="text-indigo-600" />}
+                                {!searchParams.get("category") && <Check size={14} className="text-violet-600" />}
                             </button>
                             {categories.map((cat) => (
                                 <button
@@ -102,7 +102,7 @@ export function ProductFilters() {
                                     className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-[10px] font-bold uppercase tracking-widest flex items-center justify-between group"
                                 >
                                     {cat}
-                                    {searchParams.get("category") === cat && <Check size={14} className="text-indigo-600" />}
+                                    {searchParams.get("category") === cat && <Check size={14} className="text-violet-600" />}
                                 </button>
                             ))}
                         </div>
@@ -121,7 +121,7 @@ export function ProductFilters() {
                         <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-slate-100 rounded-2xl shadow-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
                             <button onClick={() => updateFilter("region", "")} className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-[10px] font-bold uppercase tracking-widest flex items-center justify-between group">
                                 All Regions
-                                {!searchParams.get("region") && <Check size={14} className="text-indigo-600" />}
+                                {!searchParams.get("region") && <Check size={14} className="text-violet-600" />}
                             </button>
                             {regions.map((reg) => (
                                 <button
@@ -130,7 +130,7 @@ export function ProductFilters() {
                                     className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-[10px] font-bold uppercase tracking-widest flex items-center justify-between group"
                                 >
                                     {reg}
-                                    {searchParams.get("region") === reg && <Check size={14} className="text-indigo-600" />}
+                                    {searchParams.get("region") === reg && <Check size={14} className="text-violet-600" />}
                                 </button>
                             ))}
                         </div>
@@ -170,7 +170,7 @@ export function ProductFilters() {
                                         />
                                     </div>
                                 </div>
-                                <button type="submit" className="w-full h-11 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-2">
+                                <button type="submit" className="w-full h-11 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-violet-600 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-2">
                                     Apply Range
                                     <ArrowRight size={14} />
                                 </button>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 import { createStoreAction } from "@/lib/actions/store-actions";
 import { X, Camera, Globe, Phone, Mail, MapPin, CheckCircle, Store, Send, ChevronRight, User } from "lucide-react";
@@ -11,6 +11,8 @@ const categories = ["Electronics", "Phones", "Real Estate", "Vehicles", "Houses"
 
 export function StoreForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const planId = searchParams.get('planId');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<{ message: string; details?: string } | null>(null);
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -124,7 +126,11 @@ export function StoreForm() {
             setLoading(false);
 
             setTimeout(() => {
-                router.push("/seller/mystore");
+                if (planId) {
+                    router.push(`/seller/checkout?planId=${planId}`);
+                } else {
+                    router.push("/seller/mystore");
+                }
                 router.refresh();
             }, 3000);
         } catch (err: any) {

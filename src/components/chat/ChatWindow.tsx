@@ -181,7 +181,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, recipientId, on
                             <div key={msg._id || index} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group/msg`}>
                                 <div className={`relative max-w-[80%] p-2.5 md:p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
                                     isMe 
-                                    ? 'bg-gradient-to-br from-violet-600 to-indigo-600 text-white rounded-br-none' 
+                                    ? 'bg-gradient-to-br from-violet-600 to-pink-600 text-white rounded-br-none' 
                                     : 'bg-white text-slate-700 rounded-bl-none border border-slate-100'
                                 }`}>
                                     {msg.isDeleted ? (
@@ -251,7 +251,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, recipientId, on
                         <button 
                             type="submit"
                             disabled={!input.trim()}
-                            className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center hover:bg-indigo-700 active:scale-95 transition-all shadow-md shadow-indigo-100 disabled:opacity-50 disabled:scale-100"
+                            className="w-10 h-10 bg-violet-600 text-white rounded-xl flex items-center justify-center hover:brightness-110 active:scale-95 transition-all shadow-md shadow-violet-100 disabled:opacity-50 disabled:scale-100"
                         >
                             <Send className="w-5 h-5" fill="currentColor" />
                         </button>

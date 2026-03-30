@@ -94,22 +94,22 @@ export const Navbar = () => {
     return (
         <>
             <nav className="fixed top-0 w-full z-50 px-3 md:px-4 pt-4 md:pt-6">
-                <div className={`max-w-6xl mx-auto glass-panel rounded-2xl md:rounded-2xl px-4 md:px-6 py-2.5 md:py-3 flex items-center justify-between shadow-2xl shadow-indigo-100/50 border border-indigo-600/10 bg-white/80 backdrop-blur-md relative`}>
+                <div className={`max-w-6xl mx-auto glass-panel rounded-2xl md:rounded-2xl px-4 md:px-6 py-2.5 md:py-3 flex items-center justify-between shadow-2xl shadow-indigo-100/50 border border-violet-600/10 bg-white/80 backdrop-blur-md relative`}>
                     <Link href="/" className="flex items-center gap-2 md:gap-3 group shrink-0">
                         <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center transition-transform group-hover:rotate-6 active:scale-90">
                             <img src="/ethiopian-mascot.png" alt="Used Market Logo" className="w-full h-full object-contain" />
                         </div>
                         <div className="flex flex-col -space-y-1">
                             <span className="text-lg md:text-2xl font-black text-slate-900 tracking-tighter">Used Market</span>
-                            <span className="text-[9px] md:text-[11px] font-bold text-indigo-600 uppercase tracking-widest leading-none ml-0.5 italic">ከሰው እጅ</span>
+                            <span className="text-[9px] md:text-[11px] font-bold text-violet-600 uppercase tracking-widest leading-none ml-0.5 italic">ከሰው እጅ</span>
                         </div>
                     </Link>
 
                     {/* Main Navigation (Desktop) */}
                     <div className="hidden md:flex items-center gap-8 text-[11px] font-black uppercase tracking-widest text-slate-400">
-                        <Link href="/" className={pathname === '/' ? "text-indigo-600 underline decoration-2 underline-offset-4" : "hover:text-indigo-600 transition-colors"}>Marketplace</Link>
-                        <Link href="/brokers" className={pathname === '/brokers' ? "text-indigo-600 underline decoration-2 underline-offset-4" : "hover:text-indigo-600 transition-colors"}>Brokers</Link>
-                        <Link href="/pricing" className={pathname === '/pricing' ? "text-indigo-600 underline decoration-2 underline-offset-4" : "hover:text-indigo-600 transition-colors"}>Pricing</Link>
+                        <Link href="/" className={pathname === '/' ? "text-violet-600 underline decoration-2 underline-offset-4" : "hover:text-violet-600 transition-colors"}>Marketplace</Link>
+                        <Link href="/brokers" className={pathname === '/brokers' ? "text-violet-600 underline decoration-2 underline-offset-4" : "hover:text-violet-600 transition-colors"}>Brokers</Link>
+                        <Link href="/pricing" className={pathname === '/pricing' ? "text-violet-600 underline decoration-2 underline-offset-4" : "hover:text-violet-600 transition-colors"}>Pricing</Link>
                     </div>
 
                     <div className="flex items-center gap-2 md:gap-4">
@@ -130,10 +130,10 @@ export const Navbar = () => {
                                         }}
                                         className="p-2 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav relative flex flex-col items-center gap-1"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-indigo-500 transition-colors"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-violet-500 transition-colors"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
                                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">Favorites</span>
                                         {unreadFavorites > 0 && (
-                                            <div className="absolute top-1 right-1 w-4 h-4 bg-indigo-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black">
+                                            <div className="absolute top-1 right-1 w-4 h-4 bg-violet-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black">
                                                 {unreadFavorites}
                                             </div>
                                         )}
@@ -145,7 +145,7 @@ export const Navbar = () => {
                                                 onClick={() => router.push('/seller/mystore')}
                                                 className="p-2 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav flex flex-col items-center gap-1"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-indigo-600 transition-colors"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-violet-600 transition-colors"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
                                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">My Store</span>
                                             </button>
                                             
@@ -153,7 +153,7 @@ export const Navbar = () => {
                                                 onClick={() => router.push('/chat')}
                                                 className="p-2 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav relative flex flex-col items-center gap-1"
                                             >
-                                                <MessageCircle className="w-5 h-5 text-slate-400 group-hover/nav:text-indigo-600 transition-colors" strokeWidth={2.5} />
+                                                <MessageCircle className="w-5 h-5 text-slate-400 group-hover/nav:text-violet-600 transition-colors" strokeWidth={2.5} />
                                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">Messages</span>
                                                 {unreadTotal > 0 && (
                                                     <div className="absolute top-1 right-1 w-4 h-4 bg-violet-600 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black animate-pulse">
@@ -169,10 +169,10 @@ export const Navbar = () => {
                                                 }}
                                                 className="p-2 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav relative flex flex-col items-center gap-1"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-indigo-600 transition-colors"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-violet-600 transition-colors"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
                                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">Alerts</span>
                                                 {unreadNotifications > 0 && (
-                                                    <div className="absolute top-1 right-1 w-4 h-4 bg-indigo-600 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black animate-pulse">
+                                                    <div className="absolute top-1 right-1 w-4 h-4 bg-violet-600 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black animate-pulse">
                                                         {unreadNotifications}
                                                     </div>
                                                 )}
@@ -188,9 +188,9 @@ export const Navbar = () => {
                                         </div>
                                     ) : (
                                         <>
-                                            <Link href="/auth/login" className="hidden sm:block text-[11px] font-black text-slate-600 hover:text-indigo-600 uppercase tracking-widest active:scale-95 transition-all">Log In</Link>
+                                            <Link href="/auth/login" className="hidden sm:block text-[11px] font-black text-slate-600 hover:text-violet-600 uppercase tracking-widest active:scale-95 transition-all">Log In</Link>
                                             <Link href="/auth/register">
-                                                <Button className="!h-9 md:!h-11 px-4 md:!px-8 rounded-xl font-black text-[9px] md:text-sm uppercase tracking-widest bg-gradient-to-r from-violet-600 to-pink-600 text-white border-none shadow-lg shadow-indigo-100/50 transition-all hover:scale-105 active:scale-95">
+                                                <Button className="!h-9 md:!h-11 px-4 md:!px-8 rounded-xl font-black text-[9px] md:text-sm uppercase tracking-widest bg-gradient-to-r from-violet-600 to-pink-600 text-white border-none shadow-lg shadow-violet-100/50 transition-all hover:scale-105 active:scale-95">
                                                     Join
                                                 </Button>
                                             </Link>
@@ -229,20 +229,20 @@ export const Navbar = () => {
                                 </div>
 
                                 <div className="flex flex-col gap-8 text-sm font-black uppercase tracking-widest">
-                                    <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 ${pathname === '/' ? 'text-indigo-600' : 'text-slate-900'}`}>
-                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${pathname === '/' ? 'bg-indigo-50' : 'bg-slate-50'}`}>
+                                    <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 ${pathname === '/' ? 'text-violet-600' : 'text-slate-900'}`}>
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${pathname === '/' ? 'bg-violet-50' : 'bg-slate-50'}`}>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                                         </div>
                                         Marketplace
                                     </Link>
-                                    <Link href="/brokers" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 ${pathname === '/brokers' ? 'text-indigo-600' : 'text-slate-900'}`}>
-                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${pathname === '/brokers' ? 'bg-indigo-50' : 'bg-slate-50'}`}>
+                                    <Link href="/brokers" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 ${pathname === '/brokers' ? 'text-violet-600' : 'text-slate-900'}`}>
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${pathname === '/brokers' ? 'bg-violet-50' : 'bg-slate-50'}`}>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></svg>
                                         </div>
                                         Find Brokers
                                     </Link>
-                                    <Link href="/pricing" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 ${pathname === '/pricing' ? 'text-indigo-600' : 'text-slate-900'}`}>
-                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${pathname === '/pricing' ? 'bg-indigo-50' : 'bg-slate-50'}`}>
+                                    <Link href="/pricing" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 ${pathname === '/pricing' ? 'text-violet-600' : 'text-slate-900'}`}>
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${pathname === '/pricing' ? 'bg-violet-50' : 'bg-slate-50'}`}>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
                                         </div>
                                         Subscription

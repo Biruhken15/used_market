@@ -33,7 +33,7 @@ const features = [
         label: "New Arrival",
         icon: <Clock className="w-4 h-4" />,
         href: "/products/new-arrivals",
-        color: "bg-indigo-50 text-indigo-600 border-indigo-100"
+        color: "bg-pink-50 text-pink-600 border-pink-100"
     },
     {
         label: "Get Brokers",

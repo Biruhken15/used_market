@@ -27,7 +27,7 @@ export function PromoCarousel({ initialProducts = [] }: { initialProducts?: any[
             image: p.images?.[0]?.url || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1200",
             tag: p.isUrgent ? "URGENT DEAL" : p.isFeatured ? "FEATURED" : "PROMOTED",
             href: `/products/${p._id}`,
-            color: i % 3 === 0 ? "from-violet-600/20 to-indigo-600/10" : 
+            color: i % 3 === 0 ? "from-violet-600/20 to-pink-600/10" : 
                    i % 3 === 1 ? "from-fuchsia-600/20 to-pink-600/10" : 
                    "from-rose-600/20 to-orange-600/10"
         }))

@@ -1,4 +1,17 @@
 import mongoose from 'mongoose';
+// Ensure all models are registered
+import '@/lib/models/user';
+import '@/lib/models/product';
+import '@/lib/models/store';
+import '@/lib/models/message';
+import '@/lib/models/conversation';
+import '@/lib/models/notification';
+import '@/lib/models/favorite';
+import '@/lib/models/subscription-plan';
+import '@/lib/models/user-subscription';
+import '@/lib/models/transaction';
+import '@/lib/models/review';
+import '@/lib/models/analytics';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 

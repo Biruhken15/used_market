@@ -135,7 +135,7 @@ export default function CheckoutForm() {
     return (
         <div className="max-w-4xl mx-auto p-6 pt-12">
             <header className="mb-12">
-                <h1 className="text-5xl font-bold tracking-tighter text-slate-900 mb-2">Secure <span className="text-blue-600">Checkout</span></h1>
+                <h1 className="text-5xl font-bold tracking-tighter text-slate-900 mb-2">Secure <span className="text-violet-600">Checkout</span></h1>
                 <p className="text-slate-400 font-semibold uppercase text-[10px] tracking-[0.3em]">Transaction Powered by Chapa</p>
             </header>
 
@@ -155,7 +155,7 @@ export default function CheckoutForm() {
                             <hr className="border-slate-100 my-8" />
                             <div className="flex justify-between items-end">
                                 <div className="space-y-1">
-                                    <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 block underline decoration-blue-500 decoration-2 underline-offset-4">Total Amount</span>
+                                    <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 block underline decoration-violet-500 decoration-2 underline-offset-4">Total Amount</span>
                                     <span className="text-4xl font-bold text-slate-900">{(currentPrice ?? 0).toLocaleString()} <span className="text-sm">ETB</span></span>
                                 </div>
                             </div>
@@ -215,12 +215,12 @@ export default function CheckoutForm() {
                                     key={method.id}
                                     onClick={() => setPaymentMethod(method.id as any)}
                                     className={`p-4 rounded-2xl border-2 text-center transition-all ${paymentMethod === method.id
-                                        ? 'border-blue-600 bg-blue-50/50'
+                                        ? 'border-violet-600 bg-violet-50/50'
                                         : 'border-slate-100 bg-white hover:border-slate-200'
                                         }`}
                                 >
                                     <div className="text-2xl mb-1">{method.icon}</div>
-                                    <span className={`font-bold text-[10px] uppercase tracking-wider ${paymentMethod === method.id ? 'text-blue-700' : 'text-slate-500'}`}>
+                                    <span className={`font-bold text-[10px] uppercase tracking-wider ${paymentMethod === method.id ? 'text-violet-700' : 'text-slate-500'}`}>
                                         {method.name}
                                     </span>
                                 </button>
@@ -239,7 +239,7 @@ export default function CheckoutForm() {
                             <Button
                                 onClick={handleCheckout}
                                 disabled={loading}
-                                className="w-full h-20 rounded-[2.5rem] bg-slate-900 text-white font-bold text-xl hover:bg-blue-600 transition-all shadow-2xl shadow-slate-200 border-none group"
+                                className="w-full h-20 rounded-[2.5rem] bg-slate-900 text-white font-bold text-xl hover:bg-violet-600 transition-all shadow-2xl shadow-slate-200 border-none group"
                             >
                                 {loading ? 'Securing Gateway...' : (
                                     <span className="flex items-center justify-center gap-4">

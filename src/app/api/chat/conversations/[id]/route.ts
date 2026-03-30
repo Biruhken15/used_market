@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/utils/auth';
 import connectDB from '@/lib/db/mongoose';
 import Conversation from '@/lib/models/conversation';
+import User from '@/lib/models/user';
+import Product from '@/lib/models/product';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {

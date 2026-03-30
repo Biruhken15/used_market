@@ -135,7 +135,7 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                 key={status}
                                 onClick={() => setStatusFilter(status)}
                                 className={`px-5 h-9 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === status 
-                                    ? 'bg-slate-950 text-white shadow-md' 
+                                    ? 'bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-md' 
                                     : 'text-slate-500 hover:text-slate-900'}`}
                             >
                                 {status}
@@ -179,7 +179,7 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                 <div>
                                     <div className="flex justify-between items-start gap-4 mb-2">
                                         <div className="min-w-0">
-                                            <h3 className="text-sm md:text-base font-bold md:font-black text-slate-950 truncate uppercase tracking-tight italic leading-none group-hover:text-blue-600 transition-colors">{product.title}</h3>
+                                            <h3 className="text-sm md:text-base font-bold md:font-black text-slate-950 truncate uppercase tracking-tight italic leading-none group-hover:text-violet-600 transition-colors">{product.title}</h3>
                                             <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 opacity-60">ID: {product._id}</p>
                                         </div>
                                         <div className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${product.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
@@ -255,7 +255,7 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                     <div className="col-span-full py-20 text-center bg-white rounded-[3rem] border border-dashed border-slate-200">
                         <Package className="w-16 h-16 text-slate-200 mx-auto mb-4" />
                         <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No products match your current filtering criteria.</p>
-                        <button onClick={() => { setSearchTerm(''); setStatusFilter('all'); }} className="mt-4 text-blue-600 font-black text-[10px] uppercase underline tracking-widest">Clear all filters</button>
+                        <button onClick={() => { setSearchTerm(''); setStatusFilter('all'); }} className="mt-4 text-violet-600 font-black text-[10px] uppercase underline tracking-widest">Clear all filters</button>
                     </div>
                 )}
             </div>

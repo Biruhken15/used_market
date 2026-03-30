@@ -87,7 +87,7 @@ export const LoginForm = () => {
                         <div className="space-y-1">
                             <div className="flex justify-between items-center">
                                 <label className="text-xs font-bold text-slate-700">Password</label>
-                                <Link href="/" className="text-xs text-blue-600 hover:underline">
+                                <Link href="/" className="text-xs text-violet-600 hover:underline">
                                     Forgot?
                                 </Link>
                             </div>
@@ -106,7 +106,7 @@ export const LoginForm = () => {
                         type="submit"
                         fullWidth
                         disabled={isLoading}
-                        className="h-14 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 text-white font-bold text-base hover:brightness-110 shadow-lg shadow-indigo-100 transition-all mt-4 border-none"
+                        className="h-14 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 text-white font-bold text-base hover:brightness-110 shadow-lg shadow-violet-100 transition-all mt-4 border-none"
                     >
                         {isLoading ? "Logging in..." : "Login"}
                     </Button>

@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/utils/auth';
 import connectDB from '@/lib/db/mongoose';
 import Conversation from '@/lib/models/conversation';
 import User from '@/lib/models/user';
+import Message from '@/lib/models/message';
+import Product from '@/lib/models/product';
 
 export async function POST(req: Request) {
     try {
