@@ -5,6 +5,7 @@ import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { AuthProvider } from "@/components/common/AuthProvider";
 import { ChatProvider } from "@/components/chat/ChatManager";
+import { BottomNav } from "@/components/common/BottomNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,10 @@ export const metadata: Metadata = {
     title: "ከሰው እጅ | Used Product Marketplace",
     description: "The premium standard for used product trading in Ethiopia.",
   },
+  icons: {
+    icon: "/ethiopian-mascot.png",
+    apple: "/ethiopian-mascot.png",
+  },
 };
 
 export default function RootLayout({
@@ -43,6 +48,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
+            <BottomNav />
           </ChatProvider>
         </AuthProvider>
       </body>

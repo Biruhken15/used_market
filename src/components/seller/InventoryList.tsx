@@ -152,9 +152,16 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                         key={product._id}
                         className="group bg-white border border-slate-200 rounded-[2rem] overflow-hidden hover:shadow-2xl hover:shadow-slate-200/40 transition-all duration-500 p-4 border-2 hover:border-slate-900"
                     >
-                        <div className="flex gap-5 items-start">
+                        <div className="flex gap-5 items-start relative">
+                            {/* Background Link for the whole card */}
+                            <Link 
+                                href={`/products/${product._id}`} 
+                                className="absolute inset-0 z-0"
+                                aria-label={`View ${product.title}`}
+                            />
+
                             {/* Product Image */}
-                            <div className="w-24 h-24 md:w-32 md:h-32 bg-slate-50 rounded-2xl overflow-hidden shrink-0 relative border border-slate-100 shadow-inner">
+                            <div className="w-24 h-24 md:w-32 md:h-32 bg-slate-50 rounded-2xl overflow-hidden shrink-0 relative z-10 border border-slate-100 shadow-inner pointer-events-none">
                                 {product.images?.[0] ? (
                                     <img src={product.images[0].url} alt={product.title} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" />
                                 ) : (
@@ -175,8 +182,8 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                             </div>
 
                             {/* Info */}
-                            <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
-                                <div>
+                            <div className="flex-1 min-w-0 flex flex-col justify-between py-1 relative z-10">
+                                <div className="pointer-events-none">
                                     <div className="flex justify-between items-start gap-4 mb-2">
                                         <div className="min-w-0">
                                             <h3 className="text-sm md:text-base font-bold md:font-black text-slate-950 truncate uppercase tracking-tight italic leading-none group-hover:text-violet-600 transition-colors">{product.title}</h3>
@@ -196,10 +203,10 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-50">
+                                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-50 relative z-20">
                                     {product.status !== 'sold' ? (
                                         <button
-                                            onClick={() => handleMarkAsSold(product._id)}
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleMarkAsSold(product._id); }}
                                             disabled={loading === product._id || !subscriptionFeatures?.canMarkAsSold}
                                             className="h-10 px-4 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl text-[9px] font-bold md:font-black uppercase tracking-widest transition-all flex items-center gap-2"
                                         >
@@ -212,7 +219,7 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                         </div>
                                     )}
 
-                                    <Link href={`/seller/mystore/edit-product/${product._id}`} className="shrink-0 leading-[0]">
+                                    <Link href={`/seller/mystore/edit-product/${product._id}`} className="shrink-0 leading-[0]" onClick={(e) => e.stopPropagation()}>
                                         <button className="h-10 px-4 bg-slate-50 text-slate-500 hover:bg-slate-950 hover:text-white rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all">
                                             Edit
                                         </button>
@@ -221,7 +228,7 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                     {/* Action Toggles */}
                                     <div className="flex gap-1 ml-auto shrink-0">
                                         <button
-                                            onClick={() => handleToggleUrgent(product._id)}
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleUrgent(product._id); }}
                                             disabled={loading === product._id || !subscriptionFeatures?.canMarkAsUrgent}
                                             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${product.isUrgent ? 'bg-red-600 text-white shadow-lg animate-pulse' : 'bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500'}`}
                                             title="Urgent Boost"
@@ -229,7 +236,7 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                             <Zap size={14} fill={product.isUrgent ? 'currentColor' : 'none'} strokeWidth={3} />
                                         </button>
                                         <button
-                                            onClick={() => handleToggleFeatured(product._id)}
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleFeatured(product._id); }}
                                             disabled={loading === product._id || (subscriptionFeatures?.featuredListingsPerMonth === 0)}
                                             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${product.isFeatured ? 'bg-emerald-500 text-white shadow-lg' : 'bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-500'}`}
                                             title="Feature Listing"
@@ -237,7 +244,7 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                             <Star size={14} fill={product.isFeatured ? 'currentColor' : 'none'} strokeWidth={3} />
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(product._id)}
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(product._id); }}
                                             disabled={loading === product._id}
                                             className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-300 hover:bg-red-600 hover:text-white transition-all group/del"
                                             title="Delete permanently"

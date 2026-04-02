@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { StoreService } from "@/lib/services/store-service";
 import { FeatureBar } from "@/components/home/FeatureBar";
 import Link from "next/link";

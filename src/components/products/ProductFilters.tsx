@@ -74,12 +74,14 @@ export function ProductFilters() {
     );
 
     return (
-        <div className="w-full bg-white/50 backdrop-blur-md sticky top-20 z-40 border-b border-slate-100 py-4 mb-8" ref={dropdownRef}>
-            <div className="max-w-7xl mx-auto px-4 md:px-10 flex flex-wrap items-center gap-4">
-                <div className="flex items-center gap-2 shrink-0 border-r border-slate-200 pr-6 mr-2 hidden md:flex">
-                    <Filter size={14} className="text-slate-900" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 italic">Filter Protocol</span>
-                </div>
+        <div className="w-full bg-white/50 backdrop-blur-md sticky top-20 z-40 border-b border-slate-100 py-4 mb-4 md:mb-8" ref={dropdownRef}>
+            <div className="max-w-7xl mx-auto px-4 md:px-10 flex items-center relative">
+                {/* Horizontal scroll container */}
+                <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1 md:pb-0 w-full md:w-auto md:flex-wrap">
+                    <div className="flex items-center gap-2 shrink-0 border-r border-slate-200 pr-4 mr-1 hidden md:flex">
+                        <Filter size={14} className="text-slate-900" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 italic">Filter Protocol</span>
+                    </div>
 
                 {/* Category Dropdown */}
                 <div className="relative">
@@ -179,11 +181,12 @@ export function ProductFilters() {
                     )}
                 </div>
 
+                </div>
                 {/* Reset Button */}
                 {isFiltered && (
                     <button 
                         onClick={clearFilters}
-                        className="flex items-center gap-2 px-4 py-2 text-[10px] font-black text-rose-500 uppercase tracking-widest hover:bg-rose-50 rounded-full transition-all ml-auto"
+                        className="flex items-center gap-2 px-4 py-2 text-[10px] font-black text-rose-500 uppercase tracking-widest hover:bg-rose-50 rounded-full transition-all ml-auto shrink-0"
                     >
                         <X size={14} />
                         Clear All

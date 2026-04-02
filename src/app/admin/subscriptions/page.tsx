@@ -112,8 +112,8 @@ export default function SubscriptionsAdminPage() {
             cell: (s: any) => (
                 <div className="flex items-center gap-2">
                     {s.status === 'active'
-                        ? <Button variant="outline" size="sm" className="h-8 text-[10px] uppercase font-bold text-rose-600 border-rose-200 hover:bg-rose-50" onClick={() => handleStatusChange(s._id, s.status)}>Cancel</Button>
-                        : <Button variant="outline" size="sm" className="h-8 text-[10px] uppercase font-bold text-emerald-600 border-emerald-200 hover:bg-emerald-50" onClick={() => handleStatusChange(s._id, s.status)}>Re-Activate</Button>
+                        ? <Button variant="outline" className="h-8 text-[10px] uppercase font-bold text-rose-600 border-rose-200 hover:bg-rose-50 px-3 py-1.5" onClick={() => handleStatusChange(s._id, s.status)}>Cancel</Button>
+                        : <Button variant="outline" className="h-8 text-[10px] uppercase font-bold text-emerald-600 border-emerald-200 hover:bg-emerald-50 px-3 py-1.5" onClick={() => handleStatusChange(s._id, s.status)}>Re-Activate</Button>
                     }
                     <button onClick={() => handleDelete(s._id)} className="w-8 h-8 rounded-lg bg-rose-50 text-rose-400 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all border border-rose-100 hover:border-transparent" title="Expunge Record">
                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>

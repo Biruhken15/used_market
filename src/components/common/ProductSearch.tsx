@@ -78,18 +78,17 @@ export const ProductSearch = () => {
 
     return (
         <div className="w-full max-w-2xl mx-auto px-4 relative" ref={dropdownRef}>
-            <form 
+            <form
                 onSubmit={handleSearch}
-                className={`group relative flex items-center bg-white rounded-2xl border-2 transition-all duration-300 shadow-md z-[60] ${
-                    isFocused 
-                    ? "border-slate-950 ring-4 ring-slate-950/5 shadow-slate-200" 
-                    : "border-slate-200 shadow-slate-200/50"
-                }`}
+                className={`group relative flex items-center bg-white rounded-2xl border-2 transition-all duration-300 shadow-md z-[60] ${isFocused
+                        ? "border-slate-950 ring-4 ring-slate-950/5 shadow-slate-200"
+                        : "border-slate-200 shadow-slate-200/50"
+                    }`}
             >
                 <div className={`pl-6 pr-4 transition-colors ${isFocused ? "text-slate-900" : "text-slate-400"}`}>
                     <Search className="w-5 h-5" strokeWidth={2.5} />
                 </div>
-                
+
                 <input
                     type="text"
                     placeholder="Search for items, brands, or IDs..."
@@ -106,7 +105,7 @@ export const ProductSearch = () => {
                 />
 
                 {query && (
-                    <button 
+                    <button
                         type="button"
                         onClick={clearSearch}
                         className="p-2 mr-2 text-slate-400 hover:text-slate-900 transition-colors"
@@ -138,8 +137,8 @@ export const ProductSearch = () => {
                                 </div>
                                 <div className="space-y-1">
                                     {results.stores.map((store: any) => (
-                                        <Link 
-                                            key={store._id} 
+                                        <Link
+                                            key={store._id}
                                             href={`/stores/${store.storeSlug || store._id}`}
                                             className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-all group"
                                             onClick={() => setShowDropdown(false)}
@@ -166,8 +165,8 @@ export const ProductSearch = () => {
                                 </div>
                                 <div className="grid grid-cols-1 gap-1">
                                     {results.products.map((product: any) => (
-                                        <Link 
-                                            key={product._id} 
+                                        <Link
+                                            key={product._id}
                                             href={`/products/${product.slug || product._id}`}
                                             className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-all group"
                                             onClick={() => setShowDropdown(false)}
@@ -196,9 +195,9 @@ export const ProductSearch = () => {
                             </div>
                         )}
                     </div>
-                    
+
                     {/* Footer / Full Search Link */}
-                    <button 
+                    <button
                         onClick={handleSearch}
                         className="w-full mt-2 p-3 bg-slate-950 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-800 transition-all"
                     >
@@ -207,11 +206,11 @@ export const ProductSearch = () => {
                     </button>
                 </div>
             )}
-            
+
             <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-400">
                 <span className="uppercase tracking-widest text-[10px] opacity-60">Trending:</span>
                 {['iPhone', 'Toyota', 'Apartment', 'Laptops'].map((tag) => (
-                    <button 
+                    <button
                         key={tag}
                         type="button"
                         onClick={() => { setQuery(tag); router.push(`/products?q=${tag}`); }}

@@ -58,8 +58,6 @@ export async function POST(req: Request) {
                 email: subscriberEmail || (session.user as any).email,
                 firstName: subscriberName?.split(' ')[0] || (session.user as any).name?.split(' ')[0] || 'Store',
                 lastName: subscriberName?.split(' ').slice(1).join(' ') || (session.user as any).name?.split(' ')[1] || 'Owner',
-                paymentMethod,
-                phone: subscriberPhone,
                 billingCycle
             });
             return NextResponse.json(result);

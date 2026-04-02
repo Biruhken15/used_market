@@ -5,11 +5,12 @@ import User from '@/lib/models/user';
 
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect();
-        const reviews = await Review.find({ storeId: params.id })
+        const { id } = await params;
+        const reviews = await Review.find({ storeId: id })
             .populate('userId', 'name')
             .sort({ createdAt: -1 });
 

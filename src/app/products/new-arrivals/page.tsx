@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { ProductService } from "@/lib/services/product-service";
 import { ProductCard } from "@/components/dashboard/product-card";
 import { FeatureBar } from "@/components/home/FeatureBar";

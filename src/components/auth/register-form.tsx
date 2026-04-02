@@ -71,8 +71,8 @@ export const RegisterForm = () => {
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto relative">
-            <div className="p-10 bg-white border-2 border-slate-200 rounded-[2rem] shadow-sm">
+        <div className="w-full max-w-lg mx-auto relative px-2">
+            <div className="p-6 md:p-10 bg-white border-2 border-slate-200 rounded-[2rem] shadow-sm">
                 <div className="text-center mb-10">
                     <Link href="/" className="inline-flex items-center gap-2 mb-6 group/logo">
                         <div className="w-12 h-12 flex items-center justify-center">

@@ -101,11 +101,11 @@ export default function UsersAdminPage() {
             cell: (u: any) => (
                 <div className="flex items-center gap-2">
                     {u.role === 'admin' ? (
-                        <Button variant="outline" size="sm" className="h-8 text-[10px] uppercase font-bold text-slate-500 border-slate-200 hover:bg-slate-50" onClick={() => handleRoleChange(u._id, 'user')}>
+                        <Button variant="outline" className="h-8 text-[10px] uppercase font-bold text-slate-500 border-slate-200 hover:bg-slate-50 px-3 py-1.5" onClick={() => handleRoleChange(u._id, 'user')}>
                             Revoke Admin
                         </Button>
                     ) : (
-                        <Button variant="outline" size="sm" className="h-8 text-[10px] uppercase font-bold text-indigo-600 border-indigo-200 hover:bg-indigo-50" onClick={() => handleRoleChange(u._id, 'admin')}>
+                        <Button variant="outline" className="h-8 text-[10px] uppercase font-bold text-indigo-600 border-indigo-200 hover:bg-indigo-50 px-3 py-1.5" onClick={() => handleRoleChange(u._id, 'admin')}>
                             Make Admin
                         </Button>
                     )}

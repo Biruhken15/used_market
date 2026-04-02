@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 import { ProfileDropdown } from "../auth/profile-dropdown";
 import { usePathname, useRouter } from "next/navigation";
 import { NotificationSidebar } from "../seller/NotificationSidebar";
-import { BottomNav } from "./BottomNav";
+// import { BottomNav } from "./BottomNav";
 import { MessageCircle } from "lucide-react";
 import { useChatContext } from "@/components/chat/ChatManager";
 
@@ -100,7 +100,7 @@ export const Navbar = () => {
                             <img src="/ethiopian-mascot.png" alt="Used Market Logo" className="w-full h-full object-contain" />
                         </div>
                         <div className="flex flex-col -space-y-1">
-                            <span className="text-lg md:text-2xl font-black text-slate-900 tracking-tighter">Used Market</span>
+                            <span className="text-lg md:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-pink-600 tracking-tighter">Used Market</span>
                             <span className="text-[9px] md:text-[11px] font-bold text-violet-600 uppercase tracking-widest leading-none ml-0.5 italic">ከሰው እጅ</span>
                         </div>
                     </Link>
@@ -108,7 +108,7 @@ export const Navbar = () => {
                     {/* Main Navigation (Desktop) */}
                     <div className="hidden md:flex items-center gap-8 text-[11px] font-black uppercase tracking-widest text-slate-400">
                         <Link href="/" className={pathname === '/' ? "text-violet-600 underline decoration-2 underline-offset-4" : "hover:text-violet-600 transition-colors"}>Marketplace</Link>
-                        <Link href="/brokers" className={pathname === '/brokers' ? "text-violet-600 underline decoration-2 underline-offset-4" : "hover:text-violet-600 transition-colors"}>Brokers</Link>
+                        <Link href="/about" className={pathname === '/about' ? "text-violet-600 underline decoration-2 underline-offset-4" : "hover:text-violet-600 transition-colors"}>About Us</Link>
                         <Link href="/pricing" className={pathname === '/pricing' ? "text-violet-600 underline decoration-2 underline-offset-4" : "hover:text-violet-600 transition-colors"}>Pricing</Link>
                     </div>
 
@@ -200,7 +200,7 @@ export const Navbar = () => {
                                     {/* Mobile Menu Toggle */}
                                     <button 
                                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                        className="md:hidden p-2 rounded-xl bg-slate-50 text-slate-900 active:scale-95 transition-all"
+                                        className="md:hidden p-2 rounded-xl bg-white border border-slate-200 text-slate-900 active:scale-95 transition-all shadow-sm"
                                     >
                                         {isMobileMenuOpen ? (
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -235,11 +235,11 @@ export const Navbar = () => {
                                         </div>
                                         Marketplace
                                     </Link>
-                                    <Link href="/brokers" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 ${pathname === '/brokers' ? 'text-violet-600' : 'text-slate-900'}`}>
-                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${pathname === '/brokers' ? 'bg-violet-50' : 'bg-slate-50'}`}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></svg>
+                                    <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 ${pathname === '/about' ? 'text-violet-600' : 'text-slate-900'}`}>
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${pathname === '/about' ? 'bg-violet-50' : 'bg-slate-50'}`}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                                         </div>
-                                        Find Brokers
+                                        About Us
                                     </Link>
                                     <Link href="/pricing" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 ${pathname === '/pricing' ? 'text-violet-600' : 'text-slate-900'}`}>
                                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${pathname === '/pricing' ? 'bg-violet-50' : 'bg-slate-50'}`}>
@@ -276,10 +276,10 @@ export const Navbar = () => {
                 />
             </nav>
 
-            <BottomNav 
+            {/* <BottomNav 
                 unreadNotifications={unreadNotifications} 
                 unreadFavorites={unreadFavorites} 
-            />
+            /> */}
         </>
     );
 };

@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { 
-    MapPin, 
-    Layers, 
+import {
+    MapPin,
+    Layers,
     Globe,
     ChevronDown,
     Search
@@ -25,14 +25,14 @@ export const HomeHeroFilters = ({ isMobile = false }: { isMobile?: boolean }) =>
         if (category !== "All Categories") params.set("category", category.toLowerCase());
         if (minPrice) params.set("minPrice", minPrice);
         if (maxPrice) params.set("maxPrice", maxPrice);
-        
+
         router.push(`/products?${params.toString()}`);
         if (isMobile) setIsOpen(false);
     };
 
     if (isMobile && !isOpen) {
         return (
-            <button 
+            <button
                 onClick={() => setIsOpen(true)}
                 className="w-full h-14 bg-white border border-slate-200 rounded-2xl px-5 flex items-center justify-between shadow-sm active:scale-[0.98] transition-all"
             >
@@ -77,7 +77,7 @@ export const HomeHeroFilters = ({ isMobile = false }: { isMobile?: boolean }) =>
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Region</label>
                         <div className="relative group">
                             <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                            <select 
+                            <select
                                 value={region}
                                 onChange={(e) => setRegion(e.target.value)}
                                 className="w-full h-12 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-violet-500 outline-none transition-all appearance-none cursor-pointer"
@@ -98,7 +98,7 @@ export const HomeHeroFilters = ({ isMobile = false }: { isMobile?: boolean }) =>
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Category</label>
                         <div className="relative group">
                             <Layers className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                            <select 
+                            <select
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
                                 className="w-full h-12 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-violet-500 outline-none transition-all appearance-none cursor-pointer"
@@ -120,8 +120,8 @@ export const HomeHeroFilters = ({ isMobile = false }: { isMobile?: boolean }) =>
                         <div className="grid grid-cols-2 gap-2">
                             <div className="relative">
                                 <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400">ETB</span>
-                                <input 
-                                    type="number" 
+                                <input
+                                    type="number"
                                     placeholder="Min"
                                     value={minPrice}
                                     onChange={(e) => setMinPrice(e.target.value)}
@@ -130,8 +130,8 @@ export const HomeHeroFilters = ({ isMobile = false }: { isMobile?: boolean }) =>
                             </div>
                             <div className="relative">
                                 <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400">ETB</span>
-                                <input 
-                                    type="number" 
+                                <input
+                                    type="number"
                                     placeholder="Max"
                                     value={maxPrice}
                                     onChange={(e) => setMaxPrice(e.target.value)}
@@ -143,7 +143,7 @@ export const HomeHeroFilters = ({ isMobile = false }: { isMobile?: boolean }) =>
                 </div>
             </div>
 
-            <Button 
+            <Button
                 onClick={handleApplyFilters}
                 className="mt-auto w-full h-14 bg-gradient-to-r from-violet-600 to-pink-600 active:scale-[0.98] text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2"
             >

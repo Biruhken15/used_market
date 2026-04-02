@@ -39,8 +39,8 @@ export const SearchFilter = () => {
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
                                 className={`whitespace-nowrap px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 border-2 ${activeCategory === cat
-                                        ? "bg-slate-900 border-slate-900 text-white shadow-md shadow-slate-200 scale-[1.02]"
-                                        : "bg-white border-transparent text-slate-500 hover:border-slate-200 hover:text-slate-900"
+                                    ? "bg-slate-900 border-slate-900 text-white shadow-md shadow-slate-200 scale-[1.02]"
+                                    : "bg-white border-transparent text-slate-500 hover:border-slate-200 hover:text-slate-900"
                                     }`}
                             >
                                 {cat}

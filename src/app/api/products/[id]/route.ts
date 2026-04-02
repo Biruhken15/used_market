@@ -12,11 +12,12 @@ import dbConnect from '@/lib/db/mongoose';
 // GET: Fetch product details
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect();
-        const product = await Product.findById(params.id).populate('storeId');
+        const { id } = await params;
+        const product = await Product.findById(id).populate('storeId');
         if (!product) {
             return NextResponse.json({ error: 'Product not found' }, { status: 404 });
         }
@@ -39,7 +40,7 @@ export async function GET(
 // PUT: Update product details
 export async function PUT(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -48,8 +49,9 @@ export async function PUT(
         }
 
         const data = await req.json();
+        const { id } = await params;
         const updatedProduct = await ProductService.updateProduct(
-            params.id,
+            id,
             (session.user as any).id,
             data
         );
@@ -63,7 +65,7 @@ export async function PUT(
 // DELETE: Remove product listing
 export async function DELETE(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -71,8 +73,9 @@ export async function DELETE(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const { id } = await params;
         const result = await ProductService.deleteProduct(
-            params.id,
+            id,
             (session.user as any).id
         );
 

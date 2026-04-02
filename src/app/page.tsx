@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { FeatureBar } from "@/components/home/FeatureBar";
 import { PromoCarousel } from "@/components/home/PromoCarousel";
 import { ProductCarouselRow } from "@/components/home/ProductCarouselRow";
@@ -150,23 +152,6 @@ export default async function Home() {
           </div>
         </section>
       </div>
-
-      {/* Statistics */}
-      <section className="w-full py-20 px-6 bg-white border-t border-slate-100">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
-          {[
-            { label: 'Active Listings', value: '18k+' },
-            { label: 'Verified Stores', value: '2.5k+' },
-            { label: 'Market Growth', value: '450%' },
-            { label: 'Reliability', value: '100%' }
-          ].map((stat) => (
-            <div key={stat.label}>
-              <p className="text-4xl font-black tracking-tighter mb-1 italic text-slate-950">{stat.value}</p>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { ProductService } from "@/lib/services/product-service";
 import { ProductCard } from "@/components/dashboard/product-card";
 import { FeatureBar } from "@/components/home/FeatureBar";
@@ -9,18 +11,18 @@ import { Sparkles, Trophy, Zap, Star, Package } from "lucide-react";
 export default async function AllProductsPage({
     searchParams,
 }: {
-    searchParams: { 
+    searchParams: Promise<{ 
         page?: string, 
         category?: string, 
         region?: string, 
         minPrice?: string, 
         maxPrice?: string,
         q?: string 
-    };
+    }>;
 }) {
     const params = await searchParams;
     const page = parseInt(params.page || "1");
-    const limit = 20; // Increased limit for 5-column grid
+    const limit = 10; // Forced to 10 items per page as requested
     
     // Construct filter object from query params
     const filters: any = {};

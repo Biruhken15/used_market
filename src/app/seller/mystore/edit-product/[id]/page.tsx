@@ -20,11 +20,12 @@ async function getProduct(id: string) {
     return JSON.parse(JSON.stringify(product));
 }
 
-export default async function EditProductPage({ params }: { params: { id: string } }) {
+export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) redirect("/auth/login");
 
-    const product = await getProduct(params.id);
+    const { id } = await params;
+    const product = await getProduct(id);
     if (!product) {
         notFound();
     }

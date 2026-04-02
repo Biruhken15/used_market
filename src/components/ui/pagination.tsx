@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./button";
 
@@ -12,13 +12,14 @@ interface PaginationProps {
 export function Pagination({ currentPage, totalPages }: PaginationProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     if (totalPages <= 1) return null;
 
     const createPageURL = (pageNumber: number | string) => {
         const params = new URLSearchParams(searchParams);
         params.set("page", pageNumber.toString());
-        return `/products?${params.toString()}`;
+        return `${pathname}?${params.toString()}`;
     };
 
     const goToPage = (pageNumber: number) => {
@@ -75,7 +76,7 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
                     return (
                         <Button
                             key={page}
-                            variant={isCurrent ? "default" : "ghost"}
+                            variant={isCurrent ? "primary" : "ghost"}
                             className={`w-10 h-10 rounded-xl font-bold transition-all ${
                                 isCurrent 
                                 ? 'bg-slate-950 text-white shadow-xl scale-110' 
