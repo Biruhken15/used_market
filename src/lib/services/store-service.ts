@@ -31,6 +31,7 @@ export interface StoreData {
 export class StoreService {
     static async createStore(data: StoreData) {
         // 0. Validate Input
+        if (!data.storeType) data.storeType = 'standard';
         const validatedData = StoreSchema.parse(data);
 
         await connectDB();

@@ -36,6 +36,7 @@ export function StoreForm() {
         region: "",
         country: "Ethiopia",
         idType: "National ID",
+        storeType: "standard" as "standard" | "broker",
         logo: null as File | null,
         coverImage: null as File | null,
         idFront: null as File | null,
@@ -228,6 +229,57 @@ export function StoreForm() {
                             />
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Section: Identity Selection */}
+            <div className="space-y-8 pt-8 border-t border-slate-100">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg">
+                        <User size={20} />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight italic uppercase">Store Identity</h3>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Select your business model</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, storeType: 'standard' })}
+                        className={`p-6 rounded-[2rem] border-2 text-left transition-all relative overflow-hidden group ${
+                            formData.storeType === 'standard' 
+                            ? 'border-slate-900 bg-white shadow-xl ring-4 ring-slate-100' 
+                            : 'border-slate-100 bg-slate-50/50 hover:border-slate-300'
+                        }`}
+                    >
+                        {formData.storeType === 'standard' && (
+                            <div className="absolute top-4 right-4 text-slate-900">
+                                <CheckCircle size={20} />
+                            </div>
+                        )}
+                        <h4 className="font-black italic uppercase tracking-tighter text-slate-950 mb-1">Standard Store</h4>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-relaxed">Direct seller of products and goods to consumers.</p>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, storeType: 'broker' })}
+                        className={`p-6 rounded-[2rem] border-2 text-left transition-all relative overflow-hidden group ${
+                            formData.storeType === 'broker' 
+                            ? 'border-violet-600 bg-white shadow-xl ring-4 ring-violet-50' 
+                            : 'border-slate-100 bg-slate-50/50 hover:border-slate-300'
+                        }`}
+                    >
+                        {formData.storeType === 'broker' && (
+                            <div className="absolute top-4 right-4 text-violet-600">
+                                <CheckCircle size={20} />
+                            </div>
+                        )}
+                        <h4 className="font-black italic uppercase tracking-tighter text-slate-950 mb-1">Expert Agent</h4>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-relaxed">Commission-based agent managing multiple portfolios (Formerly Broker).</p>
+                    </button>
                 </div>
             </div>
 

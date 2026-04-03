@@ -64,7 +64,7 @@ export async function createStoreAction(formData: FormData): Promise<ActionState
 
         const storeName = formData.get("storeName") as string;
         const storeSlug = formData.get("storeSlug") as string;
-        const storeType = formData.get("storeType") as 'standard' | 'broker';
+        const storeType = (formData.get("storeType") as 'standard' | 'broker') || 'standard';
         const description = formData.get("description") as string;
         const category = formData.getAll("category") as string[];
         const phone = formData.get("phone") as string;
