@@ -131,7 +131,7 @@ export class ProductService {
         }
 
         // 2. Fetch products
-        let products = await Product.aggregate([
+        const aggregationPipeline: any[] = [
             { $match: matchStage },
             {
                 $lookup: {
@@ -160,9 +160,22 @@ export class ProductService {
                 }
             },
             { $unwind: { path: '$plan', preserveNullAndEmptyArrays: true } },
+        ];
 
-            ...(filters.hasPromotedPlan ? [{ $match: { 'plan.features.hasHomepagePromotion': true } }] : []),
+        // NEW: Apply post-lookup filters (e.g., store.storeType)
+        const postLookupMatch: any = {};
+        if (filters['store.storeType']) {
+            postLookupMatch['store.storeType'] = filters['store.storeType'];
+        }
+        if (Object.keys(postLookupMatch).length > 0) {
+            aggregationPipeline.push({ $match: postLookupMatch });
+        }
 
+        if (filters.hasPromotedPlan) {
+            aggregationPipeline.push({ $match: { 'plan.features.hasHomepagePromotion': true } });
+        }
+
+        aggregationPipeline.push(
             {
                 $addFields: {
                     rankingScore: {
@@ -190,7 +203,9 @@ export class ProductService {
             { $sort: { rankingScore: -1, createdAt: -1 } },
             { $skip: (page - 1) * limit },
             { $limit: limit }
-        ]);
+        );
+
+        let products = await Product.aggregate(aggregationPipeline);
 
         // 3. Fallback: If promoted batch is requested but empty, return featured products as promotions
         if (filters.hasPromotedPlan && products.length === 0) {

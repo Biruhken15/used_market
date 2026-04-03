@@ -36,9 +36,9 @@ const features = [
         color: "bg-pink-50 text-pink-600 border-pink-100"
     },
     {
-        label: "Get Brokers",
+        label: "About Us",
         icon: <Users className="w-4 h-4" />,
-        href: "/brokers",
+        href: "/about",
         color: "bg-violet-50 text-violet-600 border-violet-100"
     }
 ];

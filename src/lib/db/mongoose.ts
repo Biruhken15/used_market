@@ -47,21 +47,6 @@ async function connectDB() {
 
         cached.promise = mongoose.connect(MONGODB_URI!, opts).then(async (mongooseInstance) => {
             console.log('=> MongoDB connected successfully');
-
-            // Auto-seed subscription plans if not already done in this instance
-            if (!cached.seeded) {
-                try {
-                    console.log('=> Auto-seeding subscription plans...');
-                    // Dynamic import to avoid circular dependency at module level
-                    const { SubscriptionService } = await import('@/lib/services/subscription-service');
-                    await SubscriptionService.seedPlans();
-                    cached.seeded = true;
-                    console.log('=> Subscription plans seeded successfully');
-                } catch (seedError: any) {
-                    console.error('=> Seed failed but connection succeeded:', seedError.message);
-                }
-            }
-
             return mongooseInstance;
         });
 
@@ -79,4 +64,3 @@ async function connectDB() {
 }
 
 export default connectDB;
-

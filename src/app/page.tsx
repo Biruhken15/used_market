@@ -1,68 +1,35 @@
 export const dynamic = 'force-dynamic';
 
+import { Suspense } from "react";
 import { FeatureBar } from "@/components/home/FeatureBar";
-import { PromoCarousel } from "@/components/home/PromoCarousel";
-import { ProductCarouselRow } from "@/components/home/ProductCarouselRow";
-import { ProductService } from "@/lib/services/product-service";
+import { HomeHero, HomeHeroSkeleton } from "@/components/home/HomeHero";
+import { 
+    PromotedRow, 
+    FeaturedRow, 
+    UrgentRow, 
+    NewArrivalsRow, 
+    CategoryRow, 
+    BrokerRow 
+} from "@/components/home/HomeProductRows";
+import { ProductRowSkeleton } from "@/components/home/ProductRowSkeleton";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { SearchFilter } from "@/components/dashboard/search-filter";
-import { HomeHeroFilters } from "@/components/home/HomeHeroFilters";
 
-export default async function Home() {
-  // Fetch products for different sections in parallel for performance
-  const [
-    { products: promotedProducts },
-    { products: featuredProducts },
-    { products: urgentProducts },
-    { products: newArrivals },
-    { products: phoneAndElectronics },
-    { products: realEstate },
-    { products: vehicles },
-    { products: brokerItems }
-  ] = await Promise.all([
-    ProductService.getMarketplaceProducts({ hasPromotedPlan: true }, 1, 10),
-    ProductService.getMarketplaceProducts({ isFeatured: true }, 1, 10),
-    ProductService.getMarketplaceProducts({ isUrgent: true }, 1, 10),
-    ProductService.getMarketplaceProducts({ last24Hours: true }, 1, 10),
-    ProductService.getMarketplaceProducts({ category: 'electronics' }, 1, 10),
-    ProductService.getMarketplaceProducts({ category: 'real-estate' }, 1, 10),
-    ProductService.getMarketplaceProducts({ category: 'vehicles' }, 1, 10),
-    ProductService.getMarketplaceProducts({ 'store.storeType': 'broker' }, 1, 10),
-  ]);
-
+export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-slate-100 pt-36">
+    <div className="flex flex-col min-h-screen bg-slate-50/50 pt-36">
       {/* Top Navigation below Navbar */}
       <FeatureBar />
 
-      {/* Hero / Promo Section with Filters */}
-      <section className="max-w-6xl mx-auto w-full px-4 md:px-8 py-4">
-        <div className="flex flex-col-reverse lg:grid lg:grid-cols-4 gap-6">
-          {/* Left: Sidebar Filters (Desktop only or Drawer on Mobile) */}
-          <div className="hidden lg:block lg:col-span-1 h-full">
-            <HomeHeroFilters />
-          </div>
-
-          {/* Right: Promotional Carousel (Top on Mobile) */}
-          <div className="lg:col-span-3">
-            <div className="h-full rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-sm bg-white border border-slate-200">
-                <PromoCarousel initialProducts={promotedProducts} />
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Quick Filters Button */}
-        <div className="lg:hidden mt-4">
-             <HomeHeroFilters isMobile={true} />
-        </div>
-      </section>
+      {/* Hero / Promo Section with Filters (Streamed) */}
+      <Suspense fallback={<HomeHeroSkeleton />}>
+        <HomeHero />
+      </Suspense>
 
       {/* Main Marketplace Sections */}
       <div className="space-y-4 pb-20">
-        
         <header className="px-4 md:px-10 pt-12 pb-4">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-950 italic tracking-tighter">
+            <h2 className="text-3xl md:text-4xl font-black text-slate-950 italic tracking-tighter uppercase">
                 Discover Used Products.
             </h2>
             <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px] mt-2">
@@ -70,72 +37,50 @@ export default async function Home() {
             </p>
         </header>
 
-        {/* Promoted Products (Real-time based on Subscription) */}
-        {promotedProducts.length > 0 && (
-          <ProductCarouselRow
-            title="Promoted Stores"
-            products={promotedProducts}
-            filterUrl="/products?promoted=true"
-          />
-        )}
+        {/* Streaming Rows */}
+        <Suspense fallback={<ProductRowSkeleton title="Checking Promotions..." />}>
+          <PromotedRow />
+        </Suspense>
 
-        {/* Featured Products */}
-        <ProductCarouselRow
-          title="Featured Products"
-          products={featuredProducts}
-          filterUrl="/products/featured"
-        />
+        <Suspense fallback={<ProductRowSkeleton title="Analyzing Featured..." />}>
+          <FeaturedRow />
+        </Suspense>
 
-        {/* Urgent Section */}
-        <ProductCarouselRow
-          title="Urgent Deals ⚡"
-          products={urgentProducts}
-          filterUrl="/products/urgent"
-        />
+        <Suspense fallback={<ProductRowSkeleton title="Scanning Urgent Deals..." />}>
+          <UrgentRow />
+        </Suspense>
 
-        {/* New Arrivals */}
-        <ProductCarouselRow
-          title="New Arrivals (Last 24h)"
-          products={newArrivals}
-          filterUrl="/products/new-arrivals"
-        />
+        <Suspense fallback={<ProductRowSkeleton title="Fresh Arrivals..." />}>
+          <NewArrivalsRow />
+        </Suspense>
 
-        {/* Real Estate */}
-        <ProductCarouselRow
-          title="Real Estate & Houses"
-          products={realEstate}
-          filterUrl="/products?category=real-estate"
-        />
+        <Suspense fallback={<ProductRowSkeleton title="Real Estate & Houses..." />}>
+          <CategoryRow title="Real Estate & Houses" category="real-estate" />
+        </Suspense>
 
-        {/* Vehicles */}
-        <ProductCarouselRow
-          title="Vehicles & Cars"
-          products={vehicles}
-          filterUrl="/products?category=vehicles"
-        />
+        <Suspense fallback={<ProductRowSkeleton title="Vehicles & Cars..." />}>
+          <CategoryRow title="Vehicles & Cars" category="vehicles" />
+        </Suspense>
 
-        {/* Category: Electronics */}
-        <ProductCarouselRow
-          title="Phone & Electronics"
-          products={phoneAndElectronics}
-          filterUrl="/products?category=electronics"
-        />
+        <Suspense fallback={<ProductRowSkeleton title="Phone & Electronics..." />}>
+          <CategoryRow title="Phone & Electronics" category="electronics" />
+        </Suspense>
 
-        {/* Broker Listings */}
-        <ProductCarouselRow
-          title="Broker Listings"
-          products={brokerItems}
-          filterUrl="/brokers"
-        />
+        <Suspense fallback={<ProductRowSkeleton title="Agent Portfolios..." />}>
+          <BrokerRow />
+        </Suspense>
 
         {/* Sell CTA Section */}
         <section className="max-w-6xl mx-auto px-4 md:px-8 py-20">
-          <div className="relative rounded-[3rem] overflow-hidden bg-slate-950 p-12 md:p-20 text-center text-white">
-            <div className="absolute inset-0 opacity-20">
+          <div className="relative rounded-[3rem] overflow-hidden bg-slate-950 p-12 md:p-20 text-center text-white border border-white/5">
+            <div className="absolute inset-0 opacity-20 filter grayscale">
               <img src="/market-narrative-1.png" alt="Overlay" className="w-full h-full object-cover" />
             </div>
             <div className="relative z-10 space-y-8 max-w-2xl mx-auto">
-              <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full border border-white/10 backdrop-blur-md">
+                <span className="text-[10px] font-black uppercase tracking-widest text-violet-400">Join the Paradigm Shift</span>
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-none">
                 Start selling for free today.
               </h2>
               <p className="text-white/60 text-lg font-bold">
@@ -143,7 +88,7 @@ export default async function Home() {
               </p>
               <div className="pt-4">
                 <Link href="/stores/create">
-                  <Button className="h-16 px-12 bg-white text-slate-950 hover:bg-violet-600 hover:text-white font-black text-lg rounded-2xl transition-all shadow-2xl">
+                  <Button className="h-16 px-12 bg-white text-slate-950 hover:bg-violet-600 hover:text-white font-black text-lg rounded-2xl transition-all shadow-2xl hover:scale-105 active:scale-95">
                     Create Your Store Now
                   </Button>
                 </Link>

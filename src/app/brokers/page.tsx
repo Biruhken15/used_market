@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Professional Brokers | Ethiopia\'s Largest Used Marketplace',
-    description: 'Find and connect with verified professional brokers and agents in Ethiopia. High-quality used products from trusted sellers.',
+    title: 'Expert Agents | Ethiopia\'s Largest Used Marketplace',
+    description: 'Find and connect with verified professional agents and businesses in Ethiopia. High-quality used products from trusted sellers.',
 };
 
 export default async function BrokersPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
@@ -23,7 +23,7 @@ export default async function BrokersPage({ searchParams }: { searchParams: Prom
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-col gap-2">
                         <h1 className="text-4xl font-black italic tracking-tighter text-slate-900 uppercase">
-                            Professional Brokers 🤝
+                            Expert Agents 🤝
                         </h1>
                         <p className="text-slate-500 font-bold">
                             Connect with {total} verified professional agents and businesses.
