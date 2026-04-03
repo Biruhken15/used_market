@@ -4,26 +4,13 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(req: any) {
     const path = req.nextUrl.pathname;
 
-    const isPublicPath =
-        path === "/auth/login" ||
-        path === "/auth/register" ||
-        path === "/" ||
-        path.startsWith("/products") ||
-        path.startsWith("/stores") ||
-        path.startsWith("/brokers") ||
-        path.startsWith("/api");
-
     const token = await getToken({
         req,
         secret: process.env.NEXTAUTH_SECRET,
     });
-
-    if (token && (path === "/auth/login" || path === "/auth/register")) {
-        return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
-    }
-
-    // Protect all non-public paths
-    if (!isPublicPath && !token) {
+    
+    // Paths targeted by this middleware are ALWAYS private (see config.matcher)
+    if (!token) {
         return NextResponse.redirect(new URL("/auth/login", req.nextUrl));
     }
 
@@ -47,8 +34,10 @@ export async function middleware(req: any) {
 export const config = {
     matcher: [
         "/dashboard/:path*",
-        "/auth/:path*",
         "/seller/:path*",
         "/profile/:path*",
+        "/favorites",
+        "/chat",
+        "/notifications",
     ],
 };
