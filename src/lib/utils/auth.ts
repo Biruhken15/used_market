@@ -13,29 +13,33 @@ export const authOptions: AuthOptions = {
             credentials: {},
             async authorize(credentials: any) {
                 const { email, password } = credentials;
+                console.log(`[AUTH] Attempting login for: ${email}`);
 
                 try {
                     await connectDB();
                     const user = await User.findOne({ email }).select("+password");
 
                     if (!user) {
+                        console.warn(`[AUTH] User not found: ${email}`);
                         return null;
                     }
 
                     const passwordsMatch = await bcrypt.compare(password, user.password);
 
                     if (!passwordsMatch) {
+                        console.warn(`[AUTH] Invalid password for: ${email}`);
                         return null;
                     }
 
+                    console.log(`[AUTH] Successfully authorized: ${email}`);
                     return {
                         id: user._id.toString(),
                         name: user.name,
                         email: user.email,
                         role: user.role,
                     };
-                } catch (error) {
-                    console.log("Error: ", error);
+                } catch (error: any) {
+                    console.error("[AUTH ERROR] Authorize callback failed:", error.message);
                     return null;
                 }
             },
@@ -58,16 +62,19 @@ export const authOptions: AuthOptions = {
 
                 // ADDED: Fetch subscription and store mapping on login
                 try {
+                    console.log(`[AUTH] JWT Callback - Syncing state for: ${user.email}`);
                     await connectDB();
                     const sub = await UserSubscription.findOne({ userId: user.id }).populate('planId');
                     if (sub) {
                         token.storeId = sub.storeId?.toString();
-                        token.planCode = sub.planId?.planCode || 'FREE_TRIAL';
+                        token.planCode = (sub.planId as any)?.planCode || 'FREE_TRIAL';
+                        console.log(`[AUTH] Subscription found: ${token.planCode}`);
                     } else {
                         token.planCode = 'FREE_TRIAL';
+                        console.log(`[AUTH] No subscription found, defaulting to FREE_TRIAL`);
                     }
-                } catch (error) {
-                    console.error("Error fetching subscription in JWT callback:", error);
+                } catch (error: any) {
+                    console.error("[AUTH ERROR] JWT Callback failed:", error.message);
                     token.planCode = 'FREE_TRIAL';
                 }
             }
@@ -86,3 +93,4 @@ export const authOptions: AuthOptions = {
         },
     },
 };
+

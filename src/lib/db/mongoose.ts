@@ -23,7 +23,7 @@ let MONGODB_URI = process.env.MONGODB_URI;
 let cached = (global as any).mongoose;
 
 if (!cached) {
-    cached = (global as any).mongoose = { conn: null, promise: null };
+    cached = (global as any).mongoose = { conn: null, promise: null, seeded: false };
 }
 
 async function connectDB() {
@@ -39,16 +39,32 @@ async function connectDB() {
     if (!cached.promise) {
         const opts = {
             bufferCommands: false,
-            maxPoolSize: 10, // Reduced for stability
-            connectTimeoutMS: 30000, // 30s timeout
-            socketTimeoutMS: 60000, // 60s socket timeout
-            family: 4 // Use IPv4
+            maxPoolSize: 10,
+            connectTimeoutMS: 30000,
+            socketTimeoutMS: 60000,
+            family: 4
         };
 
-        cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-            console.log('=> MongoDB connected successfully (Pool: 100)');
-            return mongoose;
+        cached.promise = mongoose.connect(MONGODB_URI!, opts).then(async (mongooseInstance) => {
+            console.log('=> MongoDB connected successfully');
+
+            // Auto-seed subscription plans if not already done in this instance
+            if (!cached.seeded) {
+                try {
+                    console.log('=> Auto-seeding subscription plans...');
+                    // Dynamic import to avoid circular dependency at module level
+                    const { SubscriptionService } = await import('@/lib/services/subscription-service');
+                    await SubscriptionService.seedPlans();
+                    cached.seeded = true;
+                    console.log('=> Subscription plans seeded successfully');
+                } catch (seedError: any) {
+                    console.error('=> Seed failed but connection succeeded:', seedError.message);
+                }
+            }
+
+            return mongooseInstance;
         });
+
     }
 
     try {
@@ -63,3 +79,4 @@ async function connectDB() {
 }
 
 export default connectDB;
+
