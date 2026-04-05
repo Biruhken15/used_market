@@ -59,7 +59,7 @@ export const LoginForm = () => {
                             <img src="/ethiopian-mascot.png" alt="Logo" className="w-full h-full object-contain" />
                         </div>
                         <div className="flex flex-col items-start -space-y-1">
-                            <span className="font-black text-2xl tracking-tighter text-slate-950 uppercase italic leading-none">Used Market</span>
+                            <span className="font-black text-2xl tracking-tighter text-slate-950 uppercase italic leading-none">KesewEj</span>
                             <span className="text-[11px] font-bold text-violet-600 uppercase tracking-widest italic ml-0.5">ከሰው እጅ</span>
                         </div>
                     </Link>

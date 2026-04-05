@@ -7,6 +7,7 @@ export async function middleware(req: any) {
     const token = await getToken({
         req,
         secret: process.env.NEXTAUTH_SECRET,
+        secureCookie: process.env.NODE_ENV === "production",
     });
     
     // Paths targeted by this middleware are ALWAYS private (see config.matcher)
