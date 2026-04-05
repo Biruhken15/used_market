@@ -1,5 +1,7 @@
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/utils/auth";
+
+export const dynamic = 'force-dynamic';
 import { redirect } from "next/navigation";
 import { StoreService } from "@/lib/services/store-service";
 import { StaffList } from "@/components/seller/StaffList";

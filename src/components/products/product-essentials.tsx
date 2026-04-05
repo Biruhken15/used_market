@@ -163,7 +163,7 @@ export const ProductEssentials = ({
                 <div className="space-y-3">
                     <h5 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Description</h5>
                     <div className="relative w-full max-w-full overflow-hidden">
-                        <p className="text-slate-500 font-medium leading-relaxed text-sm whitespace-pre-line break-words overflow-hidden">
+                        <p className="text-slate-500 font-medium leading-relaxed text-sm whitespace-pre-line break-words break-all overflow-hidden">
                             {displayDescription}
                         </p>
                         {shouldTruncate && (

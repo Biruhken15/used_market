@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/utils/auth";
+
+export const dynamic = 'force-dynamic';
 import { redirect } from "next/navigation";
 import { StoreService } from "@/lib/services/store-service";
 import { SubscriptionService } from "@/lib/services/subscription-service";
@@ -19,8 +21,8 @@ import { TransactionHistory } from "@/components/seller/TransactionHistory";
 import { getStoreTransactions } from "@/lib/actions/billing-actions";
 
 export const metadata: Metadata = {
-    title: 'Merchant Dashboard | Manage Your Store',
-    description: 'Manage your listings, view analytics, and grow your business on Ethiopia\'s premier used marketplace.',
+    title: 'Merchant Dashboard | KesewEj',
+    description: 'Manage your listings, view analytics, and grow your business on KesewEj, Ethiopia\'s premier used marketplace.',
 };
 
 export default async function MyStorePage({ searchParams }: { searchParams: Promise<{ mode?: string }> }) {
@@ -37,7 +39,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
         redirect("/auth/login");
     }
 
-    const store = await StoreService.getStoreByOwner(session.user.id);
+    const store = await StoreService.getStoreByOwner(session.user.id) as any;
 
     if (!store) {
         return (
@@ -111,20 +113,20 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
     const expiryStatus = await SubscriptionService.checkSubscriptionExpiry(store._id.toString());
     const isExpired = expiryStatus?.expired || subscription?.status === 'expired';
 
-    // Parse data for client components
-    const serializedProducts = JSON.parse(JSON.stringify(products));
-    const serializedActivity = JSON.parse(JSON.stringify(recentActivity));
-    const serializedPlanFeatures = JSON.parse(JSON.stringify({
+    // Data is now fetched "Lean" from services, skipping extra serialization overhead
+    const serializedProducts = products;
+    const serializedActivity = recentActivity;
+    const serializedPlanFeatures = {
         ...(plan?.features || { canMarkAsSold: false }),
         featuredListingsPerMonth: plan?.limits?.featuredListingsPerMonth || 0
-    }));
-    const serializedStaff = JSON.parse(JSON.stringify(store.staff || []));
-    const serializedPlanLimits = JSON.parse(JSON.stringify({
+    };
+    const serializedStaff = store.staff || [];
+    const serializedPlanLimits = {
         ...(plan?.limits || { maxActiveListings: 3, imagesPerProduct: 3 }),
         planCode: plan?.planCode,
         canMarkAsUrgent: plan?.features?.canMarkAsUrgent,
         canMarkAsFeatured: (plan?.limits?.featuredListingsPerMonth || 0) > 0
-    }));
+    };
 
     return (
         <div className="min-h-screen bg-slate-50/50 pb-24">

@@ -129,12 +129,12 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                         />
                     </div>
                     
-                    <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl shrink-0 border border-slate-200">
+                    <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl shrink-0 border border-slate-200 overflow-x-auto thin-scrollbar">
                         {(['all', 'active', 'sold'] as const).map((status) => (
                             <button
                                 key={status}
                                 onClick={() => setStatusFilter(status)}
-                                className={`px-5 h-9 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === status 
+                                className={`px-4 md:px-5 h-8 md:h-9 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${statusFilter === status 
                                     ? 'bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-md' 
                                     : 'text-slate-500 hover:text-slate-900'}`}
                             >
@@ -203,50 +203,90 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-50 relative z-20">
-                                    {product.status !== 'sold' ? (
-                                        <button
-                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleMarkAsSold(product._id); }}
-                                            disabled={loading === product._id || !subscriptionFeatures?.canMarkAsSold}
-                                            className="h-10 px-4 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl text-[9px] font-bold md:font-black uppercase tracking-widest transition-all flex items-center gap-2"
-                                        >
-                                            <CheckCircle2 size={12} />
-                                            Sold
-                                        </button>
-                                    ) : (
-                                        <div className="h-10 px-4 bg-rose-600 text-white rounded-xl text-[9px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-rose-100">
-                                            Marked Sold
-                                        </div>
-                                    )}
+                                <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-slate-50 relative z-20">
+                                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                                        {product.status !== 'sold' ? (
+                                            <button
+                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleMarkAsSold(product._id); }}
+                                                disabled={loading === product._id || !subscriptionFeatures?.canMarkAsSold}
+                                                className="h-9 md:h-10 px-4 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl text-[9px] font-bold md:font-black uppercase tracking-widest transition-all flex items-center gap-2 flex-1 sm:flex-none justify-center"
+                                            >
+                                                <CheckCircle2 size={12} />
+                                                Sold
+                                            </button>
+                                        ) : (
+                                            <div className="h-9 md:h-10 px-4 bg-rose-600 text-white rounded-xl text-[9px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-rose-100 flex-1 sm:flex-none justify-center">
+                                                Marked Sold
+                                            </div>
+                                        )}
 
-                                    <Link href={`/seller/mystore/edit-product/${product._id}`} className="shrink-0 leading-[0]" onClick={(e) => e.stopPropagation()}>
-                                        <button className="h-10 px-4 bg-slate-50 text-slate-500 hover:bg-slate-950 hover:text-white rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all">
-                                            Edit
-                                        </button>
-                                    </Link>
+                                        <Link href={`/seller/mystore/edit-product/${product._id}`} className="shrink-0 leading-[0] flex-1 sm:flex-none" onClick={(e) => e.stopPropagation()}>
+                                            <button className="w-full h-9 md:h-10 px-4 bg-slate-50 text-slate-500 hover:bg-slate-950 hover:text-white rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all">
+                                                Edit
+                                            </button>
+                                        </Link>
+                                    </div>
 
                                     {/* Action Toggles */}
-                                    <div className="flex gap-1 ml-auto shrink-0">
-                                        <button
-                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleUrgent(product._id); }}
-                                            disabled={loading === product._id || !subscriptionFeatures?.canMarkAsUrgent}
-                                            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${product.isUrgent ? 'bg-red-600 text-white shadow-lg animate-pulse' : 'bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500'}`}
-                                            title="Urgent Boost"
-                                        >
-                                            <Zap size={14} fill={product.isUrgent ? 'currentColor' : 'none'} strokeWidth={3} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleFeatured(product._id); }}
-                                            disabled={loading === product._id || (subscriptionFeatures?.featuredListingsPerMonth === 0)}
-                                            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${product.isFeatured ? 'bg-emerald-500 text-white shadow-lg' : 'bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-500'}`}
-                                            title="Feature Listing"
-                                        >
-                                            <Star size={14} fill={product.isFeatured ? 'currentColor' : 'none'} strokeWidth={3} />
-                                        </button>
+                                    <div className="flex gap-1 ml-auto shrink-0 pt-2 sm:pt-0">
+                                        {/* URGENT TOGGLE WITH UPSELL */}
+                                        <div className="group/upsell relative">
+                                            <button
+                                                onClick={(e) => { 
+                                                    if (!subscriptionFeatures?.canMarkAsUrgent) {
+                                                        e.preventDefault(); e.stopPropagation(); router.push('/pricing'); return;
+                                                    }
+                                                    e.preventDefault(); e.stopPropagation(); handleToggleUrgent(product._id); 
+                                                }}
+                                                disabled={loading === product._id}
+                                                className={`w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center transition-all ${
+                                                    product.isUrgent ? 'bg-red-600 text-white shadow-lg animate-pulse' : 'bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500'
+                                                } ${!subscriptionFeatures?.canMarkAsUrgent ? 'blur-[1.5px] opacity-60' : ''}`}
+                                                title={subscriptionFeatures?.canMarkAsUrgent ? "Urgent Boost" : "Upgrade to use Urgent"}
+                                            >
+                                                <Zap size={14} fill={product.isUrgent ? 'currentColor' : 'none'} strokeWidth={3} />
+                                            </button>
+                                            
+                                            {!subscriptionFeatures?.canMarkAsUrgent && (
+                                                <div className="absolute inset-0 z-30 opacity-0 group-hover/upsell:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                                    <div className="bg-violet-600 text-white text-[7px] font-black uppercase px-1.5 py-0.5 rounded shadow-lg -rotate-12 border border-white/20 whitespace-nowrap">
+                                                        Upgrade
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* FEATURED TOGGLE WITH UPSELL */}
+                                        <div className="group/upsell relative">
+                                            <button
+                                                onClick={(e) => { 
+                                                    if (subscriptionFeatures?.featuredListingsPerMonth === 0) {
+                                                        e.preventDefault(); e.stopPropagation(); router.push('/pricing'); return;
+                                                    }
+                                                    e.preventDefault(); e.stopPropagation(); handleToggleFeatured(product._id); 
+                                                }}
+                                                disabled={loading === product._id}
+                                                className={`w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center transition-all ${
+                                                    product.isFeatured ? 'bg-emerald-500 text-white shadow-lg' : 'bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-500'
+                                                } ${subscriptionFeatures?.featuredListingsPerMonth === 0 ? 'blur-[1.5px] opacity-60' : ''}`}
+                                                title={subscriptionFeatures?.featuredListingsPerMonth > 0 ? "Feature Listing" : "Upgrade to use Featured"}
+                                            >
+                                                <Star size={14} fill={product.isFeatured ? 'currentColor' : 'none'} strokeWidth={3} />
+                                            </button>
+
+                                            {subscriptionFeatures?.featuredListingsPerMonth === 0 && (
+                                                <div className="absolute inset-0 z-30 opacity-0 group-hover/upsell:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                                    <div className="bg-violet-600 text-white text-[7px] font-black uppercase px-1.5 py-0.5 rounded shadow-lg -rotate-12 border border-white/20 whitespace-nowrap">
+                                                        Upgrade
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
                                         <button
                                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(product._id); }}
                                             disabled={loading === product._id}
-                                            className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-300 hover:bg-red-600 hover:text-white transition-all group/del"
+                                            className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-slate-300 hover:bg-red-600 hover:text-white transition-all group/del"
                                             title="Delete permanently"
                                         >
                                             <Trash2 size={14} strokeWidth={3} />

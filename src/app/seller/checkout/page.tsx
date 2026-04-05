@@ -3,7 +3,7 @@ import CheckoutForm from './CheckoutForm';
 import { Navbar } from '@/components/common/navbar';
 
 export const metadata = {
-    title: 'Subscribe | Used Market',
+    title: 'Subscribe | KesewEj',
     description: 'Upgrade your store with premium plans.',
 };
 

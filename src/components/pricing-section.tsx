@@ -91,9 +91,12 @@ export default function PricingSection() {
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-lg border border-accent/20">
                         <span className="text-[10px] font-black uppercase tracking-widest text-accent">Monetize Your Store</span>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">
+                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter mb-4">
                         Simple, Professional <span className="gradient-text">Pricing.</span>
                     </h2>
+                    <p className="text-violet-600 font-black text-[10px] uppercase tracking-widest mt-2 mb-6 p-2 bg-violet-50 rounded-lg inline-block border border-violet-100 italic">
+                        "Pay a little, enjoy big commissions."
+                    </p>
                     <p className="text-slate-500 font-medium text-lg max-w-2xl mx-auto">
                         Choose the plan that fits your business scale. No hidden fees, just growth.
                     </p>

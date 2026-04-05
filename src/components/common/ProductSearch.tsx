@@ -80,18 +80,18 @@ export const ProductSearch = () => {
         <div className="w-full max-w-2xl mx-auto px-4 relative" ref={dropdownRef}>
             <form
                 onSubmit={handleSearch}
-                className={`group relative flex items-center bg-white rounded-2xl border-2 transition-all duration-300 shadow-md z-[60] ${isFocused
-                        ? "border-slate-950 ring-4 ring-slate-950/5 shadow-slate-200"
-                        : "border-slate-200 shadow-slate-200/50"
+                className={`group relative flex items-center bg-white rounded-2xl border-2 transition-all duration-500 shadow-sm z-[60] ${isFocused
+                        ? "border-slate-900 ring-8 ring-slate-900/5 shadow-2xl shadow-slate-200"
+                        : "border-slate-100"
                     }`}
             >
-                <div className={`pl-6 pr-4 transition-colors ${isFocused ? "text-slate-900" : "text-slate-400"}`}>
-                    <Search className="w-5 h-5" strokeWidth={2.5} />
+                <div className={`pl-6 pr-3 transition-colors ${isFocused ? "text-slate-900" : "text-slate-300"}`}>
+                    <Search className="w-5 h-5" strokeWidth={3} />
                 </div>
 
                 <input
                     type="text"
-                    placeholder="Search for items, brands, or IDs..."
+                    placeholder="Search products, brands, or IDs..."
                     value={query}
                     onChange={(e) => {
                         setQuery(e.target.value);
@@ -101,26 +101,26 @@ export const ProductSearch = () => {
                         setIsFocused(true);
                         if (query.length >= 2) setShowDropdown(true);
                     }}
-                    className="flex-1 h-14 bg-transparent border-none outline-none text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium text-base"
+                    className="flex-1 h-12 bg-transparent border-none outline-none text-slate-900 font-black placeholder:text-slate-300 placeholder:font-bold text-sm uppercase tracking-tight"
                 />
 
                 {query && (
                     <button
                         type="button"
                         onClick={clearSearch}
-                        className="p-2 mr-2 text-slate-400 hover:text-slate-900 transition-colors"
+                        className="p-2 mr-1 text-slate-300 hover:text-slate-900 transition-colors"
                     >
-                        <X className="w-5 h-5" strokeWidth={2.5} />
+                        <X className="w-5 h-5" strokeWidth={3} />
                     </button>
                 )}
 
                 <button
                     type="submit"
-                    className="mr-2 h-10 px-6 rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 active:scale-95 transition-all shadow-lg"
+                    className="mr-2 h-9 px-6 rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-violet-600 active:scale-95 transition-all shadow-lg"
                 >
                     <span className="flex items-center gap-2">
-                        Search
-                        <Sparkles className="w-3 h-3 fill-current" />
+                        Find 
+                        <ArrowRight className="w-3 h-3" strokeWidth={4} />
                     </span>
                 </button>
             </form>

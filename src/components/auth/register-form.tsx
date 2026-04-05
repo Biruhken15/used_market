@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -54,11 +55,19 @@ export const RegisterForm = () => {
             });
 
             if (res.ok) {
-                // If it was an invite, we might want to go straight to login or dashboard
-                // For better UX during invitation: push to login but with a hint, 
-                // or just to dashboard if redirect works.
-                // Redirecting to login is safer for next-auth session establishment.
-                router.push(`/auth/login?email=${encodeURIComponent(email)}&invited=true`);
+                // Auto sign-in after registration — no need to visit the login page
+                const signInRes = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                });
+                if (signInRes?.ok) {
+                    // Redirect to marketplace (not a middleware-guarded route)
+                    window.location.href = "/";
+                    return;
+                }
+                // Fallback: go to login if auto sign-in fails
+                router.push(`/auth/login?email=${encodeURIComponent(email)}`);
             } else {
                 const data = await res.json();
                 setError(data.message || "Registration failed.");
@@ -71,7 +80,7 @@ export const RegisterForm = () => {
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto relative px-2">
+        <div className="w-full max-w-lg mx-auto relative px-2 py-10 md:py-20">
             <div className="p-6 md:p-10 bg-white border-2 border-slate-200 rounded-[2rem] shadow-sm">
                 <div className="text-center mb-10">
                     <Link href="/" className="inline-flex items-center gap-2 mb-6 group/logo">
@@ -80,84 +89,88 @@ export const RegisterForm = () => {
                         </div>
                         <div className="flex flex-col items-start -space-y-1">
                             <span className="font-black text-2xl tracking-tighter text-slate-950 uppercase italic leading-none">Used Market</span>
-                            <span className="text-[11px] font-bold text-accent uppercase tracking-widest italic ml-0.5">ከሰው እጅ</span>
+                            <span className="text-[11px] font-bold text-violet-600 uppercase tracking-widest italic ml-0.5">ከሰው እጅ</span>
                         </div>
                     </Link>
 
-                    <h1 className="text-3xl font-black text-slate-950 tracking-tighter mb-2">Create Account</h1>
-                    <p className="text-slate-500 font-bold text-sm">Join our marketplace today</p>
+                    <h1 className="text-3xl font-black text-slate-950 tracking-tighter mb-2">Create Identity</h1>
+                    <p className="text-slate-500 font-bold text-sm">Join the ecosystem today</p>
+                    <p className="text-emerald-600 font-black text-[10px] uppercase tracking-widest mt-4 p-2 bg-emerald-50 rounded-lg inline-block border border-emerald-100 italic">
+                        "Your portal to professional trade."
+                    </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {error && (
-                        <div className="bg-violet-50 border-2 border-violet-100 text-violet-600 text-[11px] font-black uppercase tracking-widest py-4 px-4 rounded-xl text-center">
+                        <div className="bg-red-50 border border-red-100 text-red-600 text-[11px] font-black uppercase tracking-widest py-4 px-4 rounded-xl text-center">
                             {error}
                         </div>
                     )}
 
-                    <div className="space-y-4">
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-700">Full Name</label>
+                    <div className="grid grid-cols-1 gap-4">
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-slate-700 ml-1">Full Name</label>
                             <Input
                                 type="text"
                                 placeholder="Abebe Balcha"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="h-12 !rounded-lg border-slate-200 focus:border-slate-950 transition-all bg-white"
+                                className="h-12 !rounded-xl border-slate-200 focus:border-slate-950 transition-all bg-white font-medium text-slate-900"
                                 required
                             />
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-700">Email Address</label>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-slate-700 ml-1">Digital Identity (Email)</label>
                             <Input
                                 type="email"
                                 placeholder="abebe@market.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="h-12 !rounded-lg border-slate-200 focus:border-slate-950 transition-all bg-white"
+                                className="h-12 !rounded-xl border-slate-200 focus:border-slate-950 transition-all bg-white font-medium text-slate-900"
                                 required
                             />
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-700">Password</label>
-                            <Input
-                                type="password"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="h-12 !rounded-lg border-slate-200 focus:border-slate-950 transition-all bg-white"
-                                required
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-700">Confirm Password</label>
-                            <Input
-                                type="password"
-                                placeholder="••••••••"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="h-12 !rounded-lg border-slate-200 focus:border-slate-950 transition-all bg-white"
-                                required
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-slate-700 ml-1">Keyword</label>
+                                <Input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="h-12 !rounded-xl border-slate-200 focus:border-slate-950 transition-all bg-white font-medium text-slate-900"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-slate-700 ml-1">Confirm</label>
+                                <Input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="h-12 !rounded-xl border-slate-200 focus:border-slate-950 transition-all bg-white font-medium text-slate-900"
+                                    required
+                                />
+                            </div>
                         </div>
                     </div>
 
                     <div className="pt-4">
                         <Button
                             type="submit"
-                            fullWidth
                             disabled={isLoading}
-                            className="h-14 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 text-white font-bold text-base hover:brightness-110 shadow-lg shadow-indigo-100 transition-all border-none"
+                            className="h-14 w-full rounded-xl bg-slate-950 text-white font-black text-xs uppercase tracking-widest hover:bg-violet-600 shadow-xl shadow-slate-100 transition-all border-none"
                         >
-                            {isLoading ? "Creating Account..." : "Register"}
+                            {isLoading ? "Synchronizing..." : "Initialize Profile"}
                         </Button>
                     </div>
 
-                    <div className="text-center pt-2">
-                        <p className="text-sm text-slate-500">
-                            Already have an account?{" "}
-                            <Link href="/auth/login" className="text-slate-950 font-bold hover:underline">
-                                Login
+                    <div className="text-center pt-6 border-t border-slate-100">
+                        <p className="text-xs font-bold text-slate-500">
+                            Already synchronized?{" "}
+                            <Link href="/auth/login" className="text-violet-600 font-bold hover:underline transition-colors">
+                                Authorize Access
                             </Link>
                         </p>
                     </div>

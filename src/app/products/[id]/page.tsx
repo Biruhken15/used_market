@@ -33,13 +33,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/utils/auth';
+
+export const dynamic = 'force-dynamic';
+
 export default async function ProductDetailPage({ params }: PageProps) {
     const { id } = await params;
-    const product = await ProductService.getProductById(id);
+    const product = await ProductService.getProductById(id) as any;
 
     if (!product) {
         notFound();
     }
 
-    return <ProductDetailsClient product={JSON.parse(JSON.stringify(product))} />;
+    // Role-based Confidentiality: Only the store owner or listing creator can see the source data
+    const session = await getServerSession(authOptions);
+    const isOwner = session?.user && (
+        product.ownerId === (session.user as any).id || 
+        product.storeId?.ownerId === (session.user as any).id
+    );
+
+    if (!isOwner) {
+        // Strip sensitive metadata before passing to client
+        delete product.sourceOwner;
+    }
+
+    return <ProductDetailsClient product={product} />;
 }

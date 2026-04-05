@@ -51,9 +51,11 @@ export default function CreateStorePage() {
                                 Used Product <br />
                                 <span className="bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">SAAS Platform</span>
                             </h1>
-                            <p className="text-slate-500 font-bold text-sm leading-relaxed max-w-sm">
-                                The professional standard for buying and selling quality used products. Our SaaS infrastructure empowers sellers to scale and buyers to find value.
-                            </p>
+                            <div className="bg-violet-100/50 border border-violet-200 p-4 rounded-xl inline-block mt-2">
+                                <p className="text-violet-700 font-black text-[11px] uppercase tracking-widest italic leading-relaxed max-w-sm">
+                                    "Pay a little, enjoy big commissions."
+                                </p>
+                            </div>
                         </div>
 
                         <div className="space-y-6">

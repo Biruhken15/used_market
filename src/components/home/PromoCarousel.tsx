@@ -23,7 +23,7 @@ export function PromoCarousel({ initialProducts = [] }: { initialProducts?: any[
         ? initialProducts.map((p, i) => ({
             id: p._id,
             title: p.title,
-            description: p.description.length > 120 ? p.description.substring(0, 120) + '...' : p.description,
+            description: (p.description || "").length > 120 ? (p.description || "").substring(0, 120) + '...' : (p.description || ""),
             image: p.images?.[0]?.url || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1200",
             tag: p.isUrgent ? "URGENT DEAL" : p.isFeatured ? "FEATURED" : "PROMOTED",
             href: `/products/${p._id}`,

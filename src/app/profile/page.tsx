@@ -19,16 +19,16 @@ export default function ProfilePage() {
     const initial = session.user.name ? session.user.name[0].toUpperCase() : "U";
 
     return (
-        <div className="max-w-4xl mx-auto px-6 py-20">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 py-10 md:py-20">
             <div className="space-y-12">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row items-center gap-8 pb-12 border-b border-slate-100">
-                    <div className="w-32 h-32 bg-slate-900 text-white rounded-[2.5rem] flex items-center justify-center text-4xl font-black shadow-2xl shadow-slate-200 border-4 border-white">
+                <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 pb-8 md:pb-12 border-b border-slate-100">
+                    <div className="w-24 h-24 md:w-32 md:h-32 bg-slate-900 text-white rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center text-3xl md:text-4xl font-black shadow-2xl shadow-slate-200 border-4 border-white">
                         {initial}
                     </div>
                     <div className="text-center md:text-left space-y-2">
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tighter">System Profile</h1>
-                        <p className="text-slate-500 font-bold text-lg">Manage your identity and synchronization across Ethio Market.</p>
+                        <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter italic uppercase">System Profile</h1>
+                        <p className="text-slate-500 font-bold text-sm md:text-lg">Manage your identity across the ecosystem.</p>
                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">
                             Status: Online & Synchronized
                         </div>

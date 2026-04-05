@@ -11,10 +11,10 @@ export const Footer = () => {
                     <div className="space-y-6">
                         <Link href="/" className="flex items-center gap-3">
                             <div className="w-10 h-10 flex items-center justify-center">
-                                <img src="/ethiopian-mascot.png" alt="Used Market Logo" className="w-full h-full object-contain" />
+                                <img src="/ethiopian-mascot.png" alt="KesewEj Logo" className="w-full h-full object-contain" />
                             </div>
                             <div className="flex flex-col -space-y-1">
-                                <span className="text-xl font-black text-white tracking-tighter">Used Market</span>
+                                <span className="text-xl font-black text-white tracking-tighter">KesewEj</span>
                                 <span className="text-[11px] font-bold text-accent uppercase tracking-widest leading-none ml-0.5 italic">ከሰው እጅ</span>
                             </div>
                         </Link>
@@ -67,7 +67,7 @@ export const Footer = () => {
 
                 <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-slate-500 text-xs font-medium">
-                        © {new Date().getFullYear()} Used Market. All rights reserved.
+                        © {new Date().getFullYear()} KesewEj. All rights reserved.
                     </p>
                     <div className="flex items-center gap-6 text-slate-500 text-xs font-medium">
                         <span className="flex items-center gap-1">

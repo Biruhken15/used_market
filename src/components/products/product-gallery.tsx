@@ -25,6 +25,16 @@ export const ProductGallery = ({ images, title }: ProductGalleryProps) => {
         );
     }
 
+    const handleNext = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setActiveImage((prev) => (prev + 1) % images.length);
+    };
+
+    const handlePrev = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setActiveImage((prev) => (prev - 1 + images.length) % images.length);
+    };
+
     return (
         <div className="space-y-4 md:space-y-6">
             {/* Fullscreen Modal */}
@@ -42,6 +52,23 @@ export const ProductGallery = ({ images, title }: ProductGalleryProps) => {
                             priority
                         />
                     </div>
+                    
+                    {/* Modal Controls */}
+                    <div className="absolute inset-x-4 md:inset-x-12 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none">
+                        <button 
+                            onClick={handlePrev}
+                            className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/20 transition-all pointer-events-auto"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <button 
+                            onClick={handleNext}
+                            className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/20 transition-all pointer-events-auto"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                    </div>
+
                     <button 
                         className="absolute top-8 right-10 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/20 transition-colors"
                         onClick={(e) => { e.stopPropagation(); setIsFullscreen(false); }}
@@ -53,51 +80,49 @@ export const ProductGallery = ({ images, title }: ProductGalleryProps) => {
 
             {/* Main Image View */}
             <div
-                className="relative aspect-square md:aspect-[4/3] bg-slate-100 rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm group"
+                className="relative aspect-square md:aspect-[4/3] bg-slate-50 rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-sm group"
             >
-                {/* Mobile Swipe Container */}
-                <div className="md:hidden absolute inset-0 flex overflow-x-auto snap-x snap-mandatory thin-scrollbar">
-                    {images.map((img: any, idx: number) => (
-                        <div key={idx} className="relative w-full h-full flex-shrink-0 snap-center">
-                            <Image
-                                src={img.url}
-                                alt={`${title} ${idx}`}
-                                fill
-                                className="object-contain p-4"
-                                priority={idx === 0}
-                            />
-                        </div>
-                    ))}
-                </div>
-
-                {/* Desktop Static View */}
+                {/* Image Container */}
                 <div 
-                    className="hidden md:block relative w-full h-full cursor-zoom-in"
+                    className="relative w-full h-full cursor-zoom-in"
                     onClick={() => setIsFullscreen(true)}
                 >
                     <Image
                         src={images[activeImage]?.url}
                         alt={title}
                         fill
-                        className="object-contain p-8"
+                        className="object-contain p-4 md:p-12 transition-transform duration-700"
                         priority
                     />
+                </div>
+
+                {/* Navigation Arrows - Visible on Desktop hover, always on Mobile */}
+                <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                     <button 
-                        className="absolute bottom-6 right-6 px-6 py-3 bg-white/90 backdrop-blur-md rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-900 border border-white shadow-xl opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0"
+                        onClick={handlePrev}
+                        className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-900 hover:bg-white transition-all shadow-xl border border-slate-100 pointer-events-auto active:scale-90"
                     >
-                        Expand View
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <button 
+                        onClick={handleNext}
+                        className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-900 hover:bg-white transition-all shadow-xl border border-slate-100 pointer-events-auto active:scale-90"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
                 </div>
                 
-                {/* Mobile Indicators */}
-                <div className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-md rounded-full">
-                    {images.map((_: any, idx: number) => (
-                        <div 
-                            key={idx} 
-                            className={`w-1.5 h-1.5 rounded-full transition-all ${activeImage === idx ? 'bg-white w-4' : 'bg-white/40'}`}
-                        />
-                    ))}
+                {/* View Status */}
+                <div className="absolute bottom-6 left-6 px-4 py-2 bg-slate-900/10 backdrop-blur-md rounded-full text-[9px] font-black uppercase tracking-widest text-slate-900">
+                    {activeImage + 1} / {images.length}
                 </div>
+
+                <button 
+                    disabled
+                    className="absolute bottom-6 right-6 px-6 py-3 bg-white/90 backdrop-blur-md rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-900 border border-white shadow-xl opacity-0 md:group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 hidden md:block"
+                >
+                    Expand View
+                </button>
             </div>
 
             {/* Thumbnails Navigation */}

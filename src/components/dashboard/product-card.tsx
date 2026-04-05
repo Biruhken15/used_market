@@ -107,7 +107,7 @@ export const ProductCard = memo(({ product, initialIsFavorited = false, isLogged
                                 src={images[currentImageIndex].url}
                                 alt={product.title}
                                 fill
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
                                 className="object-contain p-2 transition-transform duration-700 group-hover:scale-110"
                                 priority={false}
                             />
@@ -131,14 +131,14 @@ export const ProductCard = memo(({ product, initialIsFavorited = false, isLogged
                         </div>
                     </div>
 
-                    <div className="p-3 md:p-4 flex flex-col flex-1 gap-1.5">
-                        <h3 className="text-sm md:text-base font-bold text-gray-800 leading-tight line-clamp-2 md:line-clamp-1 group-hover:text-indigo-600 transition-colors">
+                    <div className="p-2 md:p-3 flex flex-col flex-1 gap-1">
+                        <h3 className="text-xs md:text-sm font-bold text-gray-800 leading-tight line-clamp-2 transition-colors">
                             {product.title}
                         </h3>
                         <div className="space-y-1 mt-auto">
                             <div className="flex items-baseline gap-1">
-                                <span className="text-lg md:text-xl font-black text-slate-950 tracking-tight">
-                                    {product.price.toLocaleString()} <span className="text-[10px] opacity-70">ETB</span>
+                                <span className="text-base md:text-lg font-black text-slate-950 tracking-tight">
+                                    {product.price.toLocaleString()} <span className="text-[8px] opacity-70">ETB</span>
                                 </span>
                             </div>
                             <div className="flex items-center gap-1.5">

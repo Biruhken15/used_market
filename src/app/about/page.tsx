@@ -49,15 +49,15 @@ export default function AboutPage() {
                 <div className="max-w-6xl mx-auto">
                     {/* Header Section (Safety Center Style) */}
                     <div className="flex flex-col items-center text-center mb-16">
-                        <div className="p-4 bg-violet-100 rounded-full mb-6">
+                        <div className="p-4 bg-violet-100 rounded-full mb-6 ring-8 ring-violet-50">
                             <Sparkles className="w-12 h-12 text-violet-600" />
                         </div>
                         <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tighter uppercase italic">
-                            Beyond a Marketplace. <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-600">This is SaaS.</span>
+                            Beyond a Marketplace.<br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-600 leading-tight">Pay a little, enjoy big commissions.</span>
                         </h1>
-                        <p className="max-w-2xl text-lg md:text-xl font-bold text-slate-500 leading-relaxed">
-                             Used Market (ከሰው እጅ) is a centralized, high-performance ecosystem designed to transform how used goods are traded in Ethiopia.
+                        <p className="max-w-2xl text-lg md:text-xl font-bold text-slate-500 leading-relaxed mb-6">
+                            The ultimate ecosystem designed explicitly for expert sellers.
                         </p>
                     </div>
 

@@ -4,12 +4,14 @@ import { Navbar } from '@/components/common/navbar';
 import Product from '@/lib/models/product';
 import dbConnect from '@/lib/db/mongoose';
 import { StoreService } from '@/lib/services/store-service';
-import { notFound, redirect } from 'next/navigation';
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/utils/auth";
+import { notFound, redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
-    title: 'Edit Product | Used Market',
+    title: 'Edit Product | KesewEj',
     description: 'Update your existing product listing.',
 };
 
@@ -55,7 +57,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             <div className="pt-32 pb-20 px-6 max-w-5xl mx-auto">
                 <header className="mb-12 text-center md:text-left">
                     <h1 className="text-5xl font-black tracking-tighter text-slate-900 mb-2">Edit <span className="text-blue-600">Listing</span></h1>
-                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">Marketplace Inventory • {plan?.planName || 'Free'} Plan</p>
+                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">KesewEj Inventory • {plan?.planName || 'Free'} Plan</p>
                 </header>
 
                 <ProductForm

@@ -79,7 +79,24 @@ export default function ProductForm({ initialData, isEditing = false, productId,
         region: initialData?.region || '',
     });
 
-    const categories = ['electronics', 'phones', 'real-estate', 'vehicles', 'houses', 'furniture', 'fashion', 'sports', 'books', 'other'];
+    const categories = [
+        "Real Estate & Property",
+        "Vehicles & Cars",
+        "Phones & Tablets",
+        "Computers & Laptops",
+        "Home Appliances",
+        "Electronics",
+        "Furniture & Decor",
+        "Construction & Materials",
+        "Heavy Machinery & Equipment",
+        "Office & Business",
+        "Fashion & Wearables",
+        "Sports & Outdoors",
+        "Health & Beauty",
+        "Books & Education",
+        "Services",
+        "Other"
+    ];
     const conditions = [
         { value: 'new', label: 'New' },
         { value: 'like-new', label: 'Like New' },
@@ -321,7 +338,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                                 >
                                     <option value="">Choose Area</option>
-                                    {categories.map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+                                    {categories.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             </div>
                             <div>
@@ -346,11 +363,19 @@ export default function ProductForm({ initialData, isEditing = false, productId,
                             >
                                 <option value="">Choose Area</option>
                                 <option value="Addis Ababa">Addis Ababa</option>
-                                <option value="Oromia">Oromia</option>
+                                <option value="Afar">Afar</option>
                                 <option value="Amhara">Amhara</option>
+                                <option value="Benishangul-Gumuz">Benishangul-Gumuz</option>
+                                <option value="Central Ethiopia">Central Ethiopia</option>
                                 <option value="Dire Dawa">Dire Dawa</option>
+                                <option value="Gambela">Gambela</option>
+                                <option value="Harari">Harari</option>
+                                <option value="Oromia">Oromia</option>
+                                <option value="Sidama">Sidama</option>
+                                <option value="Somali">Somali</option>
+                                <option value="South Ethiopia">South Ethiopia</option>
+                                <option value="South West Ethiopia">South West Ethiopia</option>
                                 <option value="Tigray">Tigray</option>
-                                <option value="SNNPR">SNNPR</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
@@ -472,9 +497,9 @@ export default function ProductForm({ initialData, isEditing = false, productId,
 
     if (viewType === 'drawer') {
         return (
-            <div className="fixed top-[15%] right-6 bottom-6 w-full max-w-[420px] bg-white z-[200] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] border border-slate-100 flex flex-col rounded-[2.5rem] animate-in fade-in slide-in-from-bottom-8 duration-500 overflow-hidden">
+            <div className="fixed inset-0 sm:top-[10%] sm:right-6 sm:bottom-6 sm:left-auto sm:w-full sm:max-w-[440px] bg-white z-[200] shadow-2xl flex flex-col sm:rounded-[3rem] animate-in fade-in slide-in-from-bottom-12 duration-500 overflow-hidden">
                 {/* Independent Scroll Container */}
-                <div className="flex-1 overflow-y-auto px-8 pt-8 relative scrollbar-hide">
+                <div className="flex-1 overflow-y-auto px-6 sm:px-8 pt-8 relative scrollbar-hide">
                     {/* Floating Header */}
                     <div className="flex items-center justify-between mb-8 sticky top-0 bg-white/90 backdrop-blur-md pt-2 pb-4 z-20 border-b border-slate-50">
                         <div className="flex items-center gap-3">
@@ -499,8 +524,8 @@ export default function ProductForm({ initialData, isEditing = false, productId,
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-slate-50/30">
-            <div className="w-full max-w-2xl bg-white border-4 border-slate-200 rounded-[2.5rem] p-10 md:p-14 shadow-2xl shadow-slate-200/50">
+        <div className="min-h-screen flex items-center justify-center py-6 sm:py-12 px-0 sm:px-4 bg-slate-50/30">
+            <div className="w-full max-w-2xl bg-white border-none sm:border-4 border-slate-200 sm:rounded-[3rem] p-6 sm:p-10 md:p-14 shadow-2xl shadow-slate-200/50">
                 <div className="mb-10 text-center">
                     <h1 className="text-4xl font-black text-slate-900 tracking-tight italic uppercase">{isEditing ? 'Edit Listing' : 'New Listing'}</h1>
                     <p className="text-slate-400 font-bold text-[10px] tracking-[0.3em] uppercase mt-1">Marketplace Protocol</p>

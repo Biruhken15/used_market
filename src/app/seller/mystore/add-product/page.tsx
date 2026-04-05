@@ -1,15 +1,17 @@
 import React from 'react';
 import ProductForm from '@/components/seller/ProductForm';
 import { Navbar } from '@/components/common/navbar';
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/utils/auth";
 import { redirect } from "next/navigation";
+
+export const dynamic = 'force-dynamic';
 import { StoreService } from "@/lib/services/store-service";
 import { SubscriptionService } from "@/lib/services/subscription-service";
 
 export const metadata = {
-    title: 'Add Product | Used Market',
-    description: 'List a new product for sale in the marketplace.',
+    title: 'Add Product | KesewEj',
+    description: 'List a new product for sale on KesewEj.',
 };
 
 export default async function AddProductPage() {
@@ -35,7 +37,7 @@ export default async function AddProductPage() {
             <div className="pt-32 pb-20 px-6 max-w-5xl mx-auto">
                 <header className="mb-12 text-center md:text-left">
                     <h1 className="text-5xl font-black tracking-tighter text-slate-900 mb-2">Post <span className="text-blue-600">New Listing</span></h1>
-                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">Marketplace Inventory • {plan?.planName || 'Free'} Plan</p>
+                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">KesewEj Inventory • {plan?.planName || 'Free'} Plan</p>
                 </header>
 
                 <ProductForm

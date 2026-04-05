@@ -27,7 +27,7 @@ export default function Home() {
       </Suspense>
 
       {/* Main Marketplace Sections */}
-      <div className="space-y-4 pb-20">
+      <div className="space-y-1 pb-20">
         <header className="px-4 md:px-10 pt-12 pb-4">
             <h2 className="text-3xl md:text-4xl font-black text-slate-950 italic tracking-tighter uppercase">
                 Discover Used Products.
@@ -54,16 +54,68 @@ export default function Home() {
           <NewArrivalsRow />
         </Suspense>
 
-        <Suspense fallback={<ProductRowSkeleton title="Real Estate & Houses..." />}>
-          <CategoryRow title="Real Estate & Houses" category="real-estate" />
+        <Suspense fallback={<ProductRowSkeleton title="Real Estate & Property..." />}>
+          <CategoryRow title="Real Estate & Property" category="Real Estate & Property" />
         </Suspense>
 
         <Suspense fallback={<ProductRowSkeleton title="Vehicles & Cars..." />}>
-          <CategoryRow title="Vehicles & Cars" category="vehicles" />
+          <CategoryRow title="Vehicles & Cars" category="Vehicles & Cars" />
         </Suspense>
 
-        <Suspense fallback={<ProductRowSkeleton title="Phone & Electronics..." />}>
-          <CategoryRow title="Phone & Electronics" category="electronics" />
+        <Suspense fallback={<ProductRowSkeleton title="Phones & Tablets..." />}>
+          <CategoryRow title="Phones & Tablets" category="Phones & Tablets" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Computers & Laptops..." />}>
+          <CategoryRow title="Computers & Laptops" category="Computers & Laptops" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Home Appliances..." />}>
+          <CategoryRow title="Home Appliances" category="Home Appliances" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Electronics..." />}>
+          <CategoryRow title="Electronics" category="Electronics" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Furniture & Decor..." />}>
+          <CategoryRow title="Furniture & Decor" category="Furniture & Decor" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Construction & Materials..." />}>
+          <CategoryRow title="Construction & Materials" category="Construction & Materials" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Heavy Machinery & Equipment..." />}>
+          <CategoryRow title="Heavy Machinery & Equipment" category="Heavy Machinery & Equipment" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Office & Business..." />}>
+          <CategoryRow title="Office & Business" category="Office & Business" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Fashion & Wearables..." />}>
+          <CategoryRow title="Fashion & Wearables" category="Fashion & Wearables" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Sports & Outdoors..." />}>
+          <CategoryRow title="Sports & Outdoors" category="Sports & Outdoors" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Health & Beauty..." />}>
+          <CategoryRow title="Health & Beauty" category="Health & Beauty" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Books & Education..." />}>
+          <CategoryRow title="Books & Education" category="Books & Education" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Professional Services..." />}>
+          <CategoryRow title="Services" category="Services" />
+        </Suspense>
+
+        <Suspense fallback={<ProductRowSkeleton title="Other..." />}>
+          <CategoryRow title="Other" category="Other" />
         </Suspense>
 
         <Suspense fallback={<ProductRowSkeleton title="Agent Portfolios..." />}>
@@ -84,7 +136,7 @@ export default function Home() {
                 Start selling for free today.
               </h2>
               <p className="text-white/60 text-lg font-bold">
-                Join thousands of verified sellers in Ethiopia's most professional marketplace.
+                "Pay a little, enjoy big commissions." The premier platform for verified merchants.
               </p>
               <div className="pt-4">
                 <Link href="/stores/create">

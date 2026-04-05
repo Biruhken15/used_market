@@ -11,7 +11,9 @@ export async function middleware(req: any) {
     
     // Paths targeted by this middleware are ALWAYS private (see config.matcher)
     if (!token) {
-        return NextResponse.redirect(new URL("/auth/login", req.nextUrl));
+        const loginUrl = new URL("/auth/login", req.nextUrl);
+        loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
+        return NextResponse.redirect(loginUrl);
     }
 
     // ADDED: Subscription Gating Logic

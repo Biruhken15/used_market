@@ -2,8 +2,8 @@ import React from 'react';
 import { ShieldCheck, UserCheck, Smartphone, Eye, MapPin, AlertTriangle } from 'lucide-react';
 
 export const metadata = {
-    title: 'Safety Tips | ከሰው እጅ Marketplace',
-    description: 'Learn how to stay safe while buying and selling on our platform.',
+    title: 'Safety Tips | ከሰው እጅ KesewEj Marketplace',
+    description: 'Learn how to stay safe while buying and selling on KesewEj.',
 };
 
 const safetyTips = [

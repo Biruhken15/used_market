@@ -10,21 +10,21 @@ import { BottomNav } from "@/components/common/BottomNav";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ከሰው እጅ | Ethio Used Product Marketplace",
-  description: "The professional standard for quality used products in Ethiopia. Buy and sell with trust on our premium SaaS platform.",
-  keywords: ["Used Market Ethiopia", "Ethio Used Products", "Addis Ababa Marketplace", "Used Electronics Ethiopia", "Used Furniture Addis"],
-  authors: [{ name: "Ethio Used Market Team" }],
+  title: "ከሰው እጅ | KesewEj Market",
+  description: "The professional standard for quality used products in Ethiopia. Buy and sell with trust on KesewEj, the premium SaaS platform.",
+  keywords: ["KesewEj Ethiopia", "Ethio Used Products", "Addis Ababa Marketplace", "Used Electronics Ethiopia", "Used Furniture Addis"],
+  authors: [{ name: "KesewEj Team" }],
   openGraph: {
-    title: "ከሰው እጅ | Ethio Used Product Marketplace",
-    description: "Professional SaaS implementation for used item trading in Ethiopia.",
-    url: "https://usedmarket.et",
-    siteName: "Ethio Used Market",
+    title: "ከሰው እጅ | KesewEj Product Marketplace",
+    description: "Professional SaaS implementation for used item trading in Ethiopia via KesewEj.",
+    url: "https://kesewej.et",
+    siteName: "KesewEj Market",
     locale: "am_ET",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ከሰው እጅ | Used Product Marketplace",
+    title: "ከሰው እጅ | KesewEj Marketplace",
     description: "The premium standard for used product trading in Ethiopia.",
   },
   icons: {

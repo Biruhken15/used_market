@@ -104,11 +104,20 @@ export const HomeHeroFilters = ({ isMobile = false }: { isMobile?: boolean }) =>
                                 className="w-full h-12 pl-10 pr-4 bg-slate-50 border border-transparent rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-violet-500 outline-none transition-all appearance-none cursor-pointer"
                             >
                                 <option>All Categories</option>
+                                <option>Real Estate & Property</option>
+                                <option>Vehicles & Cars</option>
+                                <option>Phones & Tablets</option>
+                                <option>Computers & Laptops</option>
+                                <option>Home Appliances</option>
                                 <option>Electronics</option>
-                                <option>Fashion</option>
-                                <option>Vehicles</option>
-                                <option>Home & Garden</option>
-                                <option>Real Estate</option>
+                                <option>Furniture & Decor</option>
+                                <option>Construction & Materials</option>
+                                <option>Heavy Machinery & Equipment</option>
+                                <option>Office & Business</option>
+                                <option>Fashion & Wearables</option>
+                                <option>Sports & Outdoors</option>
+                                <option>Books & Education</option>
+                                <option>Other</option>
                             </select>
                             <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
                         </div>

@@ -6,7 +6,7 @@ export interface IProduct extends Document {
     description: string;
     price: number;
     priceType: 'fixed' | 'negotiable';
-    category: 'electronics' | 'phones' | 'real-estate' | 'vehicles' | 'houses' | 'furniture' | 'fashion' | 'sports' | 'books' | 'other';
+    category: 'Real Estate & Property' | 'Vehicles & Cars' | 'Phones & Tablets' | 'Computers & Laptops' | 'Home Appliances' | 'Electronics' | 'Furniture & Decor' | 'Construction & Materials' | 'Heavy Machinery & Equipment' | 'Office & Business' | 'Fashion & Wearables' | 'Sports & Outdoors' | 'Health & Beauty' | 'Books & Education' | 'Services' | 'Other';
     condition: 'new' | 'like-new' | 'good' | 'fair' | 'for-parts';
     status: 'active' | 'sold' | 'pending' | 'archived';
     quantity: number;
@@ -31,7 +31,7 @@ export interface IProduct extends Document {
     isUrgent: boolean;
     urgentSetAt?: Date;
     isFeatured: boolean;
-    region: 'Addis Ababa' | 'Oromia' | 'Amhara' | 'Dire Dawa' | 'Tigray' | 'SNNPR' | 'Other';
+    region: 'Addis Ababa' | 'Afar' | 'Amhara' | 'Benishangul-Gumuz' | 'Central Ethiopia' | 'Dire Dawa' | 'Gambela' | 'Harari' | 'Oromia' | 'Sidama' | 'Somali' | 'South Ethiopia' | 'South West Ethiopia' | 'Tigray' | 'Other';
     saleType: 'sale' | 'rent';
 }
 
@@ -75,7 +75,24 @@ const productSchema = new Schema<IProduct>({
     category: {
         type: String,
         required: [true, 'Category is required'],
-        enum: ['electronics', 'phones', 'real-estate', 'vehicles', 'houses', 'furniture', 'fashion', 'sports', 'books', 'other']
+        enum: [
+            'Real Estate & Property',
+            'Vehicles & Cars',
+            'Phones & Tablets',
+            'Computers & Laptops',
+            'Home Appliances',
+            'Electronics',
+            'Furniture & Decor',
+            'Construction & Materials',
+            'Heavy Machinery & Equipment',
+            'Office & Business',
+            'Fashion & Wearables',
+            'Sports & Outdoors',
+            'Health & Beauty',
+            'Books & Education',
+            'Services',
+            'Other'
+        ]
     },
 
     condition: {
@@ -172,7 +189,7 @@ const productSchema = new Schema<IProduct>({
     region: {
         type: String,
         required: [true, 'Location region is required'],
-        enum: ['Addis Ababa', 'Oromia', 'Amhara', 'Dire Dawa', 'Tigray', 'SNNPR', 'Other'],
+        enum: ['Addis Ababa', 'Afar', 'Amhara', 'Benishangul-Gumuz', 'Central Ethiopia', 'Dire Dawa', 'Gambela', 'Harari', 'Oromia', 'Sidama', 'Somali', 'South Ethiopia', 'South West Ethiopia', 'Tigray', 'Other'],
         default: 'Addis Ababa'
     },
     saleType: {
@@ -193,14 +210,16 @@ productSchema.index({ category: 1, status: 1, createdAt: -1 });
 productSchema.index({ ownerId: 1, status: 1 });
 productSchema.index({ isUrgent: 1, status: 1 });
 productSchema.index({ isFeatured: 1, status: 1 });
+productSchema.index({ region: 1, status: 1, createdAt: -1 });
+productSchema.index({ price: 1, status: 1 });
 productSchema.index({ createdAt: -1 });
 
 // Text Search Index for keyword searches
-productSchema.index({ 
-    title: 'text', 
+productSchema.index({
+    title: 'text',
     category: 'text',
     region: 'text',
-    description: 'text' 
+    description: 'text'
 }, {
     weights: {
         title: 10,

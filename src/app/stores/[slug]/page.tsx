@@ -106,7 +106,7 @@ export default function StoreProfilePage() {
                                 <span className="px-4 py-1.5 bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest rounded-full border border-accent/20">Verified Merchant</span>
                             </div>
                             <div className="relative w-full max-w-full overflow-hidden">
-                                <p className="text-slate-500 text-lg font-medium max-w-2xl leading-relaxed whitespace-pre-line break-words">
+                                <p className="text-slate-500 text-lg font-medium max-w-2xl leading-relaxed whitespace-pre-line break-words break-all">
                                     {(store.description?.length > 200 && !isDescriptionExpanded)
                                         ? `${store.description.slice(0, 200)}...`
                                         : store.description}

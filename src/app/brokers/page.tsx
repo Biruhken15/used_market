@@ -4,6 +4,7 @@ import { StoreService } from "@/lib/services/store-service";
 import { FeatureBar } from "@/components/home/FeatureBar";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { BrokerChatButton } from "@/components/brokers/BrokerChatButton";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -76,9 +77,10 @@ export default async function BrokersPage({ searchParams }: { searchParams: Prom
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 text-slate-300 group-hover:bg-accent/10 group-hover:text-accent transition-all">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                                            </div>
+                                            {/* Chat Intercept Button */}
+                                            <BrokerChatButton 
+                                                ownerId={(broker.ownerId?._id || broker.ownerId).toString()} 
+                                            />
                                         </div>
                                     </Link>
                                 );

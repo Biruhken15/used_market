@@ -4,8 +4,21 @@ import { useState } from "react";
 
 export const SearchFilter = () => {
     const categories = [
-        "All Products", "Electronics", "Fashion", "Furniture",
-        "Vehicles", "Real Estate", "Jobs", "Services", "Books"
+        "All Products",
+        "Real Estate & Property",
+        "Vehicles & Cars",
+        "Phones & Tablets",
+        "Computers & Laptops",
+        "Home Appliances",
+        "Electronics",
+        "Furniture & Decor",
+        "Construction & Materials",
+        "Heavy Machinery & Equipment",
+        "Office & Business",
+        "Fashion & Wearables",
+        "Sports & Outdoors",
+        "Books & Education",
+        "Other"
     ];
     const [activeCategory, setActiveCategory] = useState("All Products");
 

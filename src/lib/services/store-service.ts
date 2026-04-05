@@ -37,7 +37,7 @@ export class StoreService {
         await connectDB();
 
         // 1. Check if user already has a store
-        const existingStore = await Store.findOne({ ownerId: data.ownerId });
+        const existingStore = await Store.findOne({ ownerId: data.ownerId }).lean();
         if (existingStore) {
             throw new Error("You already have an active store. Each user can only own one store.");
         }
@@ -49,7 +49,7 @@ export class StoreService {
             throw new Error("Invalid store name. Please provide a valid name for your store URL.");
         }
 
-        const slugExists = await Store.findOne({ storeSlug });
+        const slugExists = await Store.findOne({ storeSlug }).lean();
         if (slugExists) {
             if (data.storeSlug) {
                 throw new Error(`The URL "ethio.market/${storeSlug}" is already taken. Please try a different one.`);
@@ -58,7 +58,7 @@ export class StoreService {
             // Auto-generate unique slug if generic one is taken
             let counter = 1;
             let uniqueSlug = storeSlug;
-            while (await Store.findOne({ storeSlug: uniqueSlug })) {
+            while (await Store.findOne({ storeSlug: uniqueSlug }).lean()) {
                 uniqueSlug = `${storeSlug}-${counter}`;
                 counter++;
             }
@@ -86,17 +86,17 @@ export class StoreService {
 
     static async getStoreByOwner(ownerId: string) {
         await connectDB();
-        return await Store.findOne({ ownerId });
+        return await Store.findOne({ ownerId }).lean() as any;
     }
 
     static async getStoreById(storeId: string) {
         await connectDB();
-        return await Store.findById(storeId);
+        return await Store.findById(storeId).lean() as any;
     }
 
     static async getAllStores() {
         await connectDB();
-        return await Store.find({ status: "approved" }).sort({ createdAt: -1 });
+        return await Store.find({ status: "approved" }).sort({ createdAt: -1 }).lean();
     }
 
     static async updateStore(storeId: string, data: Partial<StoreData>) {
@@ -105,7 +105,7 @@ export class StoreService {
             storeId,
             { $set: data },
             { new: true, runValidators: true }
-        );
+        ).lean();
         if (!updatedStore) {
             throw new Error("Store not found");
         }
@@ -128,11 +128,13 @@ export class StoreService {
         await connectDB();
 
         // 1. Find user by email
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).lean() as any;
         if (!user) throw new Error("User with this email not found. They must have an account first.");
 
         // 2. Check if user is already staff or owner
-        const store = await Store.findById(storeId);
+        const store = await Store.findById(storeId).lean() as any;
+        if (!store) throw new Error("Store not found.");
+        
         if (store.ownerId.toString() === user._id.toString()) {
             throw new Error("This user is already the store owner.");
         }
@@ -214,6 +216,7 @@ export class StoreService {
                     region: 1,
                     logo: 1,
                     sellerName: 1,
+                    ownerId: 1,
                     'owner.profile': 1,
                     'owner.name': 1,
                     'owner.email': 1,

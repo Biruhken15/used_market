@@ -34,12 +34,28 @@ export class ProductService {
             throw new Error(canAdd.reason);
         }
 
-        // 2. Generate Slug explicitly to bypass validation issues
+        // 2. Fetch Subscription & Enforce Premium Features
+        const subscription = await SubscriptionService.getStoreSubscription(storeId);
+        const plan = subscription?.planId as any;
+
+        // Strip "Urgent" if plan doesn't allow it
+        if (data.isUrgent && !plan?.features?.canMarkAsUrgent) {
+            console.warn(`[Security] Unauthorized 'isUrgent' flag stripped for store: ${storeId}`);
+            data.isUrgent = false;
+        }
+
+        // Strip "Featured" if plan has no featured allowance
+        if (data.isFeatured && (plan?.limits?.featuredListingsPerMonth || 0) === 0) {
+            console.warn(`[Security] Unauthorized 'isFeatured' flag stripped for store: ${storeId}`);
+            data.isFeatured = false;
+        }
+
+        // 3. Generate Slug explicitly to bypass validation issues
         const { slugify } = await import("../utils/slug");
         const baseSlug = slugify(data.title || "product");
         const uniqueSlug = `${baseSlug}-${Date.now().toString(36)}`;
 
-        // 3. Create the product
+        // 4. Create the product
         return await Product.create({
             ...data,
             slug: uniqueSlug,
@@ -93,15 +109,11 @@ export class ProductService {
         }
 
         // Apply remaining filters (like isFeatured, isUrgent, storeId, etc.)
-        // Filter out handled ones to avoid conflicts
-        const { minPrice, maxPrice, region, category, keyword, last24Hours, ...rest } = filters;
+        const { minPrice, maxPrice, region, category, keyword, last24Hours, hasPromotedPlan, ...rest } = filters;
         Object.assign(matchStage, rest);
 
-        // 1. Get total count for pagination
-        // If hasPromotedPlan is true, we need to account for the join in the count
         let total = 0;
-        if (filters.hasPromotedPlan) {
-            // For promoted plans, we do a join count
+        if (hasPromotedPlan) {
             const promoCount = await Product.aggregate([
                 { $match: matchStage },
                 {
@@ -130,7 +142,6 @@ export class ProductService {
             total = await Product.countDocuments(matchStage);
         }
 
-        // 2. Fetch products
         const aggregationPipeline: any[] = [
             { $match: matchStage },
             {
@@ -159,20 +170,22 @@ export class ProductService {
                     as: 'plan'
                 }
             },
-            { $unwind: { path: '$plan', preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: '$plan', preserveNullAndEmptyArrays: true } }
         ];
 
-        // NEW: Apply post-lookup filters (e.g., store.storeType)
-        const postLookupMatch: any = {};
-        if (filters['store.storeType']) {
-            postLookupMatch['store.storeType'] = filters['store.storeType'];
-        }
-        if (Object.keys(postLookupMatch).length > 0) {
-            aggregationPipeline.push({ $match: postLookupMatch });
-        }
-
-        if (filters.hasPromotedPlan) {
-            aggregationPipeline.push({ $match: { 'plan.features.hasHomepagePromotion': true } });
+        // NEW: Homepage Promotion Logic for Enterprise Tiers
+        if (hasPromotedPlan) {
+            const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            aggregationPipeline.push(
+                { $match: { 
+                    'plan.features.hasHomepagePromotion': true,
+                    'createdAt': { $gte: lastWeek } 
+                } },
+                // Sort by recency then limit per person would require grouping, 
+                // but for now we take the top 5 overall from Enterprise tier
+                { $sort: { createdAt: -1 } },
+                { $limit: 5 }
+            );
         }
 
         aggregationPipeline.push(
@@ -183,92 +196,44 @@ export class ProductService {
                             { $ifNull: ['$plan.features.searchRankingBoost', 0] },
                             { $cond: [{ $eq: ['$plan.features.hasVerifiedBadge', true] }, 10, 0] },
                             { $cond: [{ $eq: ['$isFeatured', true] }, 25, 0] },
-                            { $cond: [{ $eq: ['$isUrgent', true] }, 30, 0] }
+                            { $cond: [{ $eq: ["$isUrgent", true] }, 30, 0] }
                         ]
-                    },
-                    isUrgentExpired: {
-                        $cond: {
-                            if: { $and: [{ $eq: ["$isUrgent", true] }, { $ne: ["$urgentSetAt", null] }] },
-                            then: {
-                                $gt: [
-                                    { $divide: [{ $subtract: [new Date(), "$urgentSetAt"] }, 86400000] },
-                                    { $ifNull: ["$plan.limits.urgentDurationDays", 0] }
-                                ]
-                            },
-                            else: false
-                        }
                     }
                 }
             },
             { $sort: { rankingScore: -1, createdAt: -1 } },
             { $skip: (page - 1) * limit },
-            { $limit: limit }
+            { $limit: limit },
+            { 
+                $project: {
+                    title: 1, slug: 1, price: 1, priceType: 1, category: 1, 
+                    description: 1, images: 1, isUrgent: 1, isFeatured: 1, status: 1, 
+                    createdAt: 1, region: 1, storeId: 1, rankingScore: 1,
+                    'store.storeName': 1, 'store.logo': 1, 'store.storeSlug': 1
+                }
+            }
         );
 
         let products = await Product.aggregate(aggregationPipeline);
 
-        // 3. Fallback: If promoted batch is requested but empty, return featured products as promotions
         if (filters.hasPromotedPlan && products.length === 0) {
             const fallbackFilters = { ...matchStage, isFeatured: true };
-            // Get total for featured fallback
             total = await Product.countDocuments(fallbackFilters);
-            // Fetch featured as fallback
             products = await Product.aggregate([
                 { $match: fallbackFilters },
-                {
-                    $lookup: {
-                        from: 'stores',
-                        localField: 'storeId',
-                        foreignField: '_id',
-                        as: 'store'
-                    }
-                },
+                { $lookup: { from: 'stores', localField: 'storeId', foreignField: '_id', as: 'store' } },
                 { $unwind: { path: '$store', preserveNullAndEmptyArrays: true } },
-                {
-                    $lookup: {
-                        from: 'usersubscriptions',
-                        localField: 'storeId',
-                        foreignField: 'storeId',
-                        as: 'subscription'
-                    }
-                },
-                { $unwind: { path: '$subscription', preserveNullAndEmptyArrays: true } },
-                {
-                    $lookup: {
-                        from: 'subscriptionplans',
-                        localField: 'subscription.planId',
-                        foreignField: '_id',
-                        as: 'plan'
-                    }
-                },
-                { $unwind: { path: '$plan', preserveNullAndEmptyArrays: true } },
-                {
-                    $addFields: {
-                        rankingScore: {
-                            $add: [
-                                { $ifNull: ['$plan.features.searchRankingBoost', 0] },
-                                { $cond: [{ $eq: ['$plan.features.hasVerifiedBadge', true] }, 10, 0] },
-                                { $cond: [{ $eq: ['$isFeatured', true] }, 25, 0] },
-                                { $cond: [{ $eq: ['$isUrgent', true] }, 30, 0] }
-                            ]
-                        },
-                        isUrgentExpired: {
-                            $cond: {
-                                if: { $and: [{ $eq: ["$isUrgent", true] }, { $ne: ["$urgentSetAt", null] }] },
-                                then: {
-                                    $gt: [
-                                        { $divide: [{ $subtract: [new Date(), "$urgentSetAt"] }, 86400000] },
-                                        { $ifNull: ["$plan.limits.urgentDurationDays", 0] }
-                                    ]
-                                },
-                                else: false
-                            }
-                        }
-                    }
-                },
-                { $sort: { rankingScore: -1, createdAt: -1 } },
+                { $sort: { createdAt: -1 } },
                 { $skip: (page - 1) * limit },
-                { $limit: limit }
+                { $limit: limit },
+                { 
+                    $project: {
+                        title: 1, slug: 1, price: 1, priceType: 1, category: 1, 
+                        description: 1, images: 1, isUrgent: 1, isFeatured: 1, status: 1, 
+                        createdAt: 1, region: 1, storeId: 1,
+                        'store.storeName': 1, 'store.logo': 1, 'store.storeSlug': 1
+                    }
+                }
             ]);
         }
 
@@ -279,114 +244,67 @@ export class ProductService {
             totalPages: Math.ceil(total / limit)
         };
 
-        // Store in cache
         cache.set(cacheKey, { data: result, expires: Date.now() + CACHE_TTL });
-
-        // Periodically clean cache (crude but effective for memory safety)
-        if (cache.size > 1000) {
-            const now = Date.now();
-            for (const [key, val] of cache.entries()) {
-                if (val.expires < now) cache.delete(key);
-            }
-        }
-
         return result;
     }
 
-    /**
-     * Get products for a specific store.
-     */
     static async getStoreProducts(storeId: string) {
         await dbConnect();
-        const products = await Product.find({ storeId: new mongoose.Types.ObjectId(storeId) }).sort({ createdAt: -1 });
+        const products = await Product.find({ storeId: new mongoose.Types.ObjectId(storeId) })
+            .select('_id title slug price priceType category description images isUrgent isFeatured status createdAt region')
+            .sort({ createdAt: -1 })
+            .lean();
         return serialize(products);
     }
 
-    /**
-     * Mark a product as sold with subscription verification.
-     */
     static async markAsSold(productId: string, ownerId: string) {
         await dbConnect();
-
-        const product = await Product.findOne({
-            _id: productId,
-            ownerId: new mongoose.Types.ObjectId(ownerId)
-        });
-
-        if (!product) {
-            throw new Error('Product not found or access denied');
-        }
-
-        // Verify subscription features
-        const subscription = await SubscriptionService.getStoreSubscription(product.storeId.toString());
-        const plan = subscription?.planId as any;
-
-        if (!plan?.features?.canMarkAsSold) {
-            throw new Error('Your current plan does not support marking items as sold. Please upgrade.');
-        }
-
-        product.status = 'sold';
-        product.updatedAt = new Date();
-        return await product.save();
-    }
-
-    /**
-     * Update an existing product with ownership verification.
-     */
-    static async updateProduct(productId: string, ownerId: string, data: any) {
-        await dbConnect();
-
-        // Ownership and existence check
         const product = await Product.findOneAndUpdate(
             { _id: productId, ownerId: new mongoose.Types.ObjectId(ownerId) },
-            { ...data, updatedAt: new Date() },
+            { $set: { status: 'sold', updatedAt: new Date() } },
             { new: true }
         );
-
-        if (!product) {
-            throw new Error('Product not found or access denied');
-        }
-
+        if (!product) throw new Error('Product not found or access denied');
         return product;
     }
 
-    /**
-     * Delete a product listing.
-     */
-    static async deleteProduct(productId: string, ownerId: string) {
+    static async updateProduct(productId: string, ownerId: string, data: any) {
         await dbConnect();
+        
+        // Ownership check & Feature strip
+        const productToCheck = await Product.findById(productId).lean();
+        if (productToCheck) {
+            const subscription = await SubscriptionService.getStoreSubscription(productToCheck.storeId.toString());
+            const plan = subscription?.planId as any;
 
-        const result = await Product.deleteOne({
-            _id: productId,
-            ownerId: new mongoose.Types.ObjectId(ownerId)
-        });
-
-        if (result.deletedCount === 0) {
-            throw new Error('Product not found or access denied');
+            if (data.isUrgent && !plan?.features?.canMarkAsUrgent) data.isUrgent = false;
+            if (data.isFeatured && (plan?.limits?.featuredListingsPerMonth || 0) === 0) data.isFeatured = false;
         }
 
-        return { success: true, message: 'Product deleted successfully' };
+        const product = await Product.findOneAndUpdate(
+            { _id: productId, ownerId: new mongoose.Types.ObjectId(ownerId) },
+            { $set: { ...data, updatedAt: new Date() } },
+            { new: true }
+        );
+        if (!product) throw new Error('Product not found or access denied');
+        return product;
     }
 
-    /**
-     * Get the number of featured products for a store.
-     */
+    static async deleteProduct(productId: string, ownerId: string) {
+        await dbConnect();
+        const result = await Product.deleteOne({ _id: productId, ownerId: new mongoose.Types.ObjectId(ownerId) });
+        if (result.deletedCount === 0) throw new Error('Product not found or access denied');
+        return { success: true };
+    }
+
     static async getStoreFeaturedCount(storeId: string) {
         await dbConnect();
-        return await Product.countDocuments({
-            storeId: new mongoose.Types.ObjectId(storeId),
-            isFeatured: true,
-            status: 'active'
-        });
+        return await Product.countDocuments({ storeId: new mongoose.Types.ObjectId(storeId), isFeatured: true, status: 'active' });
     }
 
-    /**
-     * Get a single product by ID.
-     */
     static async getProductById(productId: string) {
         await dbConnect();
-        const product = await Product.findById(productId).populate('storeId');
-        if (!product) return null;
+        const product = await Product.findById(productId).populate('storeId').lean();
         return serialize(product);
     }
 }
