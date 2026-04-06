@@ -5,6 +5,7 @@ import connectDB from "@/lib/db/mongoose";
 import User from "@/lib/models/user";
 import UserSubscription from "@/lib/models/user-subscription";
 import SubscriptionPlan from "@/lib/models/subscription-plan";
+import Store from "@/lib/models/store";
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -76,9 +77,19 @@ export const authOptions: AuthOptions = {
                 try {
                     console.log(`[AUTH] JWT Callback - Syncing state for: ${user.email}`);
                     await connectDB();
+                    
+                    // 1. Check for Store Ownership (Primary Source of truth for having a store)
+                    const userStore = await Store.findOne({ ownerId: user.id }).select('_id');
+                    if (userStore) {
+                        token.storeId = userStore._id.toString();
+                        console.log(`[AUTH] Store ownership verified: ${token.storeId}`);
+                    }
+
+                    // 2. Check for Subscription
                     const sub = await UserSubscription.findOne({ userId: user.id }).populate('planId');
                     if (sub) {
-                        token.storeId = sub.storeId?.toString();
+                        // Priority to subscription's store mapping if it exists
+                        if (sub.storeId) token.storeId = sub.storeId.toString();
                         token.planCode = (sub.planId as any)?.planCode || 'FREE_TRIAL';
                         console.log(`[AUTH] Subscription found: ${token.planCode}`);
                     } else {

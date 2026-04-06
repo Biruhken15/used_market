@@ -94,20 +94,29 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
     }
 
     // Parallelize data fetching for better performance
-    const [subscription, metrics, products, transactions] = await Promise.all([
+    const [rawSubscription, rawMetrics, rawProducts, rawTransactions, rawWeekly] = await Promise.all([
         SubscriptionService.getStoreSubscription(store._id.toString()),
         AnalyticsService.getStoreMetrics(store._id.toString()),
         ProductService.getStoreProducts(store._id.toString()),
-        isBilling ? getStoreTransactions(store._id.toString()) : Promise.resolve([])
+        isBilling ? getStoreTransactions(store._id.toString()) : Promise.resolve([]),
+        AnalyticsService.getWeeklyEngagement(store._id.toString())
     ]);
+
+    // Force strict serialization for all DB objects before passing to Client Components
+    const subscription = JSON.parse(JSON.stringify(rawSubscription));
+    const metrics = JSON.parse(JSON.stringify(rawMetrics));
+    const products = JSON.parse(JSON.stringify(rawProducts));
+    const transactions = JSON.parse(JSON.stringify(rawTransactions));
+    const weeklyData = JSON.parse(JSON.stringify(rawWeekly));
 
     const plan = subscription?.planId as any;
     const isProOrEnterprise = plan?.planCode === 'PRO_SELLER' || plan?.planCode === 'ENTERPRISE_SELLER';
 
     // Fetch activity only if in analytics mode and user has the plan for it
-    const recentActivity = isAnalytics && isProOrEnterprise
+    const rawActivity = isAnalytics && isProOrEnterprise
         ? await AnalyticsService.getRecentActivity(store._id.toString())
         : [];
+    const recentActivity = JSON.parse(JSON.stringify(rawActivity));
 
     // Check for expiry status
     const expiryStatus = await SubscriptionService.checkSubscriptionExpiry(store._id.toString());
@@ -120,7 +129,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
         ...(plan?.features || { canMarkAsSold: false }),
         featuredListingsPerMonth: plan?.limits?.featuredListingsPerMonth || 0
     };
-    const serializedStaff = store.staff || [];
+    const serializedStaff = JSON.parse(JSON.stringify(store.staff || []));
     const serializedPlanLimits = {
         ...(plan?.limits || { maxActiveListings: 3, imagesPerProduct: 3 }),
         planCode: plan?.planCode,
@@ -278,6 +287,7 @@ export default async function MyStorePage({ searchParams }: { searchParams: Prom
                         <StoreInsights
                             metrics={metrics}
                             recentActivity={serializedActivity}
+                            weeklyData={weeklyData}
                             planName={plan?.planName || 'Free Trial'}
                             isProOrEnterprise={isProOrEnterprise}
                         />

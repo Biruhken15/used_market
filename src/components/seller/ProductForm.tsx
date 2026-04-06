@@ -36,7 +36,11 @@ export default function ProductForm({ initialData, isEditing = false, productId,
 
     // Media state
     const [imageFiles, setImageFiles] = useState<File[]>([]);
-    const [imagePreviews, setImagePreviews] = useState<string[]>(initialData?.images?.map((img: any) => img.url) || []);
+    const [imagePreviews, setImagePreviews] = useState<string[]>(
+        Array.isArray(initialData?.images) 
+            ? initialData.images.map((img: any) => img.url).filter(Boolean) 
+            : []
+    );
 
     // Form state
     const [formData, setFormData] = useState<{
@@ -242,7 +246,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
                     {/* Media Section */}
                     <div className="space-y-4">
                         <label className={labelClasses}>Product Photos ({imageFiles.length}/{planLimits?.imagesPerProduct || 3})</label>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                             {imagePreviews.map((preview, idx) => (
                                 <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 group">
                                     <img src={preview} alt="Preview" className="w-full h-full object-cover" />
@@ -292,7 +296,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label className={labelClasses}>Listing Type</label>
                                 <select
@@ -328,7 +332,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className={labelClasses}>Category</label>
                                 <select

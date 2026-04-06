@@ -64,8 +64,8 @@ export const LoginForm = () => {
                         </div>
                     </Link>
 
-                    <h1 className="text-3xl font-black text-slate-950 tracking-tighter mb-2">Authorize Access</h1>
-                    <p className="text-slate-500 font-bold text-sm">Enter your ecosystem credentials</p>
+                    <h1 className="text-3xl font-black text-slate-950 tracking-tighter mb-2">Log In</h1>
+                    <p className="text-slate-500 font-bold text-sm">Log into your account</p>
                     <p className="text-violet-600 font-black text-[10px] uppercase tracking-widest mt-4 p-2 bg-violet-50 rounded-lg inline-block border border-violet-100 italic">
                         "Pay a little, enjoy big commissions."
                     </p>
@@ -83,7 +83,7 @@ export const LoginForm = () => {
                         {/* Email Field */}
                         <div className="space-y-1.5">
                             <div className="flex justify-between items-center">
-                                <label className="text-xs font-bold text-slate-700 ml-1">Digital Identity</label>
+                                <label className="text-xs font-bold text-slate-700 ml-1">Email</label>
                             </div>
                             <div className="relative">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -94,7 +94,7 @@ export const LoginForm = () => {
                                     placeholder="your@identity.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="h-12 !rounded-xl border border-slate-200 bg-white focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-all pl-12 font-medium text-slate-900"
+                                    className="h-12 !rounded-xl border border-slate-200 bg-white focus:border-slate-950 outline-none transition-all pl-12 font-medium text-slate-900"
                                     required
                                 />
                             </div>
@@ -103,8 +103,8 @@ export const LoginForm = () => {
                         {/* Password Field */}
                         <div className="space-y-1.5">
                             <div className="flex justify-between items-center">
-                                <label className="text-xs font-bold text-slate-700 ml-1">Secret Keyword</label>
-                                <Link href="/" className="text-xs font-bold text-violet-600 hover:text-pink-600 transition-colors">
+                                <label className="text-xs font-bold text-slate-700 ml-1">Password</label>
+                                <Link href="/" className="text-xs font-bold text-violet-600 hover:underline transition-colors">
                                     Recovery?
                                 </Link>
                             </div>
@@ -117,7 +117,7 @@ export const LoginForm = () => {
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="h-12 !rounded-xl border border-slate-200 bg-white focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-all pl-12 font-medium text-slate-900"
+                                    className="h-12 !rounded-xl border border-slate-200 bg-white focus:border-slate-950 outline-none transition-all pl-12 font-medium text-slate-900"
                                     required
                                 />
                             </div>
@@ -130,24 +130,14 @@ export const LoginForm = () => {
                         className="w-full h-12 rounded-xl bg-slate-950 text-white font-bold text-sm hover:bg-violet-600 active:scale-[0.98] transition-all border-none relative overflow-hidden group/btn"
                     >
                         <span className="relative z-10 flex items-center justify-center gap-2">
-                            {isLoading ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    <span>Synchronizing...</span>
-                                </>
-                            ) : (
-                                <>
-                                    Authorize Access
-                                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
+                            {isLoading ? "Logging in..." : "Log In"}
                         </span>
                     </Button>
 
                     <div className="text-center pt-6 border-t border-slate-100">
                         <p className="text-xs font-bold text-slate-500">
                             New to the ecosystem?{" "}
-                            <Link href="/auth/register" className="text-violet-600 hover:text-pink-600 transition-colors">
+                            <Link href="/auth/register" className="text-violet-600 hover:underline transition-colors">
                                 Create Profile
                             </Link>
                         </p>

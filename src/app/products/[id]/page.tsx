@@ -58,5 +58,5 @@ export default async function ProductDetailPage({ params }: PageProps) {
         delete product.sourceOwner;
     }
 
-    return <ProductDetailsClient product={product} />;
+    return <ProductDetailsClient product={product} isOwner={isOwner} />;
 }

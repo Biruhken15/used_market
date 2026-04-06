@@ -5,6 +5,7 @@ import React from 'react';
 interface StoreInsightsProps {
     metrics: Record<string, number>;
     recentActivity: any[];
+    weeklyData: { label: string; value: number }[];
     planName: string;
     isProOrEnterprise: boolean;
 }
@@ -33,7 +34,7 @@ const Icons = {
     )
 };
 
-export default function StoreInsights({ metrics, recentActivity, planName, isProOrEnterprise }: StoreInsightsProps) {
+export default function StoreInsights({ metrics, recentActivity, weeklyData, planName, isProOrEnterprise }: StoreInsightsProps) {
     const stats = [
         {
             label: "Store Views",
@@ -117,28 +118,28 @@ export default function StoreInsights({ metrics, recentActivity, planName, isPro
                     </div>
 
                     <div className="h-64 flex items-end justify-between gap-2 px-2">
-                        {[0.4, 0.7, 0.5, 0.9, 0.6, 1.0, 0.8].map((v, i) => (
-                            <div key={i} className="flex-1 group relative">
-                                <div
-                                    className="w-full bg-accent/20 rounded-t-lg group-hover:bg-accent transition-all duration-300"
-                                    style={{ height: `${v * 100}%` }}
-                                >
-                                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        {Math.floor(v * 250)} Views
+                        {weeklyData.map((day, i) => {
+                            const max = Math.max(...weeklyData.map(d => d.value), 1);
+                            const height = (day.value / max) * 100;
+                            return (
+                                <div key={i} className="flex-1 group relative">
+                                    <div
+                                        className="w-full bg-accent/20 rounded-t-lg group-hover:bg-accent transition-all duration-300"
+                                        style={{ height: `${Math.max(height, 5)}%` }}
+                                    >
+                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-30">
+                                            {day.value} Interactions
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     <div className="mt-6 flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">
-                        <span>Mon</span>
-                        <span>Tue</span>
-                        <span>Wed</span>
-                        <span>Thu</span>
-                        <span>Fri</span>
-                        <span>Sat</span>
-                        <span>Sun</span>
+                        {weeklyData.map((day, i) => (
+                            <span key={i}>{day.label}</span>
+                        ))}
                     </div>
                 </div>
 

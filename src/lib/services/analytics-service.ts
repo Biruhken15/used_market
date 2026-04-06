@@ -69,4 +69,56 @@ export class AnalyticsService {
             .sort({ timestamp: -1 })
             .limit(limit);
     }
+    
+    /**
+     * Get engagement counts for the last 7 days grouped by day.
+     */
+    static async getWeeklyEngagement(storeId: string) {
+        await dbConnect();
+        const oid = new mongoose.Types.ObjectId(storeId);
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+
+        const aggregation = await Analytics.aggregate([
+            {
+                $match: {
+                    storeId: oid,
+                    timestamp: { $gte: sevenDaysAgo }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: '$timestamp' },
+                        month: { $month: '$timestamp' },
+                        day: { $dayOfMonth: '$timestamp' }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } }
+        ]);
+
+        // Standardize returning 7 days (even with zeros)
+        const days = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toLocaleDateString([], { weekday: 'short' });
+            
+            const match = aggregation.find(a => 
+                a._id.day === d.getDate() && 
+                a._id.month === (d.getMonth() + 1) && 
+                a._id.year === d.getFullYear()
+            );
+
+            days.push({
+                label: dateStr,
+                value: match ? match.count : 0
+            });
+        }
+
+        return days;
+    }
 }

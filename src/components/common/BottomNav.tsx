@@ -124,10 +124,10 @@ export const BottomNav = () => {
                         <button
                             key={item.label}
                             onClick={() => item.protected ? handleProtectedNav(item.href) : router.push(item.href)}
-                            className={`relative flex flex-col items-center justify-center min-w-[64px] transition-all active:scale-90 ${isActive ? 'text-violet-600' : 'text-slate-400'}`}
+                            className={`relative flex flex-col items-center justify-center min-w-[64px] transition-colors py-1 ${isActive ? 'text-violet-600' : 'text-slate-400'}`}
                         >
-                            <div className={`p-2.5 rounded-2xl transition-all duration-500 ${isActive ? 'bg-violet-600 text-white shadow-lg shadow-violet-200 scale-110 -translate-y-1' : 'bg-transparent'}`}>
-                                <Icon className={`w-5 h-5 ${isActive ? 'stroke-[3px]' : 'stroke-[1.8px]'}`} />
+                            <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-violet-50 text-violet-600' : 'bg-transparent'}`}>
+                                <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
                                 {!session && item.protected && (
                                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-slate-200 rounded-full flex items-center justify-center border-2 border-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" strokeWidth="3"/></svg>

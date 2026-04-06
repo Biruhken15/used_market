@@ -150,15 +150,11 @@ export default function InventoryList({ initialProducts, storeId, subscriptionFe
                 {filteredProducts.map((product) => (
                     <div
                         key={product._id}
-                        className="group bg-white border border-slate-200 rounded-[2rem] overflow-hidden hover:shadow-2xl hover:shadow-slate-200/40 transition-all duration-500 p-4 border-2 hover:border-slate-900"
+                        onClick={() => router.push(`/products/${product._id}`)}
+                        className="group bg-white border border-slate-200 rounded-[2rem] overflow-hidden hover:shadow-2xl hover:shadow-slate-200/40 transition-all duration-500 p-4 border-2 hover:border-slate-900 cursor-pointer"
                     >
                         <div className="flex gap-5 items-start relative">
-                            {/* Background Link for the whole card */}
-                            <Link 
-                                href={`/products/${product._id}`} 
-                                className="absolute inset-0 z-0"
-                                aria-label={`View ${product.title}`}
-                            />
+
 
                             {/* Product Image */}
                             <div className="w-24 h-24 md:w-32 md:h-32 bg-slate-50 rounded-2xl overflow-hidden shrink-0 relative z-10 border border-slate-100 shadow-inner pointer-events-none">

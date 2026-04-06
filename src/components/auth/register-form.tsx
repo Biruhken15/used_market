@@ -93,8 +93,8 @@ export const RegisterForm = () => {
                         </div>
                     </Link>
 
-                    <h1 className="text-3xl font-black text-slate-950 tracking-tighter mb-2">Create Identity</h1>
-                    <p className="text-slate-500 font-bold text-sm">Join the ecosystem today</p>
+                    <h1 className="text-3xl font-black text-slate-950 tracking-tighter mb-2">Create Account</h1>
+                    <p className="text-slate-500 font-bold text-sm">Join the platform today</p>
                     <p className="text-emerald-600 font-black text-[10px] uppercase tracking-widest mt-4 p-2 bg-emerald-50 rounded-lg inline-block border border-emerald-100 italic">
                         "Your portal to professional trade."
                     </p>
@@ -120,7 +120,7 @@ export const RegisterForm = () => {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-700 ml-1">Digital Identity (Email)</label>
+                            <label className="text-xs font-bold text-slate-700 ml-1">Email</label>
                             <Input
                                 type="email"
                                 placeholder="abebe@market.com"
@@ -132,7 +132,7 @@ export const RegisterForm = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-slate-700 ml-1">Keyword</label>
+                                <label className="text-xs font-bold text-slate-700 ml-1">Password</label>
                                 <Input
                                     type="password"
                                     placeholder="••••••••"
@@ -143,7 +143,7 @@ export const RegisterForm = () => {
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-slate-700 ml-1">Confirm</label>
+                                <label className="text-xs font-bold text-slate-700 ml-1">Confirm Password</label>
                                 <Input
                                     type="password"
                                     placeholder="••••••••"
@@ -162,7 +162,7 @@ export const RegisterForm = () => {
                             disabled={isLoading}
                             className="h-14 w-full rounded-xl bg-slate-950 text-white font-black text-xs uppercase tracking-widest hover:bg-violet-600 shadow-xl shadow-slate-100 transition-all border-none"
                         >
-                            {isLoading ? "Synchronizing..." : "Initialize Profile"}
+                            {isLoading ? "Registering..." : "Register"}
                         </Button>
                     </div>
 
@@ -170,7 +170,7 @@ export const RegisterForm = () => {
                         <p className="text-xs font-bold text-slate-500">
                             Already synchronized?{" "}
                             <Link href="/auth/login" className="text-violet-600 font-bold hover:underline transition-colors">
-                                Authorize Access
+                                Log In
                             </Link>
                         </p>
                     </div>

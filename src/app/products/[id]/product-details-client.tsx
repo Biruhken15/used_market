@@ -11,9 +11,10 @@ import { MobileProductActions } from "@/components/products/MobileProductActions
 
 interface ProductDetailsClientProps {
     product: any;
+    isOwner?: boolean;
 }
 
-export default function ProductDetailsClient({ product }: ProductDetailsClientProps) {
+export default function ProductDetailsClient({ product, isOwner = false }: ProductDetailsClientProps) {
     const router = useRouter();
 
     useEffect(() => {
@@ -115,12 +116,14 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
                     </div>
                 </div>
 
-                <div className="mt-32">
-                    <RelatedProducts
-                        storeId={product.storeId?._id}
-                        excludeProductId={product._id}
-                    />
-                </div>
+                {!isOwner && (
+                    <div className="mt-32">
+                        <RelatedProducts
+                            storeId={product.storeId?._id}
+                            excludeProductId={product._id}
+                        />
+                    </div>
+                )}
             </div>
 
             <MobileProductActions 

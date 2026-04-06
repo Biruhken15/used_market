@@ -42,10 +42,27 @@ export class PaymentService {
             status: 'pending'
         });
 
-        // 3. Chapa Integration Logic
+        // 3. Chapa Integration Logic & URL Normalization
+        const rawBaseUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || '';
+        
+        // Remove trailing slash if exists to prevent double slashes //
+        const baseUrl = rawBaseUrl.replace(/\/$/, "");
+        
+        if (!baseUrl || !baseUrl.startsWith('http')) {
+            console.error('CRITICAL: Payment system lacks a valid absolute Base URL (NEXTAUTH_URL or APP_URL).', { baseUrl });
+            return {
+                status: 'error',
+                message: 'Payment configuration error: Invalid or missing Site URL. Please configure NEXTAUTH_URL.'
+            };
+        }
+
+        const CALLBACK_URL = `${baseUrl}/api/subscriptions/verify?tx_ref=${tx_ref}`;
+        const RETURN_URL = `${baseUrl}/seller/checkout/verify?tx_ref=${tx_ref}`;
+
+        // Ensure amount is a number and rounded to 2 decimal places (standard for payments)
+        const formattedAmount = Number(params.amount.toFixed(2));
+
         const CHAPA_SECRET_KEY = process.env.CHAPA_SECRET_KEY;
-        const CALLBACK_URL = `${process.env.NEXTAUTH_URL}/api/subscriptions/verify?tx_ref=${tx_ref}`;
-        const RETURN_URL = `${process.env.NEXTAUTH_URL}/seller/checkout/verify?tx_ref=${tx_ref}`;
 
         if (!CHAPA_SECRET_KEY) {
             console.warn('CHAPA_SECRET_KEY not found. Falling back to mock Chapa response.');
@@ -54,11 +71,13 @@ export class PaymentService {
                 message: 'Checkout URL generated (Mock)',
                 data: {
                     checkout_url: `/seller/checkout?tx_ref=${tx_ref}&mock=true`
-                }
+                },
+                tx_ref // Include tx_ref for the frontend to track
             };
         }
 
         try {
+            console.log(`Initiating Chapa transaction for store ${params.storeId}, amount: ${formattedAmount}`);
             const response = await fetch('https://api.chapa.co/v1/transaction/initialize', {
                 method: 'POST',
                 headers: {
@@ -66,7 +85,7 @@ export class PaymentService {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    amount: params.amount,
+                    amount: formattedAmount,
                     currency: 'ETB',
                     email: params.email,
                     first_name: params.firstName,
@@ -82,11 +101,27 @@ export class PaymentService {
             });
 
             const data = await response.json();
-            console.log('Chapa Initialization Response:', data);
-            return data; // Returns { status, message, data: { checkout_url } }
-        } catch (error) {
-            console.error('Chapa Initialization Error:', error);
-            throw new Error('Failed to initialize payment with Chapa');
+            
+            if (!response.ok || data.status === 'failed') {
+                console.error('Chapa API Error Response:', data);
+                return {
+                    status: 'error',
+                    message: data.message || 'Chapa initialization failed',
+                    error: data
+                };
+            }
+
+            console.log('Chapa Initialization Success:', data.message);
+            return {
+                ...data,
+                tx_ref // Pass reference back to frontend
+            }; 
+        } catch (error: any) {
+            console.error('Chapa Initialization Network/System Error:', error);
+            return {
+                status: 'error',
+                message: `Payment system connectivity issue: ${error.message}`
+            };
         }
     }
 

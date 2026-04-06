@@ -1,101 +1,199 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { signOut, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { User, LogOut, Shield, ShieldCheck, Mail, Fingerprint, Bell, Check, ArrowRight } from "lucide-react";
+import { acceptInvitationAction } from "@/lib/actions/staff-actions";
 
 export default function ProfilePage() {
     const { data: session, update } = useSession();
     const [loading, setLoading] = useState(false);
+    const [name, setName] = useState(session?.user?.name || "");
+    const [invitations, setInvitations] = useState<any[]>([]);
+    const [invitesLoading, setInvitesLoading] = useState(true);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    useEffect(() => {
+        const fetchInvites = async () => {
+            try {
+                const res = await fetch('/api/user/invitations');
+                const data = await res.json();
+                setInvitations(data.invitations || []);
+            } catch (err) {
+                console.error("Failed to fetch protocol invitations.");
+            } finally {
+                setInvitesLoading(false);
+            }
+        };
+        if (session) fetchInvites();
+    }, [session]);
 
     if (!session) return (
         <div className="flex items-center justify-center min-h-[60vh]">
-            <p className="text-slate-500 font-bold uppercase tracking-widest animate-pulse">Initializing Session...</p>
+            <p className="text-slate-400 font-black uppercase tracking-[0.3em] animate-pulse">Synchronizing Session...</p>
         </div>
     );
+
+    const handleUpdateProfile = async () => {
+        setLoading(true);
+        setMessage(null);
+        try {
+            const res = await fetch(`/api/user/${(session.user as any).id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name })
+            });
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+
+            await update({ name }); // Update NextAuth session
+            setMessage({ type: 'success', text: 'Identity protocol updated successfully.' });
+        } catch (err: any) {
+            setMessage({ type: 'error', text: err.message || 'Failed to update identity.' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAcceptInvite = async (inviteId: string) => {
+        setLoading(true);
+        try {
+            const result = await acceptInvitationAction(inviteId);
+            if (result.error) throw new Error(result.error);
+            
+            setInvitations(prev => prev.filter(i => i._id !== inviteId));
+            setMessage({ type: 'success', text: 'Access protocol accepted. Store access granted.' });
+            
+            // Short delay then redirect to the store
+            const acceptedInvite = invitations.find(i => i._id === inviteId);
+            if (acceptedInvite?.storeId?.storeSlug) {
+                setTimeout(() => {
+                    window.location.href = `/seller/mystore`;
+                }, 1500);
+            }
+        } catch (err: any) {
+            setMessage({ type: 'error', text: err.message });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const initial = session.user.name ? session.user.name[0].toUpperCase() : "U";
 
     return (
-        <div className="max-w-4xl mx-auto px-4 md:px-6 py-10 md:py-20">
-            <div className="space-y-12">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 pb-8 md:pb-12 border-b border-slate-100">
-                    <div className="w-24 h-24 md:w-32 md:h-32 bg-slate-900 text-white rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center text-3xl md:text-4xl font-black shadow-2xl shadow-slate-200 border-4 border-white">
-                        {initial}
-                    </div>
-                    <div className="text-center md:text-left space-y-2">
-                        <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter italic uppercase">System Profile</h1>
-                        <p className="text-slate-500 font-bold text-sm md:text-lg">Manage your identity across the ecosystem.</p>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">
-                            Status: Online & Synchronized
+        <div className="max-w-2xl mx-auto px-6 py-12 md:py-24">
+            <div className="space-y-16">
+                {/* Minimalist Header */}
+                <div className="flex flex-col items-center text-center space-y-6">
+                    <div className="relative group">
+                        <div className="w-24 h-24 bg-white border-2 border-slate-900 rounded-full flex items-center justify-center text-3xl font-black shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-none transition-all duration-200">
+                            {initial}
                         </div>
+                        <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 rounded-full border-2 border-white flex items-center justify-center text-white shadow-lg">
+                            <ShieldCheck size={14} strokeWidth={3} />
+                        </div>
+                    </div>
+                    <div className="space-y-1">
+                        <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter italic">Settings Protocol</h1>
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">User ID: {(session.user as any).id?.slice(-8)}</p>
                     </div>
                 </div>
 
-                {/* Form Sections */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    <div className="space-y-2">
-                        <h3 className="text-xl font-bold text-slate-900 tracking-tight">Personal Data</h3>
-                        <p className="text-slate-400 text-sm font-medium leading-relaxed">Your public identifier and communication address.</p>
+                {/* Invitations Section (If any) */}
+                {invitations.length > 0 && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Bell size={12} className="text-blue-500" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">Pending System Invitations</span>
+                        </div>
+                        {invitations.map((invite) => (
+                            <div key={invite._id} className="bg-blue-50/50 border border-blue-100 p-6 rounded-3xl flex items-center justify-between group">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-white rounded-2xl border border-blue-100 flex items-center justify-center text-xl shadow-sm">
+                                        🏪
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-black uppercase tracking-tight text-slate-900 italic">
+                                            {invite.storeId?.storeName || "Unknown Store"}
+                                        </p>
+                                        <p className="text-[10px] font-bold text-blue-600/60 uppercase tracking-widest">
+                                            Invited by {invite.invitedBy?.name || "Admin"}
+                                        </p>
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={() => handleAcceptInvite(invite._id)}
+                                    disabled={loading}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-200 border-none"
+                                >
+                                    Accept Protocol
+                                </Button>
+                            </div>
+                        ))}
                     </div>
+                )}
 
-                    <div className="md:col-span-2 space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Full Name</label>
-                                <Input
-                                    defaultValue={session.user.name || ""}
-                                    className="h-12 rounded-xl border-slate-200 bg-slate-50/50 px-4 font-semibold text-slate-900 focus:bg-white"
-                                />
+                {/* Identity Form */}
+                <div className="space-y-8 bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100">
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2 mb-2">
+                                <User size={12} className="text-slate-400" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Display Identity</span>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Email Address</label>
-                                <Input
-                                    defaultValue={session.user.email || ""}
-                                    disabled
-                                    className="h-12 rounded-xl border-slate-100 bg-slate-100 px-4 font-mono font-bold text-slate-400 cursor-not-allowed"
-                                />
-                            </div>
+                            <Input
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="h-14 rounded-2xl border-slate-200 bg-white px-6 font-bold text-slate-900 focus:ring-2 focus:ring-blue-500/20 transition-all text-sm"
+                                placeholder="Full Name"
+                            />
                         </div>
 
-                        <div className="flex justify-end pt-4">
-                            <Button
-                                className="bg-slate-900 text-white font-black uppercase text-xs tracking-widest px-8 rounded-xl h-12 shadow-xl shadow-slate-200 hover:scale-105 transition-transform"
-                                onClick={() => setMessage({ type: 'success', text: 'Profile synchronization logic will be implemented in the next phase.' })}
-                            >
-                                Update Profile
-                            </Button>
+                        <div className="space-y-2 opacity-60">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Mail size={12} className="text-slate-400" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Core Address (Locked)</span>
+                            </div>
+                            <div className="h-14 rounded-2xl border border-slate-200 bg-slate-100/50 px-6 flex items-center font-mono font-bold text-slate-400 text-xs truncate">
+                                {session.user.email}
+                            </div>
                         </div>
                     </div>
+
+                    <Button
+                        disabled={loading || name === session.user.name}
+                        onClick={handleUpdateProfile}
+                        className="w-full h-14 bg-slate-900 hover:bg-slate-800 text-white font-black uppercase text-[11px] tracking-[0.2em] rounded-2xl shadow-xl shadow-slate-200 transition-all active:scale-95 disabled:opacity-50 disabled:grayscale"
+                    >
+                        {loading ? "SYNCHRONIZING..." : "Save Changes"}
+                    </Button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-8">
-                    <div className="space-y-2">
-                        <h3 className="text-xl font-bold text-slate-900 tracking-tight">Security</h3>
-                        <p className="text-slate-400 text-sm font-medium leading-relaxed">Manage your authentication protocol and credentials.</p>
-                    </div>
-
-                    <div className="md:col-span-2 space-y-4">
-                        <button className="w-full flex items-center justify-between p-6 bg-slate-50/50 border border-slate-200 rounded-2xl hover:border-slate-900 transition-colors group">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:text-slate-900 border border-slate-100 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-black text-slate-900 text-sm">Update Password</p>
-                                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Enhanced Encryption Protocol</p>
-                                </div>
+                {/* Account Actions */}
+                <div className="space-y-4">
+                    <button 
+                        onClick={() => signOut({ callbackUrl: '/' })}
+                        className="w-full flex items-center justify-between p-6 bg-white border border-slate-100 rounded-3xl hover:border-red-200 hover:bg-red-50/30 transition-all group shadow-sm"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <LogOut size={20} strokeWidth={2.5} />
                             </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-slate-300 group-hover:text-slate-900"><path d="m9 18 6-6-6-6" /></svg>
-                        </button>
-                    </div>
+                            <div className="text-left">
+                                <p className="font-black text-slate-900 text-sm italic uppercase">Sign Out</p>
+                                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Terminate Current Session</p>
+                            </div>
+                        </div>
+                        <div className="w-8 h-8 rounded-full border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-red-500 group-hover:border-red-200 transition-all">
+                            <ArrowRight size={14} />
+                        </div>
+                    </button>
                 </div>
 
                 {message && (
-                    <div className={`p-4 rounded-xl border font-bold text-sm text-center ${message.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-red-50 border-red-100 text-red-600'}`}>
+                    <div className={`p-5 rounded-2xl border font-black text-[11px] uppercase tracking-widest text-center animate-in fade-in slide-in-from-top-2 duration-300 ${message.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
                         {message.text}
                     </div>
                 )}

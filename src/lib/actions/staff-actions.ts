@@ -8,6 +8,8 @@ import dbConnect from "../db/mongoose";
 import User from "../models/user";
 import Store from "../models/store";
 
+import Invitation from "../models/invitation";
+
 export type ActionState = {
     success?: boolean;
     error?: string;
@@ -16,9 +18,7 @@ export type ActionState = {
 
 /**
  * Action to invite a staff member to a store via email.
- * If the user is already registered, they are added directly.
- * If not, they are added to a "pending" list (or marked as editor by default).
- * Per user request: "all grant on the store no manager and editor roles".
+ * This creates a formal Invitation record that the user can accept.
  */
 export async function inviteStaffAction(storeId: string, email: string): Promise<ActionState> {
     try {
@@ -34,51 +34,78 @@ export async function inviteStaffAction(storeId: string, email: string): Promise
             return { error: "Only the store owner can invite staff." };
         }
 
-        // 2. Check if user exists
-        const invitedUser = await User.findOne({ email });
+        // 2. Check if already staff
+        const isAlreadyStaff = store.staff.some((s: any) => s.email.toLowerCase() === email.toLowerCase());
+        if (isAlreadyStaff) return { error: "User is already a staff member or pending." };
 
-        if (invitedUser) {
-            // Check if already staff
-            const isAlreadyStaff = store.staff.some((s: any) => s.userId.toString() === invitedUser._id.toString());
-            if (isAlreadyStaff) return { error: "User is already a staff member." };
+        // 3. Create or Update Invitation
+        await Invitation.findOneAndUpdate(
+            { storeId, email: email.toLowerCase() },
+            { 
+                invitedBy: session.user.id,
+                status: 'pending',
+                role: 'manager'
+            },
+            { upsert: true, new: true }
+        );
 
-            // Add as staff with "manager" level grants (no differentiation as requested)
-            store.staff.push({
-                userId: invitedUser._id,
-                email: invitedUser.email,
-                role: 'manager' // Granting "all" by default as requested
-            });
-            await store.save();
-        } else {
-            // Per requirement: "invited staff have to be register to the website if not registered"
-            // Check if email already in pending/staff list
-            const isEmailInStaff = store.staff.some((s: any) => s.email === email);
-            if (isEmailInStaff) return { error: "An invitation has already been sent to this email." };
+        // Generate invitation link (redirects to platform)
+        const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+        const inviteLink = `${baseUrl}/auth/register?inviteEmail=${encodeURIComponent(email)}&storeId=${store._id}`;
 
-            store.staff.push({
-                email: email,
-                role: 'manager' // Unified role
-            });
-            await store.save();
-
-            // Generate invitation link for new users
-            const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-            const inviteLink = `${baseUrl}/auth/register?inviteEmail=${encodeURIComponent(email)}&storeId=${store._id}`;
-
-            // SIMULATED EMAIL LOG
-            console.log("\n--- SIMULATED PROTOCOL EMAIL ---");
-            console.log(`To: ${email}`);
-            console.log(`Subject: Invitation to join ${store.storeName} Staff`);
-            console.log(`Message: You have been invited to manage ${store.storeName}.`);
-            console.log(`Register here: ${inviteLink}`);
-            console.log("-------------------------------\n");
-        }
+        // SIMULATED EMAIL LOG
+        console.log("\n--- PROFESSIONAL PROTOCOL EMAIL ---");
+        console.log(`To: ${email}`);
+        console.log(`Subject: [ACTION REQ] Invitation to manage ${store.storeName}`);
+        console.log(`Link: ${inviteLink}`);
+        console.log("-----------------------------------\n");
 
         revalidatePath("/seller/mystore");
         return { success: true };
     } catch (error: any) {
         console.error("[inviteStaffAction] Error:", error);
-        return { error: "Failed to invite staff", details: error.message };
+        return { error: "Failed to initialize invitation protocol.", details: error.message };
+    }
+}
+
+/**
+ * Action to accept a store invitation.
+ */
+export async function acceptInvitationAction(invitationId: string): Promise<ActionState> {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user) return { error: "Unauthorized" };
+
+        await dbConnect();
+
+        const invitation = await Invitation.findById(invitationId).populate('storeId');
+        if (!invitation || invitation.status !== 'pending') {
+            return { error: "Invitation not found or no longer valid." };
+        }
+
+        if (invitation.email.toLowerCase() !== session.user.email?.toLowerCase()) {
+            return { error: "This invitation is not addressed to your identity." };
+        }
+
+        const store = await Store.findById(invitation.storeId);
+        if (!store) return { error: "Store no longer exists." };
+
+        // Add to staff
+        store.staff.push({
+            userId: session.user.id,
+            email: session.user.email,
+            role: invitation.role
+        });
+
+        invitation.status = 'accepted';
+        await Promise.all([store.save(), invitation.save()]);
+
+        revalidatePath("/profile");
+        revalidatePath("/seller/mystore");
+        
+        return { success: true };
+    } catch (error: any) {
+        return { error: "Failed to accept protocol invitation." };
     }
 }
 

@@ -43,7 +43,12 @@ const features = [
     }
 ];
 
+import { useSession } from "next-auth/react";
+
 export function FeatureBar() {
+    const { data: session } = useSession();
+    const storeId = (session?.user as any)?.storeId;
+
     return (
         <div className="w-full bg-white border-b border-slate-100 py-1 px-1 md:px-2 overflow-x-auto thin-scrollbar shadow-sm sticky top-[72px] md:top-[88px] z-40">
             <div className="max-w-full flex items-center justify-start gap-2.5 min-w-max">
@@ -59,10 +64,10 @@ export function FeatureBar() {
                 ))}
 
                 <Link
-                    href="/stores/create"
+                    href={storeId ? "/seller/mystore" : "/stores/create"}
                     className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 text-slate-900 border border-slate-200 font-black text-[11px] uppercase tracking-wider hover:bg-white hover:border-slate-900 transition-all active:scale-95 whitespace-nowrap shadow-sm ml-auto"
                 >
-                    Create Store Freely
+                    {storeId ? "My Store Dashboard" : "Create Store Freely"}
                     <ChevronRight className="w-3 h-3 text-slate-400" />
                 </Link>
             </div>
