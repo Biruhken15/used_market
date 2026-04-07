@@ -108,7 +108,9 @@ export async function createStoreAction(formData: FormData): Promise<ActionState
 
         return { success: true };
     } catch (error: any) {
-        console.error("[createStoreAction] Error:", error);
+        console.error("❌ [STORE_CREATION_FAILED] Reason:", error.message || error);
+        if (error.stack) console.error("   Details:", error.stack);
+        
         return {
             error: "Store Creation Failed",
             details: error.message || "An unexpected error occurred while creating your store."

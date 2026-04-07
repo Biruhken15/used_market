@@ -14,7 +14,8 @@ const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
     serverActions: {
-      bodySizeLimit: '10mb',
+      bodySizeLimit: '50mb',
+      allowedOrigins: ['localhost:3000', 'ethiousedmarket.up.railway.app', 'kesewejmarket-production.up.railway.app'],
     },
   },
 };

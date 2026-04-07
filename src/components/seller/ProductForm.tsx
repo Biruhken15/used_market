@@ -112,6 +112,7 @@ export default function ProductForm({ initialData, isEditing = false, productId,
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
         const limit = planLimits?.imagesPerProduct || 3;
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
 
         if (imageFiles.length + files.length > limit) {
             setError({
@@ -120,6 +121,19 @@ export default function ProductForm({ initialData, isEditing = false, productId,
             });
             return;
         }
+
+        // Validate file size for each image
+        for (const file of files) {
+            if (file.size > MAX_FILE_SIZE) {
+                setError({
+                    message: "File Too Large",
+                    details: `The image "${file.name}" is over 10MB. Please use a compressed or lower-resolution photo, especially on mobile devices.`
+                });
+                return;
+            }
+        }
+        
+        setError(null);
 
         const newFiles = [...imageFiles, ...files];
         setImageFiles(newFiles);

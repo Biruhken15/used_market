@@ -123,7 +123,9 @@ export async function createProductAction(formData: FormData): Promise<ActionSta
 
         return { success: true };
     } catch (error: any) {
-        console.error("[createProductAction] Error:", error);
+        console.error("❌ [PRODUCT_CREATION_FAILED] Reason:", error.message || error);
+        if (error.stack) console.error("   Details:", error.stack);
+        
         return {
             error: "Listing Creation Failed",
             details: error.message || "An unexpected error occurred."

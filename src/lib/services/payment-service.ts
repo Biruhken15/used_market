@@ -43,16 +43,20 @@ export class PaymentService {
         });
 
         // 3. Chapa Integration Logic & URL Normalization
-        const rawBaseUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || '';
+        let rawBaseUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || '';
         
         // Remove trailing slash if exists to prevent double slashes //
-        const baseUrl = rawBaseUrl.replace(/\/$/, "");
+        let baseUrl = rawBaseUrl.replace(/\/$/, "");
+        
+        if (baseUrl && !/^https?:\/\//i.test(baseUrl)) {
+            baseUrl = `https://${baseUrl}`;
+        }
         
         if (!baseUrl || !baseUrl.startsWith('http')) {
             console.error('CRITICAL: Payment system lacks a valid absolute Base URL (NEXTAUTH_URL or APP_URL).', { baseUrl });
             return {
                 status: 'error',
-                message: 'Payment configuration error: Invalid or missing Site URL. Please configure NEXTAUTH_URL.'
+                message: 'Payment configuration error: Invalid or missing Site URL. Please configure NEXTAUTH_URL or APP_URL.'
             };
         }
 
