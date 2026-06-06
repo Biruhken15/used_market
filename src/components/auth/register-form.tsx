@@ -80,7 +80,7 @@ export const RegisterForm = () => {
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto relative px-2 py-10 md:py-20">
+        <div className="w-full max-w-md mx-auto relative px-2 py-10 md:py-20">
             <div className="p-6 md:p-10 bg-white border-2 border-slate-200 rounded-[2rem] shadow-sm">
                 <div className="text-center mb-10">
                     <Link href="/" className="inline-flex items-center gap-2 mb-6 group/logo">
@@ -88,14 +88,14 @@ export const RegisterForm = () => {
                             <img src="/ethiopian-mascot.png" alt="Logo" className="w-full h-full object-contain" />
                         </div>
                         <div className="flex flex-col items-start -space-y-1">
-                            <span className="font-black text-2xl tracking-tighter text-slate-950 uppercase italic leading-none">KesewEj</span>
+                            <span className="font-black text-2xl tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-600 uppercase italic leading-none">KesewEj</span>
                             <span className="text-[11px] font-bold text-violet-600 uppercase tracking-widest italic ml-0.5">ከሰው እጅ</span>
                         </div>
                     </Link>
 
                     <h1 className="text-3xl font-black text-slate-950 tracking-tighter mb-2">Create Account</h1>
-                    <p className="text-slate-500 font-bold text-sm">Join the platform today</p>
-                    <p className="text-emerald-600 font-black text-[10px] uppercase tracking-widest mt-4 p-2 bg-emerald-50 rounded-lg inline-block border border-emerald-100 italic">
+                    <p className="text-violet-600 font-bold text-sm">Join KesewEj today</p>
+                    <p className="text-violet-600 font-black text-[10px] uppercase tracking-widest mt-4 p-2 bg-violet-50 rounded-lg inline-block border border-violet-100 italic">
                         "Your portal to professional trade."
                     </p>
                 </div>
@@ -160,7 +160,7 @@ export const RegisterForm = () => {
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="h-14 w-full rounded-xl bg-slate-950 text-white font-black text-xs uppercase tracking-widest hover:bg-violet-600 shadow-xl shadow-slate-100 transition-all border-none"
+                            className="h-14 w-full rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 text-white font-black text-xs uppercase tracking-widest hover:from-violet-700 hover:to-pink-700 shadow-xl shadow-slate-100 transition-all border-none"
                         >
                             {isLoading ? "Registering..." : "Register"}
                         </Button>

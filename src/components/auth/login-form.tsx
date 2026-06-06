@@ -51,7 +51,7 @@ export const LoginForm = () => {
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto relative px-2 py-10 md:py-20">
+        <div className="w-full max-w-md mx-auto relative px-2 py-10 md:py-20">
             <div className="p-6 md:p-10 bg-white border-2 border-slate-200 rounded-[2rem] shadow-sm">
                 <div className="text-center mb-10">
                     <Link href="/" className="inline-flex items-center gap-2 mb-6 group/logo">
@@ -59,13 +59,13 @@ export const LoginForm = () => {
                             <img src="/ethiopian-mascot.png" alt="Logo" className="w-full h-full object-contain" />
                         </div>
                         <div className="flex flex-col items-start -space-y-1">
-                            <span className="font-black text-2xl tracking-tighter text-slate-950 uppercase italic leading-none">KesewEj</span>
+                            <span className="font-black text-2xl tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-600 uppercase italic leading-none">KesewEj</span>
                             <span className="text-[11px] font-bold text-violet-600 uppercase tracking-widest italic ml-0.5">ከሰው እጅ</span>
                         </div>
                     </Link>
 
                     <h1 className="text-3xl font-black text-slate-950 tracking-tighter mb-2">Log In</h1>
-                    <p className="text-slate-500 font-bold text-sm">Log into your account</p>
+                    <p className="text-violet-600 font-bold text-sm">Log into your account</p>
                     <p className="text-violet-600 font-black text-[10px] uppercase tracking-widest mt-4 p-2 bg-violet-50 rounded-lg inline-block border border-violet-100 italic">
                         "Pay a little, enjoy big commissions."
                     </p>
@@ -127,7 +127,7 @@ export const LoginForm = () => {
                     <Button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full h-12 rounded-xl bg-slate-950 text-white font-bold text-sm hover:bg-violet-600 active:scale-[0.98] transition-all border-none relative overflow-hidden group/btn"
+                        className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 text-white font-bold text-sm hover:from-violet-700 hover:to-pink-700 active:scale-[0.98] transition-all border-none relative overflow-hidden group/btn"
                     >
                         <span className="relative z-10 flex items-center justify-center gap-2">
                             {isLoading ? "Logging in..." : "Log In"}

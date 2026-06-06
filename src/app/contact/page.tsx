@@ -50,7 +50,7 @@ export default function ContactPage() {
 
                         <div className="space-y-8 mb-12">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-violet-500 rounded-2xl">
+                                <div className="p-3 bg-violet-600 rounded-2xl">
                                     <MessageSquare className="w-6 h-6" />
                                 </div>
                                 <span className="text-xl">Available 24/7 for you</span>
@@ -58,9 +58,9 @@ export default function ContactPage() {
                         </div>
 
                         <div className="flex gap-4">
-                            <a href="#" className="p-4 bg-violet-500 rounded-full hover:bg-violet-400 transition-colors"><Instagram className="w-5 h-5" /></a>
-                            <a href="#" className="p-4 bg-violet-500 rounded-full hover:bg-violet-400 transition-colors"><Twitter className="w-5 h-5" /></a>
-                            <a href="#" className="p-4 bg-violet-500 rounded-full hover:bg-violet-400 transition-colors"><Facebook className="w-5 h-5" /></a>
+                            <a href="#" className="p-4 bg-violet-600 rounded-full hover:bg-violet-700 transition-colors"><Instagram className="w-5 h-5" /></a>
+                            <a href="#" className="p-4 bg-violet-600 rounded-full hover:bg-violet-700 transition-colors"><Twitter className="w-5 h-5" /></a>
+                            <a href="#" className="p-4 bg-violet-600 rounded-full hover:bg-violet-700 transition-colors"><Facebook className="w-5 h-5" /></a>
                         </div>
                     </div>
 
@@ -83,6 +83,14 @@ export default function ContactPage() {
                                         className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
                                     />
                                 </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-700">Phone</label>
+                                    <input 
+                                        type="tel" 
+                                        placeholder="0912 345 678"
+                                        className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
+                                    />
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-slate-700">Subject</label>
@@ -100,7 +108,7 @@ export default function ContactPage() {
                                     className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all resize-none"
                                 ></textarea>
                             </div>
-                            <button className="w-full bg-violet-600 text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-violet-700 transition-colors shadow-lg shadow-violet-200">
+                            <button className="w-full bg-violet-600 text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-violet-700 transition-colors">
                                 <Send className="w-5 h-5" />
                                 Send Message
                             </button>
