@@ -39,6 +39,11 @@ export const BottomNav = () => {
             }
         } catch (error: any) {
             if (error.name === 'AbortError') return;
+            // Handle offline, connection refused, or server restart gracefully
+            if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+                console.warn("BottomNav: Network disconnected or server unreachable.");
+                return;
+            }
             console.error("Error fetching bottom nav data:", error);
         }
     };
@@ -82,6 +87,8 @@ export const BottomNav = () => {
             href: "/",
             badge: undefined,
             protected: false,
+            iconColor: "text-violet-600",
+            activeBg: "bg-violet-50"
         },
         {
             icon: Heart,
@@ -89,6 +96,8 @@ export const BottomNav = () => {
             href: "/favorites",
             badge: unreadFavorites,
             protected: true,
+            iconColor: "text-rose-500",
+            activeBg: "bg-rose-50"
         },
         {
             icon: MessageCircle,
@@ -96,6 +105,8 @@ export const BottomNav = () => {
             href: "/chat",
             badge: unreadTotal,
             protected: true,
+            iconColor: "text-sky-500",
+            activeBg: "bg-sky-50"
         },
         {
             icon: Store,
@@ -103,6 +114,8 @@ export const BottomNav = () => {
             href: "/seller/mystore",
             badge: undefined,
             protected: true,
+            iconColor: "text-violet-600",
+            activeBg: "bg-violet-50"
         },
         {
             icon: Bell,
@@ -110,6 +123,8 @@ export const BottomNav = () => {
             href: "/notifications",
             badge: unreadNotifications,
             protected: true,
+            iconColor: "text-amber-500",
+            activeBg: "bg-amber-50"
         },
     ];
 
@@ -124,9 +139,9 @@ export const BottomNav = () => {
                         <button
                             key={item.label}
                             onClick={() => item.protected ? handleProtectedNav(item.href) : router.push(item.href)}
-                            className={`relative flex flex-col items-center justify-center min-w-[64px] transition-colors py-1 ${isActive ? 'text-violet-600' : 'text-slate-400'}`}
+                            className={`relative flex flex-col items-center justify-center min-w-[64px] transition-colors py-1 ${isActive ? 'text-slate-900' : 'text-slate-700'}`}
                         >
-                            <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-violet-50 text-violet-600' : 'bg-transparent'}`}>
+                            <div className={`p-1.5 rounded-xl transition-colors ${isActive ? item.activeBg : 'bg-transparent'} ${item.iconColor}`}>
                                 <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
                                 {!session && item.protected && (
                                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-slate-200 rounded-full flex items-center justify-center border-2 border-white">
@@ -134,7 +149,7 @@ export const BottomNav = () => {
                                     </div>
                                 )}
                             </div>
-                            <span className={`text-[9px] font-black uppercase tracking-widest mt-1.5 transition-colors ${isActive ? 'text-slate-900' : 'text-slate-500'}`}>
+                            <span className={`text-[9px] font-black uppercase tracking-widest mt-1.5 transition-colors ${isActive ? 'text-slate-900' : 'text-slate-700'}`}>
                                 {item.label}
                             </span>
                             {item.badge !== undefined && item.badge > 0 && (

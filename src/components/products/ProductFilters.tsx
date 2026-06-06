@@ -106,7 +106,7 @@ export function ProductFilters() {
     );
 
     return (
-        <div className="w-full bg-white/50 backdrop-blur-md sticky top-20 z-40 border-b border-slate-100 py-4 mb-4 md:mb-8" ref={dropdownRef}>
+        <div className="w-full bg-slate-50/80 backdrop-blur-md sticky top-20 z-40 border-b border-slate-200 py-4 mb-4 md:mb-8" ref={dropdownRef}>
             <div className="max-w-7xl mx-auto px-4 md:px-10 flex items-center relative">
                 {/* Horizontal scroll container */}
                 <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1 md:pb-0 w-full md:w-auto md:flex-wrap">
@@ -191,7 +191,7 @@ export function ProductFilters() {
                                                     placeholder="From"
                                                     value={minPrice}
                                                     onChange={(e) => setMinPrice(e.target.value)}
-                                                    className="w-full h-12 px-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 transition-all placeholder:text-slate-300"
+                                                    className="w-full h-12 px-4 bg-white border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 transition-all placeholder:text-slate-300"
                                                 />
                                             </div>
                                             <div className="h-[2px] w-4 bg-slate-200 shrink-0" />
@@ -201,7 +201,7 @@ export function ProductFilters() {
                                                     placeholder="To"
                                                     value={maxPrice}
                                                     onChange={(e) => setMaxPrice(e.target.value)}
-                                                    className="w-full h-12 px-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 transition-all placeholder:text-slate-300"
+                                                    className="w-full h-12 px-4 bg-white border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 transition-all placeholder:text-slate-300"
                                                 />
                                             </div>
                                         </div>

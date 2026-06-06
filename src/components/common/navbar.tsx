@@ -30,7 +30,12 @@ export const Navbar = () => {
                 setNotifications(data.notifications);
                 setUnreadNotifications(data.unreadCount);
             }
-        } catch (error) {
+        } catch (error: any) {
+            if (error.name === 'AbortError') return;
+            if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+                console.warn("Navbar: Network disconnected or server unreachable while fetching notifications.");
+                return;
+            }
             console.error("Error fetching notifications:", error);
         }
     };
@@ -58,7 +63,12 @@ export const Navbar = () => {
             if (res.ok) {
                 setUnreadFavorites(data.unreadCount || 0);
             }
-        } catch (error) {
+        } catch (error: any) {
+            if (error.name === 'AbortError') return;
+            if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+                console.warn("Navbar: Network disconnected or server unreachable while fetching favorites.");
+                return;
+            }
             console.error("Error fetching unread count:", error);
         }
     };
@@ -130,10 +140,10 @@ export const Navbar = () => {
                                         }}
                                         className="p-2 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav relative flex flex-col items-center gap-1"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-violet-500 transition-colors"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
-                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">Favorites</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-rose-500 transition-colors"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
+                                        <span className="text-[9px] font-black text-slate-800 uppercase tracking-wider">Favorites</span>
                                         {unreadFavorites > 0 && (
-                                            <div className="absolute top-1 right-1 w-4 h-4 bg-violet-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black">
+                                            <div className="absolute top-1 right-1 w-4 h-4 bg-rose-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black">
                                                 {unreadFavorites}
                                             </div>
                                         )}
@@ -145,18 +155,18 @@ export const Navbar = () => {
                                                 onClick={() => router.push('/seller/mystore')}
                                                 className="p-2 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav flex flex-col items-center gap-1"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-violet-600 transition-colors"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">My Store</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-violet-600 transition-colors"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                                                <span className="text-[9px] font-black text-slate-800 uppercase tracking-wider">My Store</span>
                                             </button>
                                             
                                             <button
                                                 onClick={() => router.push('/chat')}
                                                 className="p-2 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav relative flex flex-col items-center gap-1"
                                             >
-                                                <MessageCircle className="w-5 h-5 text-slate-400 group-hover/nav:text-violet-600 transition-colors" strokeWidth={2.5} />
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">Messages</span>
+                                                <MessageCircle className="w-5 h-5 text-sky-500 transition-colors" strokeWidth={2.5} />
+                                                <span className="text-[9px] font-black text-slate-800 uppercase tracking-wider">Messages</span>
                                                 {unreadTotal > 0 && (
-                                                    <div className="absolute top-1 right-1 w-4 h-4 bg-violet-600 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black animate-pulse">
+                                                    <div className="absolute top-1 right-1 w-4 h-4 bg-sky-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black animate-pulse">
                                                         {unreadTotal}
                                                     </div>
                                                 )}
@@ -169,10 +179,10 @@ export const Navbar = () => {
                                                 }}
                                                 className="p-2 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all group/nav relative flex flex-col items-center gap-1"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover/nav:text-violet-600 transition-colors"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider group-hover/nav:text-slate-600">Alerts</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500 transition-colors"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+                                                <span className="text-[9px] font-black text-slate-800 uppercase tracking-wider">Alerts</span>
                                                 {unreadNotifications > 0 && (
-                                                    <div className="absolute top-1 right-1 w-4 h-4 bg-violet-600 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black animate-pulse">
+                                                    <div className="absolute top-1 right-1 w-4 h-4 bg-amber-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black animate-pulse">
                                                         {unreadNotifications}
                                                     </div>
                                                 )}

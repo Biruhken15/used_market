@@ -26,6 +26,28 @@ interface ProductCardProps {
     isLoggedIn?: boolean;
 }
 
+const formatCondition = (condition?: string) => {
+    if (!condition) return 'Item';
+    switch (condition) {
+        case 'new':
+            return 'New';
+        case 'like-new':
+            return 'Like New';
+        case 'good':
+            return 'Good';
+        case 'fair':
+            return 'Fair';
+        case 'for-parts':
+            return 'For Parts';
+        default:
+            return condition
+                .toString()
+                .split(/[-_\s]+/)
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+    }
+};
+
 export const ProductCard = memo(({ product, initialIsFavorited = false, isLoggedIn = false }: ProductCardProps) => {
     const router = useRouter();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -86,7 +108,7 @@ export const ProductCard = memo(({ product, initialIsFavorited = false, isLogged
                     <div className="z-10 bg-gray-50 border-b border-gray-400/20 py-1 px-2 flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                             <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">
-                                {product.condition || "Item"}
+                                {formatCondition(product.condition)}
                             </span>
                             <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-sm border ${
                                 product.saleType === 'rent' 
@@ -117,13 +139,13 @@ export const ProductCard = memo(({ product, initialIsFavorited = false, isLogged
 
                         <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
                             {product.isUrgent && !product.isUrgentExpired && (
-                                <span className="bg-rose-600 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-sm shadow-xl shadow-rose-100 flex items-center gap-1">
+                                <span className="bg-rose-600 text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-sm shadow-xl shadow-rose-100 flex items-center gap-1">
                                     <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
                                     Urgent
                                 </span>
                             )}
                             {product.isFeatured && (
-                                <span className="bg-fuchsia-600 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-sm shadow-xl shadow-fuchsia-100 flex items-center gap-1">
+                                <span className="bg-emerald-600 text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-sm shadow-xl shadow-emerald-100 flex items-center gap-1">
                                     <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
                                     Featured
                                 </span>

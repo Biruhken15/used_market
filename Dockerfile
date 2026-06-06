@@ -15,6 +15,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Next.js collects completely anonymous telemetry data about general usage.
 ENV NEXT_TELEMETRY_DISABLED=1
+# Provide dummy env vars so Next.js build doesn't fail when referencing them
+ENV NEXTAUTH_SECRET="build_placeholder"
+ENV MONGODB_URI="mongodb://localhost:27017/placeholder"
+ENV NEXTAUTH_URL="https://ethiousedmarket.up.railway.app"
 RUN npm run build
 
 # Production image, copy all the files and run next
