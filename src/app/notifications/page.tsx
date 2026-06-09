@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
 import { Navbar } from "@/components/common/navbar";
-import { Bell, Info, AlertTriangle, CheckCircle, Gift, ArrowLeft, Trash2 } from "lucide-react";
+import { Bell, Info, AlertTriangle, CheckCircle, Gift, ArrowLeft, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function NotificationsPage() {
+    const router = useRouter();
     const { data: session, status } = useSession();
     const [notifications, setNotifications] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -89,14 +90,23 @@ export default function NotificationsPage() {
                             <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mt-0.5">Protocol Updates</p>
                         </div>
                     </div>
-                    {notifications.length > 0 && (
-                        <button 
-                            onClick={markAllAsRead}
-                            className="text-[10px] font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors flex items-center gap-2"
+                    <div className="flex items-center gap-3">
+                        {notifications.length > 0 && (
+                            <button 
+                                onClick={markAllAsRead}
+                                className="text-[10px] font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors flex items-center gap-2"
+                            >
+                                Mark all as read
+                            </button>
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => router.back()}
+                            className="w-10 h-10 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-white hover:bg-slate-900 transition-colors flex items-center justify-center shadow-sm"
                         >
-                            Mark all as read
+                            <X className="w-4 h-4" />
                         </button>
-                    )}
+                    </div>
                 </div>
 
                 {/* Notifications List */}
@@ -106,7 +116,7 @@ export default function NotificationsPage() {
                             <div 
                                 key={notif._id}
                                 className={`bg-white p-6 rounded-[2rem] border transition-all duration-300 relative overflow-hidden ${
-                                    notif.read ? "border-slate-100 opacity-60" : "border-indigo-600/10 shadow-2xl shadow-indigo-100/30"
+                                    notif.read ? "border-slate-200 shadow-sm" : "border-indigo-600/10 shadow-2xl shadow-indigo-100/30"
                                 }`}
                             >
                                 <div className="flex gap-5">
@@ -115,7 +125,7 @@ export default function NotificationsPage() {
                                     </div>
                                     <div className="space-y-1 pr-8">
                                         <h3 className="text-[15px] font-black text-slate-900 tracking-tight leading-tight uppercase italic">{notif.title}</h3>
-                                        <p className="text-[13px] text-slate-500 font-medium leading-relaxed">{notif.message}</p>
+                                        <p className="text-[13px] text-slate-700 font-medium leading-relaxed">{notif.message}</p>
                                         <div className="flex items-center gap-3 pt-2">
                                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
                                                 {new Date(notif.createdAt).toLocaleDateString(undefined, {

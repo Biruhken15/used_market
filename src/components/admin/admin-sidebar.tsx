@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiUsers, FiShoppingBag, FiBox, FiActivity, FiHome } from "react-icons/fi";
+import { FiUsers, FiShoppingBag, FiBox, FiActivity, FiHome, FiMessageSquare } from "react-icons/fi";
 
 export function AdminSidebar() {
     const pathname = usePathname();
@@ -12,6 +12,7 @@ export function AdminSidebar() {
         { name: "Users", href: "/admin/users", icon: FiUsers },
         { name: "Stores", href: "/admin/stores", icon: FiShoppingBag },
         { name: "Products", href: "/admin/products", icon: FiBox },
+        { name: "Contact Messages", href: "/admin/contact-messages", icon: FiMessageSquare },
         { name: "Subscriptions", href: "/admin/subscriptions", icon: FiActivity },
     ];
 

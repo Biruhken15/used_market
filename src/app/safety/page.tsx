@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { ShieldCheck, UserCheck, Smartphone, Eye, MapPin, AlertTriangle } from 'lucide-react';
 
 export const metadata = {
@@ -61,9 +62,9 @@ export default function SafetyPage() {
                         <h2 className="text-3xl font-bold mb-4">Report Suspicious Activity</h2>
                         <p className="text-lg opacity-80 leading-relaxed">Seen something that doesn't look right? Help us keep the community safe by reporting any suspicious listings or behaviors.</p>
                     </div>
-                    <button className="bg-pink-500 text-white px-10 py-4 rounded-full font-bold hover:bg-pink-600 transition-colors shrink-0">
+                    <Link href="/contact" className="bg-pink-500 text-white px-10 py-4 rounded-full font-bold hover:bg-pink-600 transition-colors shrink-0 inline-flex items-center justify-center">
                         Report an Issue
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -50,10 +51,14 @@ const formatCondition = (condition?: string) => {
 
 export const ProductCard = memo(({ product, initialIsFavorited = false, isLoggedIn = false }: ProductCardProps) => {
     const router = useRouter();
+    const { data: session } = useSession();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [isThinking, setIsThinking] = useState(false);
+
+    // Determine if user is logged in from session or prop
+    const userIsLoggedIn = isLoggedIn || !!session?.user;
 
     // Sync with initial state if it changes
     useEffect(() => {
@@ -64,7 +69,7 @@ export const ProductCard = memo(({ product, initialIsFavorited = false, isLogged
         e.preventDefault();
         e.stopPropagation();
 
-        if (!isLoggedIn) {
+        if (!userIsLoggedIn) {
             alert("Please register first to favorite products.");
             router.push('/auth/register');
             return;
@@ -90,7 +95,7 @@ export const ProductCard = memo(({ product, initialIsFavorited = false, isLogged
     const handleShare = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!isLoggedIn) {
+        if (!userIsLoggedIn) {
             alert("Please register first to share products.");
             router.push('/auth/register');
             return;
@@ -151,6 +156,23 @@ export const ProductCard = memo(({ product, initialIsFavorited = false, isLogged
                                 </span>
                             )}
                         </div>
+
+                        <button
+                            onClick={handleFavorite}
+                            disabled={isThinking}
+                            className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                            title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                        >
+                            {isFavorited ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-rose-500">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-400 hover:text-rose-500 transition-colors">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                </svg>
+                            )}
+                        </button>
                     </div>
 
                     <div className="p-2 md:p-3 flex flex-col flex-1 gap-1">
