@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export async function middleware(req: any) {
+export async function proxy(req: any) {
     const path = req.nextUrl.pathname;
 
     const token = await getToken({
@@ -10,7 +10,7 @@ export async function middleware(req: any) {
         secureCookie: process.env.NODE_ENV === "production",
     });
     
-    // Paths targeted by this middleware are ALWAYS private (see config.matcher)
+    // Paths targeted by this proxy are ALWAYS private (see config.matcher)
     if (!token) {
         const loginUrl = new URL("/auth/login", req.nextUrl);
         loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
