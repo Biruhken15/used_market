@@ -51,20 +51,20 @@ export const NotificationSidebar = ({ isOpen, onClose, notifications, onMarkAllA
             <div className={`fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white z-[101] shadow-[-20px_0_50px_-20px_rgba(0,0,0,0.15)] border-l border-slate-100 transition-transform duration-500 ease-in-out transform ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                 <div className="flex flex-col h-full">
                     {/* Header */}
-                    <div className="p-6 border-b border-slate-100 bg-white/50 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between">
+                    <div className="p-6 border-b border-slate-100 bg-white sticky top-0 z-10 flex items-center justify-between shadow-sm">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-pink-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-100">
                                 <Bell size={20} className="animate-swing" />
                             </div>
                             <div>
                                 <h2 className="text-lg font-black text-slate-900 tracking-tighter">Alerts</h2>
-                                <p className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em]">Protocol Live</p>
+                                <p className="text-[9px] font-black uppercase text-slate-500 tracking-[0.2em]">Protocol Live</p>
                             </div>
                         </div>
                         <Button
                             variant="outline"
                             onClick={onClose}
-                            className="w-10 h-10 flex items-center justify-center p-0 rounded-xl border-slate-200 hover:border-slate-900 hover:bg-slate-900 hover:text-white transition-all shadow-sm"
+                            className="w-10 h-10 flex items-center justify-center p-0 rounded-xl border border-slate-300 bg-white text-slate-700 shadow-sm transition-colors hover:border-slate-900 hover:bg-slate-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
                             <X size={18} />
                         </Button>
@@ -76,14 +76,14 @@ export const NotificationSidebar = ({ isOpen, onClose, notifications, onMarkAllA
                             notifications.map((notif) => (
                                 <div
                                     key={notif._id}
-                                    className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer relative overflow-hidden"
+                                    className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group cursor-pointer relative overflow-hidden"
                                 >
                                     <div className="flex gap-3">
                                         <div className="shrink-0">{getIcon(notif.type)}</div>
                                         <div className="space-y-0.5">
                                             <h3 className="text-[13px] font-black text-slate-900 tracking-tight leading-tight">{notif.title}</h3>
-                                            <p className="text-[11px] text-slate-500 font-medium leading-normal">{notif.message}</p>
-                                            <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest pt-1">
+                                            <p className="text-[12px] text-slate-700 font-medium leading-normal">{notif.message}</p>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest pt-1">
                                                 {isMounted ? new Date(notif.createdAt).toLocaleDateString(undefined, {
                                                     month: 'short',
                                                     day: 'numeric'

@@ -105,8 +105,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, recipientId, on
         {/* Backdrop */}
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[90] animate-in fade-in duration-300" onClick={onClose} />
         
-        <div className="fixed inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center z-[100] p-0 sm:p-6 pointer-events-none">
-            <div className="w-full sm:w-[500px] h-[600px] sm:h-[700px] max-h-screen sm:max-h-[85vh] bg-white sm:rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] flex flex-col animate-in slide-in-from-bottom-10 duration-500 overflow-hidden border border-slate-100 pointer-events-auto">
+        <div className="fixed inset-0 sm:flex sm:items-center sm:justify-center z-[100] p-0 sm:p-6 pointer-events-none">
+            <div className="w-full sm:w-[500px] h-full max-h-screen bg-white sm:rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] flex flex-col animate-in slide-in-from-bottom-10 duration-500 overflow-hidden border border-slate-100 pointer-events-auto">
             {/* Header */}
             <div className="p-4 bg-gradient-to-r from-violet-600 to-pink-600 text-white flex items-center justify-between">
                 <div className="flex items-center gap-3">

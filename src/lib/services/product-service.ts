@@ -207,7 +207,7 @@ export class ProductService {
             { 
                 $project: {
                     title: 1, slug: 1, price: 1, priceType: 1, category: 1, 
-                    description: 1, images: 1, isUrgent: 1, isFeatured: 1, status: 1, 
+                    description: 1, images: 1, condition: 1, saleType: 1, isUrgent: 1, isFeatured: 1, status: 1, 
                     createdAt: 1, region: 1, storeId: 1, rankingScore: 1,
                     'store.storeName': 1, 'store.logo': 1, 'store.storeSlug': 1
                 }
@@ -229,7 +229,7 @@ export class ProductService {
                 { 
                     $project: {
                         title: 1, slug: 1, price: 1, priceType: 1, category: 1, 
-                        description: 1, images: 1, isUrgent: 1, isFeatured: 1, status: 1, 
+                        description: 1, images: 1, condition: 1, saleType: 1, isUrgent: 1, isFeatured: 1, status: 1, 
                         createdAt: 1, region: 1, storeId: 1,
                         'store.storeName': 1, 'store.logo': 1, 'store.storeSlug': 1
                     }
@@ -251,7 +251,7 @@ export class ProductService {
     static async getStoreProducts(storeId: string) {
         await dbConnect();
         const products = await Product.find({ storeId: new mongoose.Types.ObjectId(storeId) })
-            .select('_id title slug price priceType category description images isUrgent isFeatured status createdAt region')
+            .select('_id title slug price priceType category description images condition saleType isUrgent isFeatured status createdAt region')
             .sort({ createdAt: -1 })
             .lean();
         return serialize(products);

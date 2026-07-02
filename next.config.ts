@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   },
   reactCompiler: true,
   experimental: {
+    middlewareClientMaxBodySize: '50mb',
     serverActions: {
       bodySizeLimit: '50mb',
       allowedOrigins: ['localhost:3000', 'ethiousedmarket.up.railway.app', 'kesewejmarket-production.up.railway.app'],

@@ -154,7 +154,7 @@ export const HomeHeroFilters = ({ isMobile = false }: { isMobile?: boolean }) =>
 
             <Button
                 onClick={handleApplyFilters}
-                className="mt-auto w-full h-14 bg-gradient-to-r from-violet-600 to-pink-600 active:scale-[0.98] text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2"
+                className="mt-auto w-full h-12 bg-gradient-to-r from-violet-600 to-pink-600 active:scale-[0.98] text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2"
             >
                 <Search className="w-4 h-4" />
                 Show Results
@@ -179,8 +179,10 @@ export const HomeHeroFilters = ({ isMobile = false }: { isMobile?: boolean }) =>
     }
 
     return (
-        <div className="bg-white border border-slate-100 rounded-2xl md:rounded-[2rem] p-4 md:p-8 h-full flex flex-col shadow-sm">
-            <FilterContent />
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl md:rounded-[2rem] p-4 md:p-8 h-full flex flex-col shadow-sm">
+            <div className="bg-white rounded-[1.75rem] border border-slate-200 p-5 md:p-6 shadow-sm">
+                <FilterContent />
+            </div>
         </div>
     );
 };

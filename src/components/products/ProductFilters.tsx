@@ -94,26 +94,41 @@ export function ProductFilters() {
     const DropdownButton = ({ label, value, id, icon: Icon }: any) => (
         <button
             onClick={() => setActiveDropdown(activeDropdown === id ? null : id)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all text-[11px] font-black uppercase tracking-widest whitespace-nowrap ${value
-                    ? "bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-200"
-                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-900 hover:text-slate-900"
+            className={`flex items-center gap-2 px-4 py-3 rounded-full border text-[11px] font-black uppercase tracking-widest whitespace-nowrap transition-all ${value
+                    ? "bg-slate-950 text-white border-slate-950 shadow-xl shadow-slate-900/10"
+                    : "bg-white text-slate-700 border-slate-200 hover:border-slate-900 hover:text-slate-900"
                 }`}
         >
-            {Icon && <Icon size={14} className={value ? "text-violet-400" : "text-slate-300"} />}
+            {Icon && <Icon size={14} className={value ? "text-violet-300" : "text-slate-300"} />}
             {value || label}
             <ChevronDown size={14} className={`transition-transform duration-300 ${activeDropdown === id ? "rotate-180" : ""}`} />
         </button>
     );
 
     return (
-        <div className="w-full bg-white/50 backdrop-blur-md sticky top-20 z-40 border-b border-slate-100 py-4 mb-4 md:mb-8" ref={dropdownRef}>
-            <div className="max-w-7xl mx-auto px-4 md:px-10 flex items-center relative">
-                {/* Horizontal scroll container */}
-                <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1 md:pb-0 w-full md:w-auto md:flex-wrap">
-                    <div className="flex items-center gap-2 shrink-0 border-r border-slate-200 pr-4 mr-1 hidden md:flex">
-                        <Filter size={14} className="text-slate-900" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 italic">Filter Protocol</span>
+        <div className="w-full bg-white/95 shadow-sm sticky top-20 z-40 border border-slate-200 rounded-3xl py-5 mb-4 md:mb-8" ref={dropdownRef}>
+            <div className="max-w-7xl mx-auto px-4 md:px-10 flex flex-col gap-4">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
+                            <Filter size={18} />
+                        </div>
+                        <div>
+                            <p className="text-xs font-black uppercase tracking-[0.35em] text-slate-900">Filters</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em]">Refine category, region and price</p>
+                        </div>
                     </div>
+                    {isFiltered && (
+                        <button
+                            onClick={clearFilters}
+                            className="flex items-center gap-2 px-4 py-2 text-[10px] font-black text-slate-700 uppercase tracking-widest hover:bg-slate-100 rounded-full transition-all shrink-0"
+                        >
+                            <X size={14} />
+                            Clear All
+                        </button>
+                    )}
+                </div>
+                <div className="flex items-center gap-3 overflow-x-auto pb-1 w-full no-scrollbar">
 
                     {/* Category Dropdown */}
                     <div className="relative">
@@ -191,7 +206,7 @@ export function ProductFilters() {
                                                     placeholder="From"
                                                     value={minPrice}
                                                     onChange={(e) => setMinPrice(e.target.value)}
-                                                    className="w-full h-12 px-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 transition-all placeholder:text-slate-300"
+                                                    className="w-full h-12 px-4 bg-white border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 transition-all placeholder:text-slate-300"
                                                 />
                                             </div>
                                             <div className="h-[2px] w-4 bg-slate-200 shrink-0" />
@@ -201,7 +216,7 @@ export function ProductFilters() {
                                                     placeholder="To"
                                                     value={maxPrice}
                                                     onChange={(e) => setMaxPrice(e.target.value)}
-                                                    className="w-full h-12 px-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 transition-all placeholder:text-slate-300"
+                                                    className="w-full h-12 px-4 bg-white border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-900 transition-all placeholder:text-slate-300"
                                                 />
                                             </div>
                                         </div>

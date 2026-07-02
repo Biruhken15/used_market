@@ -207,19 +207,6 @@ export const ProductSearch = () => {
                 </div>
             )}
 
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-400">
-                <span className="uppercase tracking-widest text-[10px] opacity-60">Trending:</span>
-                {['iPhone', 'Toyota', 'Apartment', 'Laptops'].map((tag) => (
-                    <button
-                        key={tag}
-                        type="button"
-                        onClick={() => { setQuery(tag); router.push(`/products?q=${tag}`); }}
-                        className="hover:text-slate-900 transition-colors underline decoration-slate-200 decoration-2 underline-offset-4"
-                    >
-                        {tag}
-                    </button>
-                ))}
-            </div>
         </div>
     );
 };

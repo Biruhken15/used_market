@@ -4,6 +4,7 @@ import '@/lib/models/user';
 import '@/lib/models/product';
 import '@/lib/models/store';
 import '@/lib/models/message';
+import '@/lib/models/contact-message';
 import '@/lib/models/conversation';
 import '@/lib/models/notification';
 import '@/lib/models/favorite';
